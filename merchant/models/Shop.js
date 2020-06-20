@@ -6,9 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   	onlineStatus: {
   		type: DataTypes.BOOLEAN,
   		defaultValue: 1
-  	}
+  	},
+    fcmToken: DataTypes.STRING    
   }, {
-  	tableName: 'shop'
+  	tableName: 'shop',
+    timestamps: false
   });
   shop.associate = function(models) {
     // associations can be defined here

@@ -1,5 +1,6 @@
 const express = require('express');
 const {orderMaster, orderDetail, sequelize} = require('../models');
+const sendMessage = require('../middleware/firebase');
 const router = express.Router();
 
 router.get('/:orderId?/:status?', async(req, res, next)=>{
@@ -27,7 +28,15 @@ router.post('/:orderId?', async(req, res, next)=>{
 	//else orders will be added to existent order
 	try {
 		if(!req.params.orderId){
-			await sequelize.query('exec spCreateNewOrder :json', { replacements: { json: JSON.stringify(req.body) }});
+			//after new order is created notification should be sent to merchant 
+			//for receiving new order
+			const shop = await sequelize.query(
+						'DECLARE @fcmToken NVARCHAR(255); exec spCreateNewOrder :json, @fcmToken OUTPUT; select @fcmToken as fcmToken;', 
+						{ 
+							replacements: { json: JSON.stringify(req.body) }
+						}).spread((user, created)=>{ return user[0] })
+			const type = 'new_order';
+			sendMessage(shop.fcmToken, type);
 		}else{
 			await sequelize.query('exec spbulkCreateOrderDetail :json, :orderMasterId', { 
 				replacements: 

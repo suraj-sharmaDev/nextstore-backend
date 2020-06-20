@@ -1,6 +1,7 @@
 --Create new orderMaster and add children orderdetails
 CREATE PROCEDURE dbo.spCreateNewOrder
-@json NVARCHAR(max)
+@json NVARCHAR(max),
+@fcmToken NVARCHAR(255) OUTPUT
 AS
 BEGIN
 DECLARE @orderMasterId INT;
@@ -28,6 +29,10 @@ INSERT into orderDetail (productId, productName, qty, price, orderMasterId)
     qty INT '$.qty'
   )json
 
+--send back the fcmToken for the shop with provided shopId
+select @fcmToken=fcmToken from shop where id in (
+  select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
+)
 END
 
 -----------------------------------------------------

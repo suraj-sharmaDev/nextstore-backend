@@ -10,14 +10,14 @@ router.get('/:customerId', (req, res, next)=>{
 })
 
 router.post('/:customerId', async(req, res, next)=>{
-	var length = req.body.length;
-	let data = req.body;
-	const t = await sequelize.transaction(); 
-	for(let i=0; i<length; i++){
-		data[i]['customerId'] = req.params.customerId;
-	}
+	const t = await sequelize.transaction();
 	try {
-		await cart.bulkCreate(data, {transaction : t});
+		await sequelize.query('exec spbulkCreateCart :json, :customerId', { 
+			replacements: { 
+				json: JSON.stringify(req.body),
+				customerId: req.params.customerId 
+			}
+		});		
 		await t.commit();
 		res.send({message: 'created'});
 	} catch(e) {

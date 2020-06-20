@@ -3,8 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const merchant = sequelize.define('merchant', {
     firstName: DataTypes.STRING(100),
     lastName: DataTypes.STRING(100),
-    mobile: DataTypes.STRING(30),
-    fcmToken: DataTypes.STRING
+    mobile: DataTypes.STRING(30)
   }, {
     tableName: 'merchant'
   });

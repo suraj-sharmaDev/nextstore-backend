@@ -12,7 +12,10 @@ module.exports = (sequelize, DataTypes) => {
   });
   OrderDetail.associate = function(models) {
     // associations can be defined here
-    OrderDetail.belongsTo(models.orderMaster);
+    OrderDetail.belongsTo(models.orderMaster, {
+      foreignKeyConstraint: true
+    , onDelete: 'cascade'      
+    });
   };
   return OrderDetail;
 };
