@@ -3,9 +3,6 @@ const {customer, orderMaster, cart, address, sequelize} = require('../models');
 const router = express.Router();
 
 router.get('/:custId', async(req, res, next)=>{
-	// sequelize
-	//   .query('exec spCustomer_Initialize')
-	//   .then(v=>res.send(v));
 	customer.findOne({
 		where: {
 			id: req.params.custId
@@ -19,8 +16,9 @@ router.get('/:custId', async(req, res, next)=>{
 			model: address,
 		}, {
 			model: orderMaster,
+			required: false,						
 			where:{
-				status: 'pending'
+				status: 'pending',
 			}
 		}],
 	})

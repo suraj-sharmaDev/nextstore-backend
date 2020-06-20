@@ -17,7 +17,7 @@ app.use('/address', jsonParser, address);
 app.use('/cart', jsonParser, cart);
 
 app.get('/', (req, res)=>{
-	sequelize.sync({alter: true})
+	sequelize.sync()
 	.then(()=>res.json(result))
 	.catch(err=>res.json(err))
 })

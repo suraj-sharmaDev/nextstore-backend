@@ -4,8 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     productId: DataTypes.INTEGER,
     name: DataTypes.STRING(100),
     image: DataTypes.STRING(180),
-    price: DataTypes.INTEGER(4),
-    qty: DataTypes.INTEGER(3)
+    price: DataTypes.INTEGER,
+    qty: DataTypes.INTEGER
   }, {
   	// freezeTableName : true,
   	tableName : 'cart',
