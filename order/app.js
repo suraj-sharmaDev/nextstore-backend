@@ -3,7 +3,7 @@ const path = require('path');
 const {sequelize} = require('./models');
 const createError = require('http-errors');
 
-const {order} = require('./routes');
+const {order, operations} = require('./routes');
 
 const app = express();
 const port = process.env.PORT || 3002;
@@ -12,6 +12,7 @@ const port = process.env.PORT || 3002;
 const jsonParser = express.json();
 
 app.use('/order', jsonParser, order);
+app.use('/operations', jsonParser, operations);
 
 app.get('/', (req, res)=>{
 	sequelize.sync()

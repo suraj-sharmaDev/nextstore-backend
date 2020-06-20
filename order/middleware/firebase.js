@@ -23,6 +23,22 @@ const createPayload = (type) => {
 				}
 			};
 			break;
+		case 'accept_order':
+			payload = {
+				notification: {
+					title: "Order Accepted",
+					body: "You order has been accepted!"
+				}
+			};
+			break;			
+		case 'reject_order':
+			payload = {
+				notification: {
+					title: "Order Rejected",
+					body: "You order has been rejected!"
+				}
+			};
+			break;						
 		default:
 			payload = {
 				notification: {

@@ -1,5 +1,6 @@
 const order = require('./order');
-
+const operations = require('./operations');
 module.exports = {
-	order
+	order,
+	operations
 }

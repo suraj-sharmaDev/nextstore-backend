@@ -83,3 +83,49 @@ ON
     s.id = t.id;
 
 END
+
+--------------------------------------------------------
+
+--accept Order with orderId
+
+CREATE PROCEDURE dbo.spAcceptOrder
+@orderId INT, @fcmToken NVARCHAR(255) OUTPUT
+AS
+BEGIN
+
+UPDATE
+    dbo.orderMaster 
+SET
+    dbo.orderMaster.status = 'accepted'
+WHERE
+    dbo.orderMaster.id = @orderId
+
+--send back the fcmToken for the customer with provided orderId
+
+select @fcmToken=fcmToken from customer where id in (
+  select customerId from dbo.orderMaster where id = @orderId
+)  
+END
+
+--------------------------------------------------------
+
+--reject Order with orderId
+
+CREATE PROCEDURE dbo.spRejectOrder
+@orderId INT, @fcmToken NVARCHAR(255) OUTPUT
+AS
+BEGIN
+
+UPDATE
+    dbo.orderMaster 
+SET
+    dbo.orderMaster.status = 'rejected'
+WHERE
+    dbo.orderMaster.id = @orderId
+
+--send back the fcmToken for the customer with provided orderId
+
+select @fcmToken=fcmToken from customer where id in (
+  select customerId from dbo.orderMaster where id = @orderId
+)  
+END
