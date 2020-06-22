@@ -43,7 +43,7 @@ CREATE PROCEDURE dbo.spbulkCreateOrderDetail
 AS
 BEGIN
 
-INSERT into orderDetail (productId, productName, price, qty, orderMasterId )
+INSERT into orderDetail (productId, productName, qty, price, orderMasterId )
   select json.productId, json.productName, json.price, json.qty, @orderMasterId as orderMasterId 
   from openjson(@json)
   with(

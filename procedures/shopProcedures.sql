@@ -53,7 +53,9 @@ END
 
 ---Search for products in shop with keyword
 CREATE PROCEDURE dbo.spSearchInShop
-@shopId INT, @keyword NVARCHAR(100)
+@shopId INT, 
+@keyword NVARCHAR(100),
+@outputData NVARCHAR(MAX) OUTPUT
 AS
 BEGIN
 
@@ -68,9 +70,9 @@ with x(json) as (
 	and product.shopId = @shopId
 	For Json Path
 )
- select json from x
+ select @outputData=json from x
+ RETURN
 END
-
 
 ----------------------------------------------------------------
 
@@ -81,31 +83,55 @@ CREATE PROCEDURE dbo.spSearchShopsWithProduct
 @custLat FLOAT, @custLng FLOAT, @keyword NVARCHAR(100)
 AS
 BEGIN
+	DECLARE @id INT;
+	DECLARE @name NVARCHAR(100);
+	DECLARE @category NVARCHAR(30);
+	DECLARE @image NVARCHAR(100);
+	DECLARE @onlineStatus bit;
 	--This procedure is combination of two separate procedures
 	-- 1st Find all shops near the user
 	-- 2nd find products in this shop matching keyword
 	
-	DECLARE @outputTable table (
+	DECLARE @stagingTable table (
 		shopId INT,
 		name nvarchar(100),
 		category nvarchar(50),
 		onlineStatus bit,
-		image nvarchar(100)
+		image nvarchar(100),
+		distance DECIMAL(3, 3)
 	);
-	INSERT Into @outputTable exec spfindShopsNearby @custLat, @custLng;
+	DECLARE @searchFlag NVARCHAR(MAX); --to check if product exist in shop
+	INSERT Into @stagingTable exec spfindShopsNearby @custLat, @custLng;
+
 	Declare shopCursor cursor for
-		select * from @outputTable
+		select shopId, name, category, onlineStatus, image from @stagingTable
 	Open shopCursor 
-	Fetch next from shopCursor 
+	
+	Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image 
+	
 	While(@@FETCH_STATUS=0)
 	Begin
-		Fetch next from shopCursor
+		--each of the row this cursor points to is shop near this user
+		exec spSearchInShop @id, @keyword, @searchFlag OUTPUT;
+		if(@searchFlag is NULL)
+		begin
+			Delete from @stagingTable where shopId=@id
+		end
+		Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image
 	END
+	SELECT * FROM @stagingTable;
 END
+
+
+
 
 ----------------------------------------------------------------
 
 --Get all shops near to user with coordinates(lan, lng)
+
+
+
+--Select all shops near to customer
 
 CREATE PROCEDURE dbo.spfindShopsNearby
 @custLat FLOAT, @custLng FLOAT
@@ -125,7 +151,8 @@ BEGIN
 		name nvarchar(100),
 		category nvarchar(50),
 		onlineStatus bit,
-		image nvarchar(100)
+		image nvarchar(100),
+		distance DECIMAL(3, 3)
 	);
 
 	DECLARE shopCursor CURSOR 
@@ -146,8 +173,8 @@ BEGIN
 			If(@distance<=@coverage)
 			begin
 				--if user is within coverage distance add shop to output table
-				INSERT INTO @outputTable(shopId, name, category, onlineStatus, image) 
-				values (@id, @name, @category, @onlineStatus, @image);
+				INSERT INTO @outputTable(shopId, name, category, onlineStatus, image, distance) 
+				values (@id, @name, @category, @onlineStatus, @image, @distance);
 			end
 			
 			Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @coverage;

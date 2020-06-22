@@ -7,7 +7,9 @@ router.get('/:shopId', async(req, res, next)=>{
 	var searchKey = req.query.searchKey;
 	if(searchKey){
 		try {
-			const result = await sequelize.query('exec spSearchInShop :shopId, :keyword', { 
+			const result = await sequelize.query(
+							'Declare @output NVARCHAR(MAX); exec spSearchInShop :shopId, :keyword, @output OUTPUT; select @output as json;', 
+							{ 
 								replacements: { 
 									shopId: req.params.shopId,
 									keyword: searchKey 
@@ -31,20 +33,44 @@ router.get('/:shopId', async(req, res, next)=>{
 })
 
 router.get('/:lat/:lng', async(req, res, next)=>{
-	try {
-		const result = await sequelize.query('exec spfindShopsNearby :lat, :lng',{
-			replacements: {
-				lat: req.params.lat,
-				lng: req.params.lng
-			}
-		}).spread((shops, created)=>{
-			return shops;
-		})
-		res.send(result);
-	} catch(e) {
-		// statements
-		res.send({error: true, reason: 'database error'})
-		console.log(e);
+	//this method does two things
+	//it either fetches all shop near the user
+	//but if search query present it fetches all shop near the user having product
+	//matched by search query
+	const searchKey = req.query.searchKey;
+	if(searchKey){
+		try {
+			const result = await sequelize.query('exec spSearchShopsWithProduct :lat, :lng, :keyword',{
+				replacements: {
+					lat: req.params.lat,
+					lng: req.params.lng,
+					keyword: searchKey
+				}
+			}).spread((shops, created)=>{
+				return shops;
+			})
+			res.send(result);
+		} catch(e) {
+			// statements
+			res.send({error: true, reason: 'database error'})
+			console.log(e);
+		}		
+	}else{
+		try {
+			const result = await sequelize.query('exec spfindShopsNearby :lat, :lng',{
+				replacements: {
+					lat: req.params.lat,
+					lng: req.params.lng
+				}
+			}).spread((shops, created)=>{
+				return shops;
+			})
+			res.send(result);
+		} catch(e) {
+			// statements
+			res.send({error: true, reason: 'database error'})
+			console.log(e);
+		}
 	}
 })
 
