@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/:shopId', async(req, res, next)=>{
 	try {
 		const result = await product.findAll({
-			attributes: ['id', 'price'],
+			attributes: ['id', 'price', 'mrp'],
 			where: { shopId: req.params.shopId },
 			include: { 
 				model: productMaster, 

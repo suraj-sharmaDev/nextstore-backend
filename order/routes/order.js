@@ -13,7 +13,7 @@ router.get('/:orderId?/:status?', async(req, res, next)=>{
 		const result = await orderMaster.findOne({
 			attributes: ['id', 'customerId', 'shopId', 'status'],
 			where: where,
-			include: {model: orderDetail, attributes: ['productId', 'productName', 'price']}
+			include: {model: orderDetail, attributes: ['productId', 'productName', 'price', 'qty']}
 		});
 		res.send(result);
 	} catch(e) {

@@ -7,7 +7,9 @@ module.exports = (sequelize, DataTypes) => {
   		type: DataTypes.BOOLEAN,
   		defaultValue: 1
   	},
-    fcmToken: DataTypes.STRING    
+    image: DataTypes.STRING,
+    coverage: DataTypes.INTEGER,
+    fcmToken: DataTypes.STRING   
   }, {
   	tableName: 'shop',
     timestamps: false

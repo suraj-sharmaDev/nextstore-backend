@@ -8,7 +8,7 @@ router.get('/:custId', async(req, res, next)=>{
 			id: req.params.custId
 		},
 		attributes: {
-			exclude: ['id']
+			exclude: ['fcmToken']
 		},
 		include: [{
 			model: cart,
@@ -18,7 +18,7 @@ router.get('/:custId', async(req, res, next)=>{
 			model: orderMaster,
 			required: false,						
 			where:{
-				status: 'pending',
+				status: ['pending', 'accepted'],
 			}
 		}],
 	})

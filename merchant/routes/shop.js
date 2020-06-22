@@ -3,21 +3,32 @@ const {shop, address, sequelize} = require('../models');
 
 const router = express.Router();
 
-router.get('/:shopId', (req, res, next)=>{
-	shop.findOne({
-		where:{
-			id: req.params.shopId
-		}
-	})
-	.then((result)=>{
-		res.send(result);
-	})
-	.catch((err)=>{
-		res.send(err);
-	})
+router.get('/:shopId', async(req, res, next)=>{
+	//this api is called at landing page of shop where only list of categories will be shown
+	//basically this api should integrate category, subcategory and subcategory child
+	try {
+
+		const categories = await sequelize.query(
+						'exec spCreateShopContent :shopId;', 
+						{ 
+							replacements: { shopId: req.params.shopId }
+					}).spread((user, created)=>{
+						//since the return data will be string and not parsed
+						//lets parse it
+						var shop = JSON.parse(user[0].shopInfo);
+						var categories = JSON.parse(user[0].categories);
+						return {shop, categories}
+					})
+		res.send(categories);
+	} catch(e) {
+		// statements
+		res.send({error: true});
+		console.log(e);
+	}
 });
 
 router.post('/:merchId', async(req, res, next)=>{
+	//add new shop for a merchant
 	const t = await sequelize.transaction();
 	try {
 		const result = await shop.create({...req.body, merchantId: req.params.merchId}, { transaction: t });
