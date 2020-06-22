@@ -60,15 +60,35 @@ AS
 BEGIN
 
 with x(json) as (
-	select productMaster.id,
-	productMaster.name, productMaster.image, 
-	productMaster.subCategoryChildId,
-	product.price
-	from productMaster
-	INNER JOIN product on product.productMasterId = productMaster.id
-	where productMaster.name LIKE '%'+@keyword+'%'
-	and product.shopId = @shopId
-	For Json Path
+	select 
+		category.categoryId as categoryId,
+		category.subCategoryId as subCategoryId,
+		category.subCategoryChildId as subCategoryChildId,
+		data.id as productId,
+		data.name, 
+		data.image, 
+		data.price		
+	from 
+	(
+		select  
+		category.id as categoryId,
+		subCategory.id as subCategoryId,
+		subCategoryChild.id as subCategoryChildId
+		from category
+		inner join subCategory on subCategory.categoryId = category.id
+		inner join subCategoryChild on subCategoryChild.subCategoryId = subCategory.id		
+	)as category 
+	inner join (
+		select productMaster.id,
+		productMaster.name, productMaster.image, 
+		productMaster.subCategoryChildId,
+		product.price
+		from productMaster
+		INNER JOIN product on product.productMasterId = productMaster.id
+		where productMaster.name LIKE '%'+@keyword+'%'
+		and product.shopId = @shopId	
+	) as data on data.subCategoryChildId = category.subCategoryChildId
+	For Json AUTO
 )
  select @outputData=json from x
  RETURN
