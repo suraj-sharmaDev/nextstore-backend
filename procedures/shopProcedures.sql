@@ -58,40 +58,64 @@ CREATE PROCEDURE dbo.spSearchInShop
 @outputData NVARCHAR(MAX) OUTPUT
 AS
 BEGIN
+	IF OBJECT_ID('tempdb..#Products') IS NOT NULL
+	DROP TABLE #Products;
 
-with x(json) as (
+	IF OBJECT_ID('tempdb..#Categories') IS NOT NULL
+	DROP TABLE #Categories;
+
+	----all matching products added to temp table #Products
 	select 
-		category.categoryId as categoryId,
-		category.subCategoryId as subCategoryId,
-		category.subCategoryChildId as subCategoryChildId,
-		data.id as productId,
-		data.name, 
-		data.image, 
-		data.price		
-	from 
-	(
-		select  
-		category.id as categoryId,
+		productMaster.id as id,
+		productMaster.name as name, 
+		productMaster.image as image, 
+		productMaster.subCategoryChildId as subCategoryChildId,
+		product.price as price
+	INTO #Products
+	From
+		productMaster
+		INNER JOIN product on product.productMasterId = productMaster.id
+	where 
+		productMaster.name LIKE '%'+@keyword+'%'
+	and 
+		product.shopId = @shopId
+	Order By 
+		productMaster.subCategoryChildId OFFSET 0 ROWS
+
+	----all categories and subCategories for the products retrieved into #Categories
+
+	select 
+		subCategory.categoryId as categoryId,
 		subCategory.id as subCategoryId,
 		subCategoryChild.id as subCategoryChildId
-		from category
-		inner join subCategory on subCategory.categoryId = category.id
-		inner join subCategoryChild on subCategoryChild.subCategoryId = subCategory.id		
-	)as category 
-	inner join (
-		select productMaster.id,
-		productMaster.name, productMaster.image, 
-		productMaster.subCategoryChildId,
-		product.price
-		from productMaster
-		INNER JOIN product on product.productMasterId = productMaster.id
-		where productMaster.name LIKE '%'+@keyword+'%'
-		and product.shopId = @shopId	
-	) as data on data.subCategoryChildId = category.subCategoryChildId
-	For Json AUTO
-)
- select @outputData=json from x
- RETURN
+	INTO #Categories
+	from 
+		subCategoryChild
+		INNER JOIN subCategory on subCategory.id = subCategoryChild.subCategoryId 
+	where 
+		subCategoryChild.id in (
+			select subCategoryChildId from #Products
+		); 
+
+	--create a CTE holding json data
+
+	with x(json) as (
+		select 
+		categoryId = categoryId,
+		subCategoryId = subCategoryId,
+		subCategoryChildId = subCategoryChildId,
+		data = (
+			select id, name, image, price from #Products
+			where subCategoryChildId = C.subCategoryChildId
+			FOR JSON PATH, INCLUDE_NULL_VALUES 
+		)
+		From 
+		#Categories C 
+		FOR JSON PATH, INCLUDE_NULL_VALUES
+	)
+	select @outputData=json from x
+	
+	RETURN
 END
 
 ----------------------------------------------------------------
@@ -111,6 +135,8 @@ BEGIN
 	--This procedure is combination of two separate procedures
 	-- 1st Find all shops near the user
 	-- 2nd find products in this shop matching keyword
+	-- For faster results lets not use second one
+	-- instead write our own sub query
 	
 	DECLARE @stagingTable table (
 		shopId INT,
@@ -120,7 +146,7 @@ BEGIN
 		image nvarchar(100),
 		distance DECIMAL(3, 3)
 	);
-	DECLARE @searchFlag NVARCHAR(MAX); --to check if product exist in shop
+	DECLARE @searchFlag INT; --to check if product exist in shop
 	INSERT Into @stagingTable exec spfindShopsNearby @custLat, @custLng;
 
 	Declare shopCursor cursor for
@@ -132,7 +158,15 @@ BEGIN
 	While(@@FETCH_STATUS=0)
 	Begin
 		--each of the row this cursor points to is shop near this user
-		exec spSearchInShop @id, @keyword, @searchFlag OUTPUT;
+		--For each loop set @searchFlag to null, to not hold past value
+		SET @searchFlag = NULL;
+		select 
+		@searchFlag=productMaster.id
+		From
+			productMaster
+			INNER JOIN product on product.productMasterId = productMaster.id
+		where (productMaster.name LIKE '%'+@keyword+'%'
+				and product.shopId = @id)
 		if(@searchFlag is NULL)
 		begin
 			Delete from @stagingTable where shopId=@id
@@ -141,6 +175,7 @@ BEGIN
 	END
 	SELECT * FROM @stagingTable;
 END
+
 
 
 
