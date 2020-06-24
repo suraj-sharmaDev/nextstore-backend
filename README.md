@@ -54,15 +54,16 @@ merchant
 Shop
 ----
 
-# Get content of shop with shopId
+1. Get content of shop with shopId
 	http://127.0.0.1:3001/shop/shopId
 
-# Get products of shop with shopId, for subCategoryId
+2. Get products of shop with shopId, for subCategoryId
 	http://127.0.0.1:3001/shop/shopId/subCategoryId
 
 3. Create Shop
 	127.0.0.1:3001/shop/merchId
 	POST : JSON
+	```javascript
 	{
 	  "name":"Kirana",
 	  "category":"wholesale",
@@ -73,10 +74,11 @@ Shop
 	    "longitude": 76.515898
 	  }
 	}
-
+	```
 4. Update Shop
 	127.0.0.1:3001/shop/shopId
 	PUT : JSON
+	```javascript
 	{
 	  "shop":{
 	    "name": "arvees",
@@ -88,98 +90,110 @@ Shop
 	    "longitude": 76.515898
 	  }
 	}
-
+	```
 category
 --------
 
-# Get All Category
+1. Get All Category
 	http://127.0.0.1:3001/category
 
-# Get category with Id
+2. Get category with Id
 	http://127.0.0.1:3001/category/category/categoryId
 
-5. Create Category
+3. Create Category
 	127.0.0.1:3001/category
 	POST : JSON
+	```javascript
 	{
 	  "name":"Vegetables"
 	}	
-
-6. Update Category
+	```
+4. Update Category
 	127.0.0.1:3001/category/category/categoryId
 	POST : JSON
+	```javascript
 	{
 	  "name":"Vegetables!"
 	}		
-
-# Get subCategory with Id
+	```
+5. Get subCategory with Id
 	http://127.0.0.1:3001/category/subCategory/subCategoryId
 
-7. Create SubCategory
+6. Create SubCategory
 	127.0.0.1:3000/category/subCategory
 	PUT : JSON
+	```javascript
 	{
 	  "name":"Vegetables",
 	  "categoryId" : 1
 	}	
-
-8. Update SubCategory
+	```
+7. Update SubCategory
 	127.0.0.1:3001/category/subCategory/subCategoryId
 	PUT : JSON
+	```javascript
 	{
 	  "name":"Vegetables!"
 	}
+	```
 
-# Get subCategoryChild with Id
+8. Get subCategoryChild with Id
 	http://127.0.0.1:3001/category/subCategory/subCategoryId
 
 9. Create SubCategoryChild
 	127.0.0.1:3001/category/subCategoryChild
+	```javascript
 	POST : JSON
 	{
 	  "name":"Vegetables",
 	  "subCategoryId" : 1
 	}	
-
+	```
 10. Update Category
 	127.0.0.1:3001/category/subCategoryChild/subCategoryChildId
 	PUT : JSON
+	```javascript
 	{
 	  "name":"Vegetables!"
 	}	
+	```
 
 Product
 ---------
 
-11. Get product
+1. Get product
 	http://127.0.0.1:3001/product/shopId
 
-12. Create product
+2. Create product
 	http://127.0.0.1:3001/product/shopId
 	POST : JSON
+	```javascript
 	{
 		"mrp" : 200			//mrp should be greater than or equal to price
 		"price" : 200,
 		"productMasterId" : 1
 	}	
+	```
 
-13. Update product
+3. Update product
 	http://127.0.0.1:3001/product/shopId/productId
 	PUT : JSON
+	```javascript
 	{
 		"price" : 200,
 		"productMasterId" : 1
 	}	
-
+	```
 Order
 --------
 
-14. Get Order Details
+1. Get Order Details
 	http://127.0.0.1:3002/order/orderId
 
-15. Create New Order
+2. Create New Order
 	http://127.0.0.1:3002/order
 	POST : JSON
+	```javascript
 	{
 	  "master": {
 		"customerId": 1,
@@ -200,10 +214,11 @@ Order
 	    }    
 	   ]
 	}
-
-16. Add orders to existent Order
+	```
+3. Add orders to existent Order
 	http://127.0.0.1:3002/order/orderId
 	POST : JSON
+	```javascript
 	[
 	  {
 		"productId": 3,
@@ -218,11 +233,12 @@ Order
 		"qty": 2
 	  }	  
 	]
-
-17. Update some products in orders
+	```
+4. Update some products in orders
 	http://127.0.0.1:3002/order
 	PUT : JSON
 	//this will affect orderDetail Table
+	```javascript
 	[
 	  {
 	    "id" : 1,
@@ -233,50 +249,57 @@ Order
 	    "qty" : 1
 	  }
 	]
-
-18. Delete full Order
+	```
+5. Delete full Order
 	http://127.0.0.1:3002/order/orderId
 	DELETE Method
 
-19. Delete particular products in order with known id for each added products in orderDetail
+6. Delete particular products in order with known id for each added products in orderDetail
 	http://127.0.0.1:3002/order
 	DELETE : JSON
+	```javascript
 	[1,2,3]
-
-# Accept order
+	```
+7. Accept order
 	http://127.0.0.1:3002/operations/acceptOrder/orderId
 
-#Reject Order
+8. Reject Order
 	http://127.0.0.1:3002/operations/rejectOrder/orderId
 
 Customer
 --------
-# Initialization of customer with customerId
+
+1. Initialization of customer with customerId
 	http://127.0.0.1:3000/login/customerId
 	GET
 
-20. Login or signup a user using mobile no.
+2. Login or signup a user using mobile no.
 	http://127.0.0.1:3000/login/
 	POST : JSON
+	```javascript
 	{
 		"mobile": 7907508735
 	}
+	```
 
-21. Update user information like name or mobile
+3. Update user information like name or mobile
 	http://127.0.0.1:3000/login/customerId
 	PUT : JSON
+	```javascript
 	{
 		"name": "suraj sharma",
 		"mobile": 7907508738
 	}
+	```
 
-22. Get address for customer 
+4. Get address for customer 
 	http://127.0.0.1:3000/address/customerId
 	GET
 
-23. Add new address for customer
+5. Add new address for customer
 	http://127.0.0.1:3000/address/
 	POST : JSON
+	```javascript
 	{
 	  "label":"home",
 	  "addressName": "Anugraha",
@@ -285,27 +308,29 @@ Customer
 	  "longitude": 76.515898,
 	  "customerId" : 1
 	}
-24. Update customer Address
+	```
+6. Update customer Address
 	http://127.0.0.1:3000/address/addressId
 	PUT : JSON
+	```javascript
 	{
 	  "addressName": "Anugraha",
 	  "landmark": "Near Arvees!!!",
 	  "latitude": 9.230385,
 	  "longitude": 76.515898
 	}
-
+	```
 
 Search Operations
 ------------------
 
-26. Shops available within x km radius of coordinates
+1. Shops available within x km radius of coordinates
 	http://127.0.0.1:3003/shop/9.230385/76.515898
 
-25. Search for shops with product within x km radius
+2. Search for shops with product within x km radius
 	http://127.0.0.1:3003/shop/9.230385/76.515898?searchKey=value
 
-26. Search for products in shop
+3. Search for products in shop
 	http://127.0.0.1:3003/shop/1?searchKey=value
 
 Author : Suraj Sharma
