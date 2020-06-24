@@ -3,31 +3,26 @@ const {customer, orderMaster, cart, address, sequelize} = require('../models');
 const router = express.Router();
 
 router.get('/:custId', async(req, res, next)=>{
-	customer.findOne({
-		where: {
-			id: req.params.custId
-		},
-		attributes: {
-			exclude: ['fcmToken']
-		},
-		include: [{
-			model: cart,
-		}, {
-			model: address,
-		}, {
-			model: orderMaster,
-			required: false,						
-			where:{
-				status: ['pending', 'accepted'],
+	var customer = null;
+	try {
+		customer = await sequelize.query('EXEC spInitializeCustomer :custId',{
+			replacements: {
+				custId: req.params.custId
 			}
-		}],
-	})
-	.then((result)=>{
-		res.json(result)
-	})
-	.catch((err)=>{
-		res.json(err)
-	})
+		}).spread((user, created)=> {
+			var obj = Object.values(user[0]);
+			if(obj[0]){
+				return(JSON.parse(obj))
+			}else{
+				return {error: true, reason: 'unknown customer Id'};
+			}
+		})
+	} catch(e) {
+		// statements
+		customer = {error: true, reason: 'database error'};
+		console.log(e);
+	}
+	res.send(customer);
 })
 
 router.post('/', async(req, res, next)=>{

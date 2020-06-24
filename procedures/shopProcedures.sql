@@ -54,68 +54,62 @@ END
 ---Search for products in shop with keyword
 CREATE PROCEDURE dbo.spSearchInShop
 @shopId INT, 
-@keyword NVARCHAR(100),
-@outputData NVARCHAR(MAX) OUTPUT
+@keyword NVARCHAR(100)
 AS
 BEGIN
-	IF OBJECT_ID('tempdb..#Products') IS NOT NULL
-	DROP TABLE #Products;
+Declare @outputData NVARCHAR(MAX);
+IF OBJECT_ID('tempdb..#Products') IS NOT NULL
+DROP TABLE #Products;
 
-	IF OBJECT_ID('tempdb..#Categories') IS NOT NULL
-	DROP TABLE #Categories;
+IF OBJECT_ID('tempdb..#Categories') IS NOT NULL
+DROP TABLE #Categories;
 
-	----all matching products added to temp table #Products
+----all matching products added to temp table #Products
+select productMaster.id as id,
+productMaster.name as name, 
+productMaster.image as image, 
+productMaster.subCategoryChildId as subCategoryChildId,
+product.price as price
+INTO #Products
+From
+	productMaster
+	INNER JOIN product on product.productMasterId = productMaster.id
+where productMaster.name LIKE '%'+@keyword+'%'
+and product.shopId = @shopId
+Order By productMaster.subCategoryChildId OFFSET 0 ROWS
+
+----all categories and subCategories for the products retrieved into #Categories
+
+select 
+subCategory.categoryId as categoryId,
+subCategory.id as subCategoryId,
+subCategoryChild.id as subCategoryChildId
+INTO #Categories
+from 
+subCategoryChild
+INNER JOIN subCategory on subCategory.id = subCategoryChild.subCategoryId 
+where subCategoryChild.id in (
+	select subCategoryChildId from #Products
+); 
+
+with x(json) as (
 	select 
-		productMaster.id as id,
-		productMaster.name as name, 
-		productMaster.image as image, 
-		productMaster.subCategoryChildId as subCategoryChildId,
-		product.price as price
-	INTO #Products
-	From
-		productMaster
-		INNER JOIN product on product.productMasterId = productMaster.id
-	where 
-		productMaster.name LIKE '%'+@keyword+'%'
-	and 
-		product.shopId = @shopId
-	Order By 
-		productMaster.subCategoryChildId OFFSET 0 ROWS
-
-	----all categories and subCategories for the products retrieved into #Categories
-
-	select 
-		subCategory.categoryId as categoryId,
-		subCategory.id as subCategoryId,
-		subCategoryChild.id as subCategoryChildId
-	INTO #Categories
-	from 
-		subCategoryChild
-		INNER JOIN subCategory on subCategory.id = subCategoryChild.subCategoryId 
-	where 
-		subCategoryChild.id in (
-			select subCategoryChildId from #Products
-		); 
-
-	--create a CTE holding json data
-
-	with x(json) as (
-		select 
-		categoryId = categoryId,
-		subCategoryId = subCategoryId,
-		subCategoryChildId = subCategoryChildId,
-		data = (
-			select id, name, image, price from #Products
-			where subCategoryChildId = C.subCategoryChildId
-			FOR JSON PATH, INCLUDE_NULL_VALUES 
-		)
-		From 
-		#Categories C 
-		FOR JSON PATH, INCLUDE_NULL_VALUES
+	categoryId = categoryId,
+	subCategoryId = subCategoryId,
+	subCategoryChildId = subCategoryChildId,
+	data = (
+		select id, name, image, price from #Products
+		where subCategoryChildId = C.subCategoryChildId
+		FOR JSON PATH, INCLUDE_NULL_VALUES 
 	)
-	select @outputData=json from x
-	
-	RETURN
+	From 
+	#Categories C 
+	FOR JSON PATH, INCLUDE_NULL_VALUES
+)
+
+ select @outputData=json from x;
+ select @outputData;
+ RETURN
 END
 
 ----------------------------------------------------------------

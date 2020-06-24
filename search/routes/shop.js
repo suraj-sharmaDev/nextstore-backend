@@ -8,14 +8,14 @@ router.get('/:shopId', async(req, res, next)=>{
 	if(searchKey){
 		try {
 			const result = await sequelize.query(
-							'Declare @output NVARCHAR(MAX); exec spSearchInShop :shopId, :keyword, @output OUTPUT; select @output as json;', 
+							'exec spSearchInShop :shopId, :keyword', 
 							{ 
 								replacements: { 
 									shopId: req.params.shopId,
 									keyword: searchKey 
 								}
 							}).spread((user, created)=>{
-								var obj = Object.values(user[0])[0];
+								var obj = Object.values(user[0]);
 								if(obj){
 									return JSON.parse(obj);
 								}else{
