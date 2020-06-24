@@ -49,6 +49,60 @@ BEGIN
 	select * from #Results
 END
 
+----------------------------------------------------------
+--Get all products belonging to shop with shopId and subCategoyId
+CREATE PROCEDURE dbo.spGetProductsInSubCategory
+@shopId INT, 
+@subCategoryId INT
+AS
+BEGIN
+	Declare @outputData NVARCHAR(MAX);
+	--steps--
+	--get all subCategoryChild matching subCategoryId = @subCategoryId
+	--get all products with subCategoryChild matching above and belonging to shopId
+	-- add categories to those shops
+	-- return in readable json format
+	
+	with x(json) as (
+		select 
+		scc.categoryId as categoryId,
+		scc.subCategoryId as subCategoryId,
+		scc.subCategoryChildId as subCategoryChildId,
+		scc.title as title,
+		data.id as productId,
+		data.name as name,
+		data.image as image,
+		data.price as price
+		from (
+			select 
+			category.id as categoryId,
+			subCategory.id as subCategoryId,
+			subCategoryChild.id as subCategoryChildId,
+			subCategoryChild.name as title
+			from subCategoryChild
+			inner join subCategory on subCategory.id = subCategoryChild.subCategoryId
+			inner join category on category.id = subCategory.categoryId
+			where subCategoryChild.subCategoryId = @subCategoryId
+		) as scc
+		inner join (
+			select 
+			productMaster.id,
+			productMaster.name,
+			productMaster.image,
+			productMaster.subCategoryChildId,
+			product.price
+			from productMaster
+			Inner join product on product.productMasterId = productMaster.id
+			where product.shopId = @shopId
+		) as data on data.subCategoryChildId = scc.subCategoryChildId
+		For Json AUTO, WITHOUT_ARRAY_WRAPPER
+	)
+ select @outputData=json from x;
+ select @outputData;
+ RETURN
+
+END
+
 -----------------------------------------------------------
 
 ---Search for products in shop with keyword

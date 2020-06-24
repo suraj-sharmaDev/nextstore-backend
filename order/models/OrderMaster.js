@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     OrderMaster.hasMany(models.orderDetail, {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
-      hooks: true
+      hooks: true,
+      foreignKeyConstraint: true
     });
   };
   return OrderMaster;

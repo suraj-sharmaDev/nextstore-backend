@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   Address.associate = function(models) {
     // associations can be defined here
-    Address.belongsTo(models.customer);
+    Address.belongsTo(models.customer,{foreignKeyConstraint: true});
   };
   return Address;
 };

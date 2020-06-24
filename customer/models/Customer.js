@@ -11,9 +11,9 @@ module.exports = (sequelize, DataTypes) => {
   });
   Customer.associate = function(models) {
     // associations can be defined here
-    Customer.hasMany(models.address);
-    Customer.hasMany(models.cart);
-    Customer.hasMany(models.orderMaster);
+    Customer.hasMany(models.address,{foreignKeyConstraint: true});
+    Customer.hasMany(models.cart,{foreignKeyConstraint: true});
+    Customer.hasMany(models.orderMaster,{foreignKeyConstraint: true});
   };
   return Customer;
 };

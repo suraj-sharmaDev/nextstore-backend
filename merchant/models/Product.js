@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   product.associate = function(models) {
     // associations can be defined here
-    product.belongsTo(models.shop);
-    product.belongsTo(models.productMaster);
+    product.belongsTo(models.shop,{foreignKeyConstraint: true});
+    product.belongsTo(models.productMaster,{foreignKeyConstraint: true});
   };
   return product;
 };

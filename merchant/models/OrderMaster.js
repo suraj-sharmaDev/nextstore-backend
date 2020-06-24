@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   OrderMaster.associate = function(models) {
     // associations can be defined here
-    OrderMaster.hasMany(models.orderDetail);
+    OrderMaster.hasMany(models.orderDetail,{foreignKeyConstraint: true});
   };
   return OrderMaster;
 };

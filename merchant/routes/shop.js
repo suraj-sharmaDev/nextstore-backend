@@ -27,6 +27,36 @@ router.get('/:shopId', async(req, res, next)=>{
 	}
 });
 
+router.get('/:shopId/:subCategoryId', async(req, res, next)=>{
+	const shopId = req.params.shopId;
+	const subCategoryId = req.params.subCategoryId;
+	try {
+
+		const products = await sequelize.query(
+						'exec spGetProductsInSubCategory :shopId, :subCategoryId', 
+						{ 
+							replacements: { 
+								shopId: shopId,
+								subCategoryId: subCategoryId 
+							}
+					}).spread((product, created)=>{
+						//since the return data will be string and not parsed
+						//lets parse it
+						var obj = Object.values(product[0])[0];
+						if(obj){
+							return JSON.parse(obj);
+						}else{
+							return {error: true, reason: 'Either shopId or subCategoryId does not exist'}
+						}
+					})
+		res.send(products);
+	} catch(e) {
+		// statements
+		res.send({error: true});
+		console.log(e);
+	}
+})
+
 router.post('/:merchId', async(req, res, next)=>{
 	//add new shop for a merchant
 	const t = await sequelize.transaction();

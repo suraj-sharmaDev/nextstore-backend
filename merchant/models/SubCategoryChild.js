@@ -8,8 +8,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   subCategoryChild.associate = function(models) {
     // associations can be defined here
-    subCategoryChild.belongsTo(models.subCategory);
-    subCategoryChild.hasMany(models.productMaster);
+    subCategoryChild.belongsTo(models.subCategory,{foreignKeyConstraint: true});
+    subCategoryChild.hasMany(models.productMaster,{foreignKeyConstraint: true});
   };
   return subCategoryChild;
 };

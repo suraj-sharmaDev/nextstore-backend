@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   merchant.associate = function(models) {
     // associations can be defined here
-    merchant.hasMany(models.shop);
+    merchant.hasMany(models.shop,{foreignKeyConstraint: true});
   };
   return merchant;
 };

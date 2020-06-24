@@ -9,8 +9,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   productMaster.associate = function(models) {
     // associations can be defined here
-    productMaster.hasMany(models.product);
-    productMaster.belongsTo(models.subCategoryChild);
+    productMaster.hasMany(models.product,{foreignKeyConstraint: true});
+    productMaster.belongsTo(models.subCategoryChild,{foreignKeyConstraint: true});
   };
   return productMaster;
 };
