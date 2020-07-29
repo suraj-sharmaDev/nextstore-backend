@@ -4,6 +4,30 @@ CREATE PROCEDURE dbo.spCreateShopContent
 AS
 BEGIN
 --will create json output for shops complete details
+
+	declare @tableId int;
+
+	If @shopId % 20 = 0
+		SET @tableId =  @shopId/20;
+	ELSE
+		SET @tableId =  @shopId/20 + 1;
+	
+	declare @tableName varchar(100) = N'product'+ cast(@tableId as varchar);	
+	declare @query nvarchar(max) = N'
+		select DISTINCT productMasterId 
+		from '+ @tableName +'
+		where shopId =' + cast(@shopId as varchar);
+
+	IF OBJECT_ID('tempdb..#DistTemp') IS NOT NULL
+	    Truncate TABLE #DistTemp
+	else
+	    CREATE TABLE #DistTemp
+	    (
+	    	productMasterId int
+	    )
+	
+	INSERT INTO #DistTemp EXEC sp_executesql @query;
+
 	IF OBJECT_ID('tempdb..#Results') IS NOT NULL
 	    Truncate TABLE #Results
 	else
@@ -28,10 +52,9 @@ BEGIN
 		INNER JOIN (
 			select DISTINCT subCategoryChildId
 			from productMaster
-			INNER JOIN (
-				select DISTINCT productMasterId 
-				from product
-				where shopId = @shopId
+			INNER JOIN (				
+			select productMasterId 
+				from #DistTemp
 			)as product on product.productMasterId = productMaster.id
 		)as productMaster on productMaster.subCategoryChildId = subCategoryChild.id 
 		FOR JSON AUTO
@@ -48,6 +71,8 @@ BEGIN
 	
 	select * from #Results
 END
+
+GO;
 
 ----------------------------------------------------------
 --Get all products belonging to shop with shopId and subCategoyId
@@ -95,7 +120,7 @@ BEGIN
 			Inner join product on product.productMasterId = productMaster.id
 			where product.shopId = @shopId
 		) as data on data.subCategoryChildId = scc.subCategoryChildId
-		For Json AUTO, WITHOUT_ARRAY_WRAPPER
+		For Json AUTO
 	)
  select @outputData=json from x;
  select @outputData;
@@ -103,6 +128,7 @@ BEGIN
 
 END
 
+GO;
 -----------------------------------------------------------
 
 ---Search for products in shop with keyword
@@ -112,25 +138,49 @@ CREATE PROCEDURE dbo.spSearchInShop
 AS
 BEGIN
 Declare @outputData NVARCHAR(MAX);
-IF OBJECT_ID('tempdb..#Products') IS NOT NULL
-DROP TABLE #Products;
+DECLARE @query NVARCHAR(MAX);
+declare @tableId int;
 
+If @shopId % 20 = 0
+	SET @tableId =  @shopId/20;
+ELSE
+	SET @tableId =  @shopId/20 + 1;
+
+declare @tableName varchar(100) = N'product'+ cast(@tableId as varchar);
+
+IF OBJECT_ID('tempdb..#Products') IS NOT NULL
+	Truncate TABLE #Products
+else
+	CREATE TABLE #Products 
+	(
+		id int,
+		name varchar(100),
+		image varchar(200),
+		subCategoryChildId int,
+		price int
+	 )
+	 
 IF OBJECT_ID('tempdb..#Categories') IS NOT NULL
 DROP TABLE #Categories;
 
 ----all matching products added to temp table #Products
-select productMaster.id as id,
-productMaster.name as name, 
-productMaster.image as image, 
-productMaster.subCategoryChildId as subCategoryChildId,
-product.price as price
-INTO #Products
-From
-	productMaster
-	INNER JOIN product on product.productMasterId = productMaster.id
-where productMaster.name LIKE '%'+@keyword+'%'
-and product.shopId = @shopId
-Order By productMaster.subCategoryChildId OFFSET 0 ROWS
+Declare @search varchar(100) = '''%' + @keyword + '%''';
+SET @query = N'
+	select productMaster.id as id,
+	productMaster.name as name, 
+	productMaster.image as image, 
+	productMaster.subCategoryChildId as subCategoryChildId,
+	product.price as price
+	From
+		productMaster
+		INNER JOIN '+ @tableName + ' as product on product.productMasterId = productMaster.id
+	where productMaster.name LIKE ' + @search + '
+	and product.shopId = ' + cast(@shopId as varchar) + '
+	Order By productMaster.subCategoryChildId OFFSET 0 ROWS
+	';
+
+INSERT INTO #Products
+	EXEC sp_executesql @query;
 
 ----all categories and subCategories for the products retrieved into #Categories
 
@@ -166,6 +216,7 @@ with x(json) as (
  RETURN
 END
 
+GO;
 ----------------------------------------------------------------
 
 --Get all shops having products with keyword
@@ -180,11 +231,16 @@ BEGIN
 	DECLARE @category NVARCHAR(30);
 	DECLARE @image NVARCHAR(100);
 	DECLARE @onlineStatus bit;
+	
+	DECLARE @tableId int;
+	DECLARE @tableName varchar(100);
+	DECLARE @query NVARCHAR(MAX);
+	DECLARE @search varchar(100) = '''%' + @keyword + '%''';
 	--This procedure is combination of two separate procedures
 	-- 1st Find all shops near the user
 	-- 2nd find products in this shop matching keyword
 	-- For faster results lets not use second one
-	-- instead write our own sub query
+	-- instead write out own sub query
 	
 	DECLARE @stagingTable table (
 		shopId INT,
@@ -208,13 +264,25 @@ BEGIN
 		--each of the row this cursor points to is shop near this user
 		--For each loop set @searchFlag to null, to not hold past value
 		SET @searchFlag = NULL;
-		select 
-		@searchFlag=productMaster.id
-		From
+		--find the table name for the shop with shopId = @id
+		If @id % 20 = 0
+			SET @tableId =  @id/20;
+		ELSE
+			SET @tableId =  @id/20 + 1;
+		
+		SET @tableName = N'product'+ cast(@tableId as varchar);
+	
+		SET @query = N'
+			select
+			TOP 1
+			@searchFlag = productMaster.id
+			From
 			productMaster
-			INNER JOIN product on product.productMasterId = productMaster.id
-		where (productMaster.name LIKE '%'+@keyword+'%'
-				and product.shopId = @id)
+			INNER JOIN product1 as product on product.productMasterId = productMaster.id
+			where (productMaster.name LIKE '+ @search +'
+				and product.shopId = ' + cast(@id as varchar) + ' )';
+			
+		EXEC sp_executesql @query, N'@searchFlag INT OUTPUT', @searchFlag=@searchFlag OUTPUT;
 		if(@searchFlag is NULL)
 		begin
 			Delete from @stagingTable where shopId=@id
@@ -227,6 +295,7 @@ END
 
 
 
+GO;
 
 ----------------------------------------------------------------
 
@@ -287,4 +356,57 @@ BEGIN
 	Deallocate shopCursor
 	--output all found shops
 	select * from @outputTable
+END
+
+GO;
+
+-------------------------------------------------------------
+------Insert product into a shop--------
+CREATE PROCEDURE dbo.spInsertProductInShop
+@json NVARCHAR(255)
+AS
+BEGIN
+-- copy json data to local variables
+	DECLARE @mrp INT = JSON_VALUE(@json, '$.mrp');
+	DECLARE @price INT = JSON_VALUE(@json, '$.price');
+	DECLARE @productMasterId INT = JSON_VALUE(@json, '$.productMasterId');
+	DECLARE @shopId INT = JSON_VALUE(@json, '$.shopId');
+	DECLARE @query NVARCHAR(MAX);
+	-- insert into productX table
+	-- each productX table stores 10,000 or more products for 20 shops 
+	-- so the calculation for which table should store products for which shop should be based
+	-- upon shopId
+	declare @tableId int;
+	
+	If @shopId % 20 = 0
+		SET @tableId =  @shopId/20;
+	ELSE
+		SET @tableId =  @shopId/20 + 1;
+	
+	declare @tableName varchar(100) = N'product'+ cast(@tableId as varchar);
+	
+	--Now check if that table exists
+	
+	IF OBJECT_ID(@tableName) IS NOT NULL
+	BEGIN
+		-- table exists then add the product
+		SELECT @tableName + ' exists';
+	END
+	ELSE
+	BEGIN
+		-- table doesn't exist so create a new table and add the product
+		SET @query = N'
+			CREATE TABLE ' + @tableName + '(
+				id int IDENTITY(1,1) NOT NULL,
+				mrp int NULL,
+				price int NULL,
+				shopId int NULL,
+				productMasterId int NULL,
+				CONSTRAINT PK__product__' + cast(@tableId as varchar) +' PRIMARY KEY (id),
+				CONSTRAINT FK__product__product__' + cast(@tableId as varchar) +' FOREIGN KEY (productMasterId) REFERENCES productMaster(id),
+				CONSTRAINT FK__product__shopId__' + cast(@tableId as varchar) +' FOREIGN KEY (shopId) REFERENCES shop(id)
+			)
+		';
+		EXEC sp_executesql @query;
+	END
 END
