@@ -372,6 +372,7 @@ BEGIN
 	DECLARE @productMasterId INT = JSON_VALUE(@json, '$.productMasterId');
 	DECLARE @shopId INT = JSON_VALUE(@json, '$.shopId');
 	DECLARE @query NVARCHAR(MAX);
+	DECLARE @paramDef nvarchar (500);
 	-- insert into productX table
 	-- each productX table stores 10,000 or more products for 20 shops 
 	-- so the calculation for which table should store products for which shop should be based
@@ -390,23 +391,82 @@ BEGIN
 	IF OBJECT_ID(@tableName) IS NOT NULL
 	BEGIN
 		-- table exists then add the product
-		SELECT @tableName + ' exists';
+		SET @query = N'
+			INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
+			(@mrp, @price, @shopId, @productMasterId)';
+		SET @paramDef = N'@mrp int, @price int, @shopId int, @productMasterId int';
+		EXEC sp_executeSql @query, @paramDef, @mrp, @price, @shopId, @productMasterId;
 	END
 	ELSE
 	BEGIN
 		-- table doesn't exist so create a new table and add the product
 		SET @query = N'
 			CREATE TABLE ' + @tableName + '(
-				id int IDENTITY(1,1) NOT NULL,
+				id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 				mrp int NULL,
 				price int NULL,
-				shopId int NULL,
-				productMasterId int NULL,
-				CONSTRAINT PK__product__' + cast(@tableId as varchar) +' PRIMARY KEY (id),
-				CONSTRAINT FK__product__product__' + cast(@tableId as varchar) +' FOREIGN KEY (productMasterId) REFERENCES productMaster(id),
-				CONSTRAINT FK__product__shopId__' + cast(@tableId as varchar) +' FOREIGN KEY (shopId) REFERENCES shop(id)
-			)
+				shopId int NULL FOREIGN KEY REFERENCES shop(id),
+				productMasterId int NULL FOREIGN KEY REFERENCES productMaster(id)
+			);
+			
+			INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
+			(@mrp, @price, @shopId, @productMasterId);
 		';
-		EXEC sp_executesql @query;
+		SET @paramDef = N'@mrp int, @price int, @shopId int, @productMasterId int';
+		EXEC sp_executesql @query, @paramDef, @mrp, @price, @shopId, @productMasterId;
 	END
-END
+END 
+
+GO;
+
+----------------------------------------------------------------
+---------Update product in shop---------------------------------
+CREATE PROCEDURE dbo.spUpdateProductInShop
+@json NVARCHAR(MAX), @shopId int
+AS
+BEGIN
+-- copy json data to local variables
+	DECLARE @query NVARCHAR(MAX);
+	DECLARE @paramDef nvarchar (500);
+	-- insert into productX table
+	-- each productX table stores 10,000 or more products for 20 shops 
+	-- so the calculation for which table should store products for which shop should be based
+	-- upon shopId
+	declare @tableId int;
+	
+	If @shopId % 20 = 0
+		SET @tableId =  @shopId/20;
+	ELSE
+		SET @tableId =  @shopId/20 + 1;
+	
+	DECLARE @tableName varchar(100) = N'product'+ cast(@tableId as varchar);
+
+	IF OBJECT_ID('tempdb..#Product') IS NOT NULL
+	DROP TABLE #Product;
+	
+	
+	SELECT * INTO #Product FROM OPENJSON(@json)
+		with(
+			id int,
+			mrp int,
+			price int,
+			productMasterId int
+		);
+	
+	SET @query = N'
+		UPDATE '+@tableName+'
+		SET 
+		'+@tableName+'.mrp = 
+			CASE WHEN (#Product.mrp IS NOT NULL) THEN #Product.mrp
+			ELSE '+@tableName+'.mrp END,
+		'+@tableName+'.price = 
+			CASE WHEN (#Product.price IS NOT NULL) THEN #Product.price
+			ELSE '+@tableName+'.price END,
+		'+@tableName+'.productMasterId = 
+			CASE WHEN (#Product.productMasterId IS NOT NULL) THEN #Product.productMasterId
+			ELSE '+@tableName+'.productMasterId END
+		FROM '+@tableName+', #Product 
+		WHERE #Product.id = '+@tableName+'.id';
+	
+	EXEC sp_executeSql @query;
+END 
