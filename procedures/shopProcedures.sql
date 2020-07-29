@@ -18,15 +18,15 @@ BEGIN
 		from '+ @tableName +'
 		where shopId =' + cast(@shopId as varchar);
 
-	IF OBJECT_ID('tempdb..#DistTemp') IS NOT NULL
-	    Truncate TABLE #DistTemp
+	IF OBJECT_ID('tempdb..#ShopContentTemp') IS NOT NULL
+	    Truncate TABLE #ShopContentTemp
 	else
-	    CREATE TABLE #DistTemp
+	    CREATE TABLE #ShopContentTemp
 	    (
 	    	productMasterId int
 	    )
 	
-	INSERT INTO #DistTemp EXEC sp_executesql @query;
+	INSERT INTO #ShopContentTemp EXEC sp_executesql @query;
 
 	IF OBJECT_ID('tempdb..#Results') IS NOT NULL
 	    Truncate TABLE #Results
@@ -54,7 +54,7 @@ BEGIN
 			from productMaster
 			INNER JOIN (				
 			select productMasterId 
-				from #DistTemp
+				from #ShopContentTemp
 			)as product on product.productMasterId = productMaster.id
 		)as productMaster on productMaster.subCategoryChildId = subCategoryChild.id 
 		FOR JSON AUTO
@@ -82,12 +82,46 @@ CREATE PROCEDURE dbo.spGetProductsInSubCategory
 AS
 BEGIN
 	Declare @outputData NVARCHAR(MAX);
+
+	declare @tableId int;
+
+	If @shopId % 20 = 0
+		SET @tableId =  @shopId/20;
+	ELSE
+		SET @tableId =  @shopId/20 + 1;
+	
+	declare @tableName varchar(100) = N'product'+ cast(@tableId as varchar);	
+
+	IF OBJECT_ID('tempdb..#DistTemp') IS NOT NULL
+	TRUNCATE TABLE #DistTemp
+	ELSE
+		CREATE TABLE #DistTemp (
+			id int,
+			name varchar(200),
+			image varchar(200),
+			subCategoryChildId int,
+			price int
+		);
+	
+	declare @query nvarchar(max) = N'
+		select 
+		productMaster.id,
+		productMaster.name,
+		productMaster.image,
+		productMaster.subCategoryChildId,
+		product.price
+		from productMaster
+		Inner join ' + @tableName +' as product on product.productMasterId = productMaster.id
+		where product.shopId = '+ cast(@shopId as varchar);
+	
 	--steps--
 	--get all subCategoryChild matching subCategoryId = @subCategoryId
 	--get all products with subCategoryChild matching above and belonging to shopId
 	-- add categories to those shops
 	-- return in readable json format
-	
+	INSERT INTO #DistTemp
+		EXEC sp_executeSql @query;
+
 	with x(json) as (
 		select 
 		scc.categoryId as categoryId,
@@ -109,17 +143,7 @@ BEGIN
 			inner join category on category.id = subCategory.categoryId
 			where subCategoryChild.subCategoryId = @subCategoryId
 		) as scc
-		inner join (
-			select 
-			productMaster.id,
-			productMaster.name,
-			productMaster.image,
-			productMaster.subCategoryChildId,
-			product.price
-			from productMaster
-			Inner join product on product.productMasterId = productMaster.id
-			where product.shopId = @shopId
-		) as data on data.subCategoryChildId = scc.subCategoryChildId
+		inner join #DistTemp as data on data.subCategoryChildId = scc.subCategoryChildId
 		For Json AUTO
 	)
  select @outputData=json from x;
