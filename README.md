@@ -161,10 +161,7 @@ category
 Product
 ---------
 
-1. Get product
-	http://127.0.0.1:3001/product/shopId
-
-2. Create product
+1. Create product
 	http://127.0.0.1:3001/product/shopId
 	POST : JSON
 	```javascript
@@ -175,7 +172,7 @@ Product
 	}	
 	```
 
-3. Update product
+2. Update product
 	http://127.0.0.1:3001/product/shopId/productId
 	PUT : JSON
 	```javascript
@@ -184,6 +181,7 @@ Product
 		"productMasterId" : 1
 	}	
 	```
+
 Order
 --------
 

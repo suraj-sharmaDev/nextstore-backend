@@ -4,22 +4,7 @@ const {productMaster, product, sequelize} = require('../models');
 const router = express.Router();
 
 router.get('/:shopId', async(req, res, next)=>{
-	try {
-		const result = await product.findAll({
-			attributes: ['id', 'price', 'mrp'],
-			where: { shopId: req.params.shopId },
-			include: { 
-				model: productMaster, 
-				attributes: ['name', 'image', 'subCategoryChildId']
-			}
-		});
-		res.send(result)
-	} catch(e) {
-		// statements
-		console.log(e);
-		res.send({error: true});
-	}
-
+	res.send({message: "404 not found", note: "placeholder"});
 })
 
 router.post('/:shopId', async(req, res, next)=>{
