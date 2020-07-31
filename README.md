@@ -26,6 +26,11 @@ There are three flavours of configuration namely development, test, production.
 The configuration for firebase i.e service_acount.json should be inside config folder 
 named as nextstore-firebase.json (required) || (not included)
 
+The configuration for nginx server is in file xConf/nginx_conf.txt
+	-follow the instructions
+
+All the api request are saved in collection[Postman] in folder xConf/collections_nginx.json
+
 procedures folder contains tsql, support for the api.
 (The initialization of this folder files is required)
 

@@ -1,0 +1,60 @@
+1. Edit /etc/nginx/sites-available/default file
+2. Start all node servers and restart nginx
+    sudo systemctl restart nginx
+-----------------------------------------------------------
+
+upstream customer {
+	server 127.0.0.1:3000;
+}
+
+upstream merchant {
+	server 127.0.0.1:3001;
+}
+
+upstream order {
+	server 127.0.0.1:3002;
+}
+
+upstream search {
+	server 127.0.0.1:3003;
+}
+
+server{
+	listen 80;
+
+	location /customerApi/{
+		proxy_pass http://customer/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;		
+	}
+
+	location /merchantApi/{
+		proxy_pass http://merchant/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;		
+	}
+
+	location /orderApi/{
+		proxy_pass http://order/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;		
+	}	
+
+	location /searchApi/{
+		proxy_pass http://search/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;		
+	}		
+}
