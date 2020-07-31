@@ -1,0 +1,68 @@
+    {
+      "id": "1186b02b-b0ad-a7ab-dd29-3d5cec35c8cf",
+      "name": "cart",
+      "timestamp": 1592312366838,
+      "order": [
+        "2e36e622-d5ac-3997-8d13-6ac5617bfd6d",
+        "4e76486d-9c71-e9ab-1b42-7ef768bdaafc",
+        "989afe88-ca5d-afed-260d-d915b981c35f",
+        "ef185f3e-d3d4-86bb-dcbf-fd7f46f05a16"
+      ],
+      "requests": [
+        {
+          "collectionId": "1186b02b-b0ad-a7ab-dd29-3d5cec35c8cf",
+          "id": "2e36e622-d5ac-3997-8d13-6ac5617bfd6d",
+          "name": "http://localhost/customerApi/cart/",
+          "description": "",
+          "url": "http://localhost/customerApi/cart/1",
+          "method": "GET",
+          "headers": "Content-Type: application/json\n",
+          "data": "[\n  {\n\t\"productId\": 3,\n\t\"productName\" : \"soup & veg\",\n\t\"price\": 200,\n\t\"qty\": 2\n  }\n]",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2
+        },
+        {
+          "collectionId": "1186b02b-b0ad-a7ab-dd29-3d5cec35c8cf",
+          "id": "4e76486d-9c71-e9ab-1b42-7ef768bdaafc",
+          "name": "http://localhost/customerApi/cart/1",
+          "description": "",
+          "url": "http://localhost/customerApi/cart/1",
+          "method": "POST",
+          "headers": "Content-Type: application/json\n",
+          "data": "[\n  {\n    \"productId\": 3,\n    \"name\": \"soup\",\n    \"image\": \"something\",\n    \"price\": 100,\n    \"qty\": 4\n  }\n]",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592663908135
+        },
+        {
+          "collectionId": "1186b02b-b0ad-a7ab-dd29-3d5cec35c8cf",
+          "id": "989afe88-ca5d-afed-260d-d915b981c35f",
+          "name": "http://localhost/customerApi/cart/1",
+          "description": "",
+          "url": "http://localhost/customerApi/cart/1",
+          "method": "PUT",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n \"qty\": 1\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592323208101
+        },
+        {
+          "collectionId": "1186b02b-b0ad-a7ab-dd29-3d5cec35c8cf",
+          "id": "ef185f3e-d3d4-86bb-dcbf-fd7f46f05a16",
+          "name": "http://localhost/customerApi/cart/1",
+          "description": "",
+          "url": "http://localhost/customerApi/cart",
+          "method": "DELETE",
+          "headers": "Content-Type: application/json\n",
+          "data": "[1]",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592323757882
+        }
+      ]
+    }

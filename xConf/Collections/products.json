@@ -1,0 +1,54 @@
+    {
+      "id": "f5ae8017-2ca3-861a-f10a-418f82485035",
+      "name": "products",
+      "timestamp": 1592065607327,
+      "order": [
+        "2cc07047-c5a6-a1ec-70af-3484f2d9d0fe",
+        "61f9a020-41cb-e9db-180a-23db82521d52",
+        "a70659cd-9af8-9f25-2e46-f55f618213ce"
+      ],
+      "requests": [
+        {
+          "collectionId": "f5ae8017-2ca3-861a-f10a-418f82485035",
+          "id": "2cc07047-c5a6-a1ec-70af-3484f2d9d0fe",
+          "name": "http://localhost/merchantApi/product",
+          "description": "",
+          "url": "http://localhost/merchantApi/product/1",
+          "method": "GET",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n  \"name\":\"Organic\",\n  \"subCategoryId\":1\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592723762307
+        },
+        {
+          "collectionId": "f5ae8017-2ca3-861a-f10a-418f82485035",
+          "id": "61f9a020-41cb-e9db-180a-23db82521d52",
+          "name": "http://localhost/merchantApi/product/1",
+          "description": "",
+          "url": "http://localhost/merchantApi/product/1",
+          "method": "POST",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n  \"mrp\" : 200,\n  \"price\" : 200,\n  \"productMasterId\" : 1\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592743219525
+        },
+        {
+          "collectionId": "f5ae8017-2ca3-861a-f10a-418f82485035",
+          "id": "a70659cd-9af8-9f25-2e46-f55f618213ce",
+          "name": "http://localhost/merchantApi/product/1/1",
+          "description": "",
+          "url": "http://localhost/merchantApi/product/2/1",
+          "method": "PUT",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n\"price\" : 200,\n\"productMasterId\" : 1\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "responses": [],
+          "version": 2
+        }
+      ]
+    }

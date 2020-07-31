@@ -1,0 +1,69 @@
+    {
+      "id": "0c5e4354-3e07-8ba9-3f12-660d804e7532",
+      "name": "merchant",
+      "timestamp": 1591889691754,
+      "order": [
+        "4b9c7a84-a2b4-f3f2-39b9-82c592ce38de",
+        "daefa6f9-74cf-8deb-5cf3-68460ccca637",
+        "2357cb54-5feb-58ff-3dce-5f801c86f4f9",
+        "82bc448d-3161-d247-948c-9b72115b8b7f"
+      ],
+      "requests": [
+        {
+          "collectionId": "0c5e4354-3e07-8ba9-3f12-660d804e7532",
+          "id": "2357cb54-5feb-58ff-3dce-5f801c86f4f9",
+          "name": "http://localhost/merchantApi/merchant",
+          "description": "",
+          "url": "http://localhost/merchantApi/merchant",
+          "method": "POST",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n\"firstName\": \"suraj\",\n\"lastName\": \"sharma\",\n\"mobile\": 7907508735\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592065896993
+        },
+        {
+          "collectionId": "0c5e4354-3e07-8ba9-3f12-660d804e7532",
+          "id": "4b9c7a84-a2b4-f3f2-39b9-82c592ce38de",
+          "name": "http://localhost/merchantApi/",
+          "description": "",
+          "url": "http://localhost/merchantApi/",
+          "method": "GET",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n  \"name\":\"Arvee\",\n  \"category\":\"bakery\",\n  \"address\":{\n    \"coordinates\": {\n      \"lat\" : 72.12,\n      \"lng\": 12.13\n    },\n    \"landmark\":\"Near arniko\"\n  }\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592060200978
+        },
+        {
+          "collectionId": "0c5e4354-3e07-8ba9-3f12-660d804e7532",
+          "id": "82bc448d-3161-d247-948c-9b72115b8b7f",
+          "name": "http://localhost/merchantApi/merchant/1",
+          "description": "",
+          "url": "http://localhost/merchantApi/merchant/1",
+          "method": "PUT",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n\"mobile\": 7907508738\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592065906764
+        },
+        {
+          "collectionId": "0c5e4354-3e07-8ba9-3f12-660d804e7532",
+          "id": "daefa6f9-74cf-8deb-5cf3-68460ccca637",
+          "name": "http://localhost/merchantApi/merchant",
+          "description": "",
+          "url": "http://localhost/merchantApi/merchant/1",
+          "method": "GET",
+          "headers": "Content-Type: application/json\n",
+          "data": "{\n  \"addressName\": \"Anugraha\",\n  \"landmark\": \"Near Arvees!!!\",\n  \"latitude\": 9.230385,\n  \"longitude\": 76.515898\n}",
+          "dataMode": "raw",
+          "timestamp": 0,
+          "version": 2,
+          "time": 1592294884437
+        }
+      ]
+    }
