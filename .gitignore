@@ -1,2 +1,4 @@
 **/node_modules
 **/nextstore-firebase.json
+
+**/package-lock.json
