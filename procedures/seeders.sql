@@ -9,11 +9,11 @@ INSERT INTO category (name) VALUES
 ('Households'),
 ('Kitchen'),
 ('Electronics Mobiles'),
-('Eggs, Meat & Fish'),
+('Eggs, Meat & Fish');
 
 SET IDENTITY_INSERT subCategory ON;
 
-INSERT INTO subCategory (`id`, `name`, `categoryId`) VALUES
+INSERT INTO subCategory (id, categoryId, name) VALUES
 (1, '1', 'Baby Bath & Hygiene'),
 (2, '1', 'Mothers & Maternity'),
 (3, '1', 'Baby Accessories'),
@@ -93,7 +93,7 @@ SET IDENTITY_INSERT subCategory OFF;
 
 SET IDENTITY_INSERT subCategoryChild ON;
 
-INSERT INTO subCategory_child (id, subCategoryId, name) VALUES
+INSERT INTO subCategoryChild (id, subCategoryId, name) VALUES
 (1, '1', 'Baby Laundry'),
 (2, '1', 'Baby Bath'),
 (3, '1', 'Baby Creams & Lotions'),
@@ -588,7 +588,7 @@ INSERT INTO productMaster (id, name, image, subCategoryChildId) VALUES
 (200, 'ACT II NACHOZ CHEESE 60G', 'productPool/ACT II NACHOZ CHEESE 60G.jpg', 101);
 SET IDENTITY_INSERT productMaster OFF;
 
-INSERT INTO product (price, shopId, productMasterId) VALUES
+INSERT INTO product1 (price, shopId, productMasterId) VALUES
 (280, 1, 1),
 (350, 1, 2),
 (240, 1, 3),
