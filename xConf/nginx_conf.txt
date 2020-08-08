@@ -56,5 +56,16 @@ server{
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;		
-	}		
+	}
+
+	location /assets/ {
+        #change this to the location of images
+        
+        #root "/home/suraj/Desktop/localhost/";
+    }
+
+#	location ~ \.(jpg|jpeg|png) {
+#        root "/home/suraj/Desktop/localhost/assets";
+#   }
+
 }
