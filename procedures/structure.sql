@@ -216,3 +216,38 @@ CREATE TABLE nextstore.dbo.product1 (
 	CONSTRAINT FK__product__shopId__214BF109 FOREIGN KEY (shopId) REFERENCES nextstore.dbo.shop(id)
 );
 
+-- nextstore.dbo.offers definition
+
+CREATE TABLE nextstore.dbo.offers (
+	id int IDENTITY(1,1) NOT NULL,
+	offer_name varchar(15) NOT NULL,
+	offer_image varchar(40) NOT NULL,
+	offer_type varchar(20) NOT NULL,
+	createdAt datetime default CURRENT_TIMESTAMP
+);
+
+
+-- nextstore.dbo.coupons definition
+
+CREATE TABLE nextstore.dbo.coupons (
+  id int IDENTITY(1,1) PRIMARY KEY,
+  coupon_code varchar(12) NULL,
+  max_use_count int NOT NULL,
+  discount_percentage int NOT NULL,
+  min_order_amount int,
+  max_discount_amount int
+);
+
+-- nextstore.dbo.notifications definition
+
+CREATE TABLE nextstore.dbo.notifications (
+  id int IDENTITY(1,1) PRIMARY KEY,
+  sender_category varchar(15) NOT NULL,
+  receiver_category varchar(15) NOT NULL,
+  sender_id int NOT NULL,
+  receiver_id int NOT NULL,
+  notification_type varchar(50) NOT NULL,
+  notification_data TEXT DEFAULT NULL,
+  received_status bit null,  
+  createdAt datetimeoffset NULL
+);

@@ -173,7 +173,7 @@ BEGIN
 
 
 	DECLARE @distance FLOAT;
-	DECLARE @outputTable table (
+	DECLARE @shopsTable table (
 		shopId INT,
 		name nvarchar(100),
 		category nvarchar(50),
@@ -200,7 +200,7 @@ BEGIN
 			If(@distance<=@coverage)
 			begin
 				--if user is within coverage distance add shop to output table
-				INSERT INTO @outputTable(shopId, name, category, onlineStatus, image, distance) 
+				INSERT INTO @shopsTable(shopId, name, category, onlineStatus, image, distance) 
 				values (@id, @name, @category, @onlineStatus, @image, @distance);
 			end
 			
@@ -209,8 +209,23 @@ BEGIN
 		
 	Close shopCursor
 	Deallocate shopCursor
-	--output all found shops
-	select * from @outputTable
+	--create a json for shops and offers
+	;with x(json)
+	as
+	(
+		select 
+		shops = (
+			SELECT * from @shopsTable
+			For Json PATH, INCLUDE_NULL_VALUES
+		),
+		offers = (
+			select * from offers
+			FOR Json PATH, INCLUDE_NULL_VALUES
+		)
+		For Json PATH, INCLUDE_NULL_VALUES
+	)
+	
+	Select json from x;
 END
 
 GO;
@@ -324,4 +339,21 @@ BEGIN
 		WHERE #Product.id = '+@tableName+'.id';
 	
 	EXEC sp_executeSql @query;
-END 
+END
+
+GO;
+----------------------------------------------------------------------------
+---------Find all the offers-------------------
+CREATE PROCEDURE dbo.spGetAllOffers
+@custLat FLOAT, @custLng FLOAT, @offers nvarchar(MAX)
+AS
+BEGIN
+	;with x(offers)
+	as
+	(
+		select * from offers
+		FOR JSON AUTO
+	)
+	
+	SELECT @offers=offers from x;
+END

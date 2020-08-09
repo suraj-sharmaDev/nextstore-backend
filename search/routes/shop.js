@@ -63,7 +63,8 @@ router.get('/:lat/:lng', async(req, res, next)=>{
 					lng: req.params.lng
 				}
 			}).spread((shops, created)=>{
-				return shops;
+				console.log(shops[0].json)
+				return JSON.parse(shops[0].json)[0];
 			})
 			res.send(result);
 		} catch(e) {
