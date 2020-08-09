@@ -57,14 +57,18 @@ router.get('/:lat/:lng', async(req, res, next)=>{
 		}		
 	}else{
 		try {
-			const result = await sequelize.query('exec spfindShopsNearby :lat, :lng',{
+			const result = await sequelize.query('exec spGetNearbyShopsOffers :lat, :lng',{
 				replacements: {
 					lat: req.params.lat,
 					lng: req.params.lng
 				}
 			}).spread((shops, created)=>{
-				console.log(shops[0].json)
-				return JSON.parse(shops[0].json)[0];
+				var obj = Object.values(shops[0])[0];
+				if(obj){
+					return JSON.parse(obj);
+				}else{
+					return {error: true, reason: 'Either shopId or subCategoryId does not exist'}
+				}
 			})
 			res.send(result);
 		} catch(e) {

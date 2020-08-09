@@ -85,6 +85,10 @@ BEGIN
 
 	declare @tableId int;
 
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
+
 	If @shopId % 20 = 0
 		SET @tableId =  @shopId/20;
 	ELSE
@@ -107,7 +111,7 @@ BEGIN
 		select 
 		productMaster.id,
 		productMaster.name,
-		productMaster.image,
+		CONCAT(@baseUrl, productMaster.image),
 		productMaster.subCategoryChildId,
 		product.price
 		from productMaster
@@ -120,7 +124,7 @@ BEGIN
 	-- add categories to those shops
 	-- return in readable json format
 	INSERT INTO #DistTemp
-		EXEC sp_executeSql @query;
+		EXEC sp_executeSql @query, N'@baseUrl VARCHAR(200)', @baseUrl;
 
 	with x(json) as (
 		select 
@@ -171,6 +175,9 @@ BEGIN
 	DECLARE @onlineStatus bit;
 	DECLARE @coverage INT;
 
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
 
 	DECLARE @distance FLOAT;
 	DECLARE @shopsTable table (
@@ -201,7 +208,7 @@ BEGIN
 			begin
 				--if user is within coverage distance add shop to output table
 				INSERT INTO @shopsTable(shopId, name, category, onlineStatus, image, distance) 
-				values (@id, @name, @category, @onlineStatus, @image, @distance);
+				values (@id, @name, @category, @onlineStatus, CONCAT(@baseUrl, @image), @distance);
 			end
 			
 			Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @coverage;
@@ -209,23 +216,8 @@ BEGIN
 		
 	Close shopCursor
 	Deallocate shopCursor
-	--create a json for shops and offers
-	;with x(json)
-	as
-	(
-		select 
-		shops = (
-			SELECT * from @shopsTable
-			For Json PATH, INCLUDE_NULL_VALUES
-		),
-		offers = (
-			select * from offers
-			FOR Json PATH, INCLUDE_NULL_VALUES
-		)
-		For Json PATH, INCLUDE_NULL_VALUES
-	)
-	
-	Select json from x;
+	--output all found shops
+	select * from @shopsTable
 END
 
 GO;
@@ -344,16 +336,78 @@ END
 GO;
 ----------------------------------------------------------------------------
 ---------Find all the offers-------------------
+
 CREATE PROCEDURE dbo.spGetAllOffers
-@custLat FLOAT, @custLng FLOAT, @offers nvarchar(MAX)
+@custLat FLOAT, 
+@custLng FLOAT
 AS
 BEGIN
-	;with x(offers)
-	as
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
+
+	select
+	id,
+	offer_name ,
+	CONCAT(@baseUrl, offer_image) as offer_image ,
+	offer_type ,
+	createdAt 
+	from offers
+	
+END
+
+GO;
+
+--------------------------------------------------------------
+--------------Get all offers and shops near user--------
+Create Procedure dbo.spGetNearbyShopsOffers
+@custLat FLOAT,
+@custLng FLOAT
+AS
+BEGIN
+	IF OBJECT_ID('tempdb..#NearByShops') IS NOT NULL
+	    Truncate TABLE #NearByShops
+	else
+	    CREATE TABLE #NearByShops
+	    (
+			shopId int,
+			name NVARCHAR(200),
+			category NVARCHAR(80),
+			onlineStatus BIT,
+			image NVARCHAR(200),
+			distance FLOAT
+	    )
+	    
+	IF OBJECT_ID('tempdb..#AllOffers') IS NOT NULL
+	    Truncate TABLE #AllOffers
+	else
+	    CREATE TABLE #AllOffers
+	    (
+			id INT,
+			offer_name NVARCHAR(100),
+			offer_image NVARCHAR(200),
+			offer_type NVARCHAR(80),
+			createdAt datetime
+	    )	    
+	    
+	INSERT INTO #NearByShops
+		exec spfindShopsNearby @custLat, @custLng
+	INSERT INTO #AllOffers
+		exec spGetAllOffers @custLat, @custLng
+	
+	;with x(json) as
 	(
-		select * from offers
-		FOR JSON AUTO
+		SELECT 
+		shops = (
+			select * from #NearByShops
+			FOR JSON PATH, INCLUDE_NULL_VALUES 
+		),
+		offers = (
+			select * from #AllOffers
+			FOR JSON PATH, INCLUDE_NULL_VALUES 			
+		)
+		For Json PATH, WITHOUT_ARRAY_WRAPPER	
 	)
 	
-	SELECT @offers=offers from x;
+	select json from x;	
 END

@@ -1,8 +1,14 @@
+-- nextstore.dbo.appConfig definition
+CREATE TABLE nextstore.dbo.appConfig (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	baseUrl nvarchar(150) NOT NULL,
+	CGST int DEFAULT 0,
+	GST int DEFAULT 0,
+	stdShipping int DEFAULT 0,
+	stateId int DEFAULT 0
+);
+
 -- nextstore.dbo.category definition
-
--- Drop table
-
--- DROP TABLE nextstore.dbo.category GO
 
 CREATE TABLE nextstore.dbo.category (
 	id int IDENTITY(1,1) NOT NULL,

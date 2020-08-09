@@ -4,83 +4,87 @@ CREATE PROCEDURE dbo.spSearchInShop
 @keyword NVARCHAR(100)
 AS
 BEGIN
-Declare @outputData NVARCHAR(MAX);
-DECLARE @query NVARCHAR(MAX);
-declare @tableId int;
+	Declare @outputData NVARCHAR(MAX);
+	DECLARE @query NVARCHAR(MAX);
+	declare @tableId int;
 
-If @shopId % 20 = 0
-	SET @tableId =  @shopId/20;
-ELSE
-	SET @tableId =  @shopId/20 + 1;
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
 
-declare @tableName varchar(100) = N'product'+ cast(@tableId as varchar);
-
-IF OBJECT_ID('tempdb..#Products') IS NOT NULL
-	Truncate TABLE #Products
-else
-	CREATE TABLE #Products 
-	(
-		id int,
-		name varchar(100),
-		image varchar(200),
-		subCategoryChildId int,
-		price int
-	 )
-	 
-IF OBJECT_ID('tempdb..#Categories') IS NOT NULL
-DROP TABLE #Categories;
-
-----all matching products added to temp table #Products
-Declare @search varchar(100) = '''%' + @keyword + '%''';
-SET @query = N'
-	select productMaster.id as id,
-	productMaster.name as name, 
-	productMaster.image as image, 
-	productMaster.subCategoryChildId as subCategoryChildId,
-	product.price as price
-	From
-		productMaster
-		INNER JOIN '+ @tableName + ' as product on product.productMasterId = productMaster.id
-	where productMaster.name LIKE ' + @search + '
-	and product.shopId = ' + cast(@shopId as varchar) + '
-	Order By productMaster.subCategoryChildId OFFSET 0 ROWS
-	';
-
-INSERT INTO #Products
-	EXEC sp_executesql @query;
-
-----all categories and subCategories for the products retrieved into #Categories
-
-select 
-subCategory.categoryId as categoryId,
-subCategory.id as subCategoryId,
-subCategoryChild.id as subCategoryChildId
-INTO #Categories
-from 
-subCategoryChild
-INNER JOIN subCategory on subCategory.id = subCategoryChild.subCategoryId 
-where subCategoryChild.id in (
-	select subCategoryChildId from #Products
-); 
-
-with x(json) as (
+	If @shopId % 20 = 0
+		SET @tableId =  @shopId/20;
+	ELSE
+		SET @tableId =  @shopId/20 + 1;
+	
+	declare @tableName varchar(100) = N'product'+ cast(@tableId as varchar);
+	
+	IF OBJECT_ID('tempdb..#Products') IS NOT NULL
+		Truncate TABLE #Products
+	else
+		CREATE TABLE #Products 
+		(
+			id int,
+			name varchar(100),
+			image varchar(200),
+			subCategoryChildId int,
+			price int
+		 )
+		 
+	IF OBJECT_ID('tempdb..#Categories') IS NOT NULL
+	DROP TABLE #Categories;
+	
+	----all matching products added to temp table #Products
+	Declare @search varchar(100) = '''%' + @keyword + '%''';
+	SET @query = N'
+		select productMaster.id as id,
+		productMaster.name as name, 
+		CONCAT(@baseUrl ,productMaster.image) as image, 
+		productMaster.subCategoryChildId as subCategoryChildId,
+		product.price as price
+		From
+			productMaster
+			INNER JOIN '+ @tableName + ' as product on product.productMasterId = productMaster.id
+		where productMaster.name LIKE ' + @search + '
+		and product.shopId = ' + cast(@shopId as varchar) + '
+		Order By productMaster.subCategoryChildId OFFSET 0 ROWS
+		';
+	
+	INSERT INTO #Products
+		EXEC sp_executesql @query, N'@baseUrl varchar(200)', @baseUrl;
+	
+	----all categories and subCategories for the products retrieved into #Categories
+	
 	select 
-	categoryId = categoryId,
-	subCategoryId = subCategoryId,
-	subCategoryChildId = subCategoryChildId,
-	data = (
-		select id, name, image, price from #Products
-		where subCategoryChildId = C.subCategoryChildId
-		FOR JSON PATH, INCLUDE_NULL_VALUES 
+	subCategory.categoryId as categoryId,
+	subCategory.id as subCategoryId,
+	subCategoryChild.id as subCategoryChildId
+	INTO #Categories
+	from 
+	subCategoryChild
+	INNER JOIN subCategory on subCategory.id = subCategoryChild.subCategoryId 
+	where subCategoryChild.id in (
+		select subCategoryChildId from #Products
+	); 
+	
+	with x(json) as (
+		select 
+		categoryId = categoryId,
+		subCategoryId = subCategoryId,
+		subCategoryChildId = subCategoryChildId,
+		data = (
+			select id, name, image, price from #Products
+			where subCategoryChildId = C.subCategoryChildId
+			FOR JSON PATH, INCLUDE_NULL_VALUES 
+		)
+		From 
+		#Categories C 
+		FOR JSON PATH, INCLUDE_NULL_VALUES
 	)
-	From 
-	#Categories C 
-	FOR JSON PATH, INCLUDE_NULL_VALUES
-)
-
- select @outputData=json from x;
- select @outputData;
- RETURN
+	
+	 select @outputData=json from x;
+	 select @outputData;
+	 RETURN
 END
 
 GO;
