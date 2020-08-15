@@ -165,3 +165,81 @@ BEGIN
 END
 
 GO;
+
+
+-----------------------------------------------------------------------------------------
+----------------Get all nearby shops having products for subCategoryChildId--------------
+
+CREATE PROCEDURE dbo.spSearchShopsWithSubCategoryChildId
+@custLat FLOAT,
+@custLng FLOAT,
+@subCategoryChildId INT
+AS
+BEGIN
+	DECLARE @id INT;
+	DECLARE @name NVARCHAR(100);
+	DECLARE @category NVARCHAR(30);
+	DECLARE @image NVARCHAR(100);
+	DECLARE @onlineStatus bit;
+	
+	DECLARE @tableId int;
+	DECLARE @tableName varchar(100);
+	DECLARE @query NVARCHAR(MAX);
+
+	--This procedure is combination of two separate procedures
+	-- 1st Find all shops near the user
+	-- 2nd find products in this shop matching keyword
+	-- For faster results lets not use second one
+	-- instead write out own sub query
+	
+	DECLARE @stagingTable table (
+		shopId INT,
+		name nvarchar(100),
+		category nvarchar(50),
+		onlineStatus bit,
+		image nvarchar(100),
+		distance DECIMAL(3, 3)
+	);
+	DECLARE @searchFlag INT; --to check if product exist in shop
+	INSERT Into @stagingTable exec spfindShopsNearby @custLat, @custLng;
+
+	Declare shopCursor cursor for
+		select shopId, name, category, onlineStatus, image from @stagingTable
+	Open shopCursor 
+	
+	Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image 
+	
+	While(@@FETCH_STATUS=0)
+	Begin
+		--each of the row this cursor points to is shop near this user
+		--For each loop set @searchFlag to null, to not hold past value
+		SET @searchFlag = NULL;
+		--find the table name for the shop with shopId = @id
+		If @id % 20 = 0
+			SET @tableId =  @id/20;
+		ELSE
+			SET @tableId =  @id/20 + 1;
+		
+		SET @tableName = N'product'+ cast(@tableId as varchar);
+	
+		-- find if the shop has products belonging to subcategoryChildId
+			
+		SET @query = N'
+			select
+			TOP 1
+			@searchFlag = productMaster.id
+			From
+			productMaster
+			INNER JOIN product1 as product on product.productMasterId = productMaster.id
+			where (productMaster.subCategoryChildId = '+ cast(@subCategoryChildId as varchar) +'
+				and product.shopId = ' + cast(@id as varchar) + ' )';
+			
+		EXEC sp_executesql @query, N'@searchFlag INT OUTPUT', @searchFlag=@searchFlag OUTPUT;
+		if(@searchFlag is NULL)
+		begin
+			Delete from @stagingTable where shopId=@id
+		end
+		Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image
+	END
+	SELECT * FROM @stagingTable;
+END

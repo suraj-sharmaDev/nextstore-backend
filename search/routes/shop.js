@@ -79,4 +79,24 @@ router.get('/:lat/:lng', async(req, res, next)=>{
 	}
 })
 
+router.get('/:lat/:lng/:subCategoryChildId', async(req, res, next)=>{
+	const subCategoryChildId = req.params.subCategoryChildId;
+	try {
+		const result = await sequelize.query('exec spSearchShopsWithSubCategoryChildId :lat, :lng, :subCategoryChildId',{
+			replacements: {
+				lat: req.params.lat,
+				lng: req.params.lng,
+				subCategoryChildId: subCategoryChildId
+			}
+		}).spread((shops, created)=>{
+			return shops;
+		})
+		res.send(result);
+	} catch(e) {
+		// statements
+		res.send({error: true, reason: 'database error'})
+		console.log(e);
+	}			
+});
+
 module.exports = router;

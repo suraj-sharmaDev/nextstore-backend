@@ -36,6 +36,17 @@ procedures folder contains tsql, support for the api.
 
 The database mandatory is sql server v. 2019
 
+Local Server to nginx map
+=========================
+
+127.0.0.1:3000 : 35.230.117.116/customerApi
+
+127.0.0.1:3001 : 35.230.117.116/merchantApi
+
+127.0.0.1:3002 : 35.230.117.116/orderApi
+
+127.0.0.1:3003 : 35.230.117.116/searchApi
+
 -------------------------
 API LISTS
 ----------
@@ -186,7 +197,42 @@ Product
 		"productMasterId" : 1
 	}	
 	```
+Cart
+-------
+1. Get all items in cart for customerId
+   http://127.0.0.1:3000/cart/customerId
+   GET
 
+2. Create cart for customer with customerId
+	http://127.0.0.1:3000/cart/customerId
+	POST : JSON
+	```javascript
+	[
+	{
+		"productId": 3,
+		"name": "soup",
+		"image": "something",
+		"price": 100,
+		"qty": 4
+	}
+	]
+	```
+3. Update some of item in cart table using cartId
+   http://127.0.0.1:3000/cart/cartId
+   PUT : JSON
+   ```javascript
+	{
+	"qty": 10
+	}   
+   ```
+
+4. Delete some or all items in cartTable using cartId
+   http://127.0.0.1:3000/cart
+   DELETE : JSON
+   ```javascript
+	[1, 2, 3]
+   ```
+   
 Order
 --------
 
@@ -335,6 +381,9 @@ Search Operations
 
 3. Search for products in shop
 	http://127.0.0.1:3003/shop/1?searchKey=value
+
+4. Find all shops within x km radius that has products from subCategoryChildId
+	http://127.0.0.1:3003/shop/9.230385/76.515898/subCategoryChildId
 
 Author : Suraj Sharma
 --------------------------
