@@ -19,10 +19,6 @@ CREATE TABLE nextstore.dbo.category (
 
 -- nextstore.dbo.customer definition
 
--- Drop table
-
--- DROP TABLE nextstore.dbo.customer GO
-
 CREATE TABLE nextstore.dbo.customer (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -31,6 +27,15 @@ CREATE TABLE nextstore.dbo.customer (
 	CONSTRAINT PK__customer__3213E83FA6F76262 PRIMARY KEY (id)
 );
 
+-- nextstore.dbo.verification definition
+
+CREATE TABLE nextstore.dbo.verification (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	customerId int NOT NULL FOREIGN KEY REFERENCES customer(id),
+	otpCode NVARCHAR(10) NOT NULL,
+	verified bit NULL,
+	[timestamp] DATETIME2 default CURRENT_TIMESTAMP
+);
 
 -- nextstore.dbo.merchant definition
 

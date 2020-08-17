@@ -330,7 +330,15 @@ Customer
 		"mobile": 7907508735
 	}
 	```
-
+2. Verify the customer
+	http://127.0.0.1:3000/verify/
+	POST : JSON
+	```javascript
+	{
+		"customerId" : 1,
+		"otpCode" : "WeYM"
+	}
+	```	
 3. Update user information like name or mobile
 	http://127.0.0.1:3000/login/customerId
 	PUT : JSON

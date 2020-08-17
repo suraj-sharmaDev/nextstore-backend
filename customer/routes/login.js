@@ -3,14 +3,14 @@ const {customer, orderMaster, cart, address, sequelize} = require('../models');
 const router = express.Router();
 
 router.get('/:custId', async(req, res, next)=>{
-	var customer = null;
+	var user = null;
 	try {
-		customer = await sequelize.query('EXEC spInitializeCustomer :custId',{
+		user = await sequelize.query('EXEC spInitializeCustomer :custId',{
 			replacements: {
 				custId: req.params.custId
 			}
-		}).spread((user, created)=> {
-			var obj = Object.values(user[0]);
+		}).spread((value, created)=> {
+			var obj = Object.values(value[0]);
 			if(obj[0]){
 				return(JSON.parse(obj))
 			}else{
@@ -19,26 +19,34 @@ router.get('/:custId', async(req, res, next)=>{
 		})
 	} catch(e) {
 		// statements
-		customer = {error: true, reason: 'database error'};
+		user = {error: true, reason: 'database error'};
 		console.log(e);
 	}
-	res.send(customer);
+	res.send(user);
 })
 
 router.post('/', async(req, res, next)=>{
+	var user = null;
 	try {
-		const [cust, created] = await customer.findOrCreate({
-			where: {
-				mobile: req.body.mobile
-			},
-			include: 'addresses',
-			defaults: {
-				mobile: req.body.mobile
-			}
-		})
-		res.json(cust);		
+		//check if mobile number is valid or not
+		let mobile = req.body.mobile;
+		if(mobile.length === 10){
+			user = await sequelize.query('EXEC spLoginOrSignupCustomer :mobile',{
+				replacements: {
+					mobile: mobile
+				}
+			}).spread((value, created)=> {
+				return value[0];
+			});
+			// after getting result we have to send OTP to users mobile
+			//remaining
+			
+			res.send(user);
+		}else{
+			res.json({error: true, message: 'invalid_number'});
+		}
 	} catch(e) {
-		res.send(e);
+		res.json({error: true, message: 'database_error'});
 		// statements
 		console.log(e);
 	}
