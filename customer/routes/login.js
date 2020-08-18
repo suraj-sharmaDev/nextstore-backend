@@ -30,7 +30,7 @@ router.post('/', async(req, res, next)=>{
 	try {
 		//check if mobile number is valid or not
 		let mobile = req.body.mobile;
-		if(mobile.length === 10){
+		if(mobile.length >= 10){
 			user = await sequelize.query('EXEC spLoginOrSignupCustomer :mobile',{
 				replacements: {
 					mobile: mobile
