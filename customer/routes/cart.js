@@ -22,7 +22,7 @@ router.post('/:customerId', async(req, res, next)=>{
 		res.send({message: 'created'});
 	} catch(e) {
 		await t.rollback();
-		res.send({error: true});
+		res.send({error: true, message: 'json_incomplete'});
 		console.log(e);
 	}
 })

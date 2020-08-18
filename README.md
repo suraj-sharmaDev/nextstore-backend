@@ -55,7 +55,7 @@ merchant
 --------
 
 1. create Merchant
-	127.0.0.1:3001/merchant
+	35.230.117.116/merchantApi/merchant
 	POST : JSON
 	{
 	"firstName": "suraj",
@@ -64,20 +64,20 @@ merchant
 	}
 
 2. update Merchant
-	127.0.0.1:3001/merchant/merchId
+	35.230.117.116/merchantApi/merchant/merchId
 	PUT : JSON
 
 Shop
 ----
 
 1. Get content of shop with shopId
-	http://127.0.0.1:3001/shop/shopId
+	http://35.230.117.116/merchantApi/shop/shopId
 
 2. Get products of shop with shopId, for subCategoryId
-	http://127.0.0.1:3001/shop/shopId/subCategoryId
+	http://35.230.117.116/merchantApi/shop/shopId/subCategoryId
 
 3. Create Shop
-	127.0.0.1:3001/shop/merchId
+	35.230.117.116/merchantApi/shop/merchId
 	POST : JSON
 	```javascript
 	{
@@ -92,7 +92,7 @@ Shop
 	}
 	```
 4. Update Shop
-	127.0.0.1:3001/shop/shopId
+	35.230.117.116/merchantApi/shop/shopId
 	PUT : JSON
 	```javascript
 	{
@@ -111,13 +111,13 @@ category
 --------
 
 1. Get All Category
-	http://127.0.0.1:3001/category
+	http://35.230.117.116/merchantApi/category
 
 2. Get category with Id
-	http://127.0.0.1:3001/category/category/categoryId
+	http://35.230.117.116/merchantApi/category/category/categoryId
 
 3. Create Category
-	127.0.0.1:3001/category
+	35.230.117.116/merchantApi/category
 	POST : JSON
 	```javascript
 	{
@@ -125,7 +125,7 @@ category
 	}	
 	```
 4. Update Category
-	127.0.0.1:3001/category/category/categoryId
+	35.230.117.116/merchantApi/category/category/categoryId
 	POST : JSON
 	```javascript
 	{
@@ -133,10 +133,10 @@ category
 	}		
 	```
 5. Get subCategory with Id
-	http://127.0.0.1:3001/category/subCategory/subCategoryId
+	http://35.230.117.116/merchantApi/category/subCategory/subCategoryId
 
 6. Create SubCategory
-	127.0.0.1:3000/category/subCategory
+	35.230.117.116/customerApi/category/subCategory
 	PUT : JSON
 	```javascript
 	{
@@ -145,7 +145,7 @@ category
 	}	
 	```
 7. Update SubCategory
-	127.0.0.1:3001/category/subCategory/subCategoryId
+	35.230.117.116/merchantApi/category/subCategory/subCategoryId
 	PUT : JSON
 	```javascript
 	{
@@ -154,10 +154,10 @@ category
 	```
 
 8. Get subCategoryChild with Id
-	http://127.0.0.1:3001/category/subCategory/subCategoryId
+	http://35.230.117.116/merchantApi/category/subCategory/subCategoryId
 
 9. Create SubCategoryChild
-	127.0.0.1:3001/category/subCategoryChild
+	35.230.117.116/merchantApi/category/subCategoryChild
 	```javascript
 	POST : JSON
 	{
@@ -166,7 +166,7 @@ category
 	}	
 	```
 10. Update Category
-	127.0.0.1:3001/category/subCategoryChild/subCategoryChildId
+	35.230.117.116/merchantApi/category/subCategoryChild/subCategoryChildId
 	PUT : JSON
 	```javascript
 	{
@@ -178,7 +178,7 @@ Product
 ---------
 
 1. Create product
-	http://127.0.0.1:3001/product/shopId
+	http://35.230.117.116/merchantApi/product/shopId
 	POST : JSON
 	```javascript
 	{
@@ -189,7 +189,7 @@ Product
 	```
 
 2. Update product
-	http://127.0.0.1:3001/product/shopId/productId
+	http://35.230.117.116/merchantApi/product/shopId/productId
 	PUT : JSON
 	```javascript
 	{
@@ -200,25 +200,38 @@ Product
 Cart
 -------
 1. Get all items in cart for customerId
-   http://127.0.0.1:3000/cart/customerId
+   http://35.230.117.116/customerApi/cart/customerId
    GET
 
 2. Create cart for customer with customerId
-	http://127.0.0.1:3000/cart/customerId
+	http://35.230.117.116/customerApi/cart/customerId
 	POST : JSON
 	```javascript
-	[
 	{
+	"master":{
+		"shopId": 1,
+		"customerId": 1
+	},
+	"detail": [
+		{
 		"productId": 3,
 		"name": "soup",
 		"image": "something",
 		"price": 100,
 		"qty": 4
-	}
+		},
+		{
+		"productId": 4,
+		"name": "soup",
+		"image": "something",
+		"price": 100,
+		"qty": 4
+		}    
 	]
+	}
 	```
 3. Update some of item in cart table using cartId
-   http://127.0.0.1:3000/cart/cartId
+   http://35.230.117.116/customerApi/cart/cartId
    PUT : JSON
    ```javascript
 	{
@@ -227,7 +240,7 @@ Cart
    ```
 
 4. Delete some or all items in cartTable using cartId
-   http://127.0.0.1:3000/cart
+   http://35.230.117.116/customerApi/cart
    DELETE : JSON
    ```javascript
 	[1, 2, 3]
@@ -237,10 +250,10 @@ Order
 --------
 
 1. Get Order Details
-	http://127.0.0.1:3002/order/orderId
+	http://35.230.117.116/orderApi/order/orderId
 
 2. Create New Order
-	http://127.0.0.1:3002/order
+	http://35.230.117.116/orderApi/order
 	POST : JSON
 	```javascript
 	{
@@ -265,7 +278,7 @@ Order
 	}
 	```
 3. Add orders to existent Order
-	http://127.0.0.1:3002/order/orderId
+	http://35.230.117.116/orderApi/order/orderId
 	POST : JSON
 	```javascript
 	[
@@ -284,7 +297,7 @@ Order
 	]
 	```
 4. Update some products in orders
-	http://127.0.0.1:3002/order
+	http://35.230.117.116/orderApi/order
 	PUT : JSON
 	//this will affect orderDetail Table
 	```javascript
@@ -300,30 +313,30 @@ Order
 	]
 	```
 5. Delete full Order
-	http://127.0.0.1:3002/order/orderId
+	http://35.230.117.116/orderApi/order/orderId
 	DELETE Method
 
 6. Delete particular products in order with known id for each added products in orderDetail
-	http://127.0.0.1:3002/order
+	http://35.230.117.116/orderApi/order
 	DELETE : JSON
 	```javascript
 	[1,2,3]
 	```
 7. Accept order
-	http://127.0.0.1:3002/operations/acceptOrder/orderId
+	http://35.230.117.116/orderApi/operations/acceptOrder/orderId
 
 8. Reject Order
-	http://127.0.0.1:3002/operations/rejectOrder/orderId
+	http://35.230.117.116/orderApi/operations/rejectOrder/orderId
 
 Customer
 --------
 
 1. Initialization of customer with customerId
-	http://127.0.0.1:3000/login/customerId
+	http://35.230.117.116/customerApi/login/customerId
 	GET
 
 2. Login or signup a user using mobile no.
-	http://127.0.0.1:3000/login/
+	http://35.230.117.116/customerApi/login/
 	POST : JSON
 	```javascript
 	{
@@ -331,7 +344,7 @@ Customer
 	}
 	```
 2. Verify the customer
-	http://127.0.0.1:3000/verify/
+	http://35.230.117.116/customerApi/verify/
 	POST : JSON
 	```javascript
 	{
@@ -340,7 +353,7 @@ Customer
 	}
 	```	
 3. Update user information like name or mobile
-	http://127.0.0.1:3000/login/customerId
+	http://35.230.117.116/customerApi/login/customerId
 	PUT : JSON
 	```javascript
 	{
@@ -350,11 +363,11 @@ Customer
 	```
 
 4. Get address for customer 
-	http://127.0.0.1:3000/address/customerId
+	http://35.230.117.116/customerApi/address/customerId
 	GET
 
 5. Add new address for customer
-	http://127.0.0.1:3000/address/
+	http://35.230.117.116/customerApi/address/
 	POST : JSON
 	```javascript
 	{
@@ -367,7 +380,7 @@ Customer
 	}
 	```
 6. Update customer Address
-	http://127.0.0.1:3000/address/addressId
+	http://35.230.117.116/customerApi/address/addressId
 	PUT : JSON
 	```javascript
 	{
@@ -382,16 +395,16 @@ Search Operations
 ------------------
 
 1. Shops available within x km radius of coordinates
-	http://127.0.0.1:3003/shop/9.230385/76.515898
+	http://35.230.117.116/searchApi/shop/9.230385/76.515898
 
 2. Search for shops with product within x km radius
-	http://127.0.0.1:3003/shop/9.230385/76.515898?searchKey=value
+	http://35.230.117.116/searchApi/shop/9.230385/76.515898?searchKey=value
 
 3. Search for products in shop
-	http://127.0.0.1:3003/shop/1?searchKey=value
+	http://35.230.117.116/searchApi/shop/1?searchKey=value
 
 4. Find all shops within x km radius that has products from subCategoryChildId
-	http://127.0.0.1:3003/shop/9.230385/76.515898/subCategoryChildId
+	http://35.230.117.116/searchApi/shop/9.230385/76.515898/subCategoryChildId
 
 Author : Suraj Sharma
 --------------------------

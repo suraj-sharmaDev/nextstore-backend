@@ -70,22 +70,51 @@ CREATE TABLE nextstore.dbo.orderMaster (
 );
 
 
+-- nextstore.dbo.orderDetail definition
+
+-- Drop table
+
+-- DROP TABLE nextstore.dbo.orderDetail GO
+
+CREATE TABLE nextstore.dbo.orderDetail (
+	id int IDENTITY(1,1) NOT NULL,
+	productId int NULL,
+	productName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	qty int NULL,
+	price int NULL,
+	orderMasterId int NULL,
+	CONSTRAINT PK__orderDet__3213E83F4619239D PRIMARY KEY (id),
+	CONSTRAINT FK__orderDeta__order__15DA3E5D FOREIGN KEY (orderMasterId) REFERENCES nextstore.dbo.orderMaster(id)
+);
+
+-- nextstore.dbo.cartMaster definition
+
+-- Drop table
+
+-- DROP TABLE nextstore.dbo.cartMaster GO
+
+CREATE TABLE nextstore.dbo.cartMaster (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	customerId int NULL FOREIGN KEY REFERENCES customer(id) ON DELETE SET NULL,
+	shopId int NULL FOREIGN KEY REFERENCES shop(id) ON DELETE SET NULL,
+	[status] bit DEFAULT 0,
+	createdAt datetimeoffset DEFAULT CURRENT_TIMESTAMP
+);
+
 -- nextstore.dbo.cart definition
 
 -- Drop table
 
 -- DROP TABLE nextstore.dbo.cart GO
 
-CREATE TABLE nextstore.dbo.cart (
-	id int IDENTITY(1,1) NOT NULL,
+CREATE TABLE nextstore.dbo.cartDetail (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	productId int NULL,
 	name nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[image] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	price int NULL,
 	qty int NULL,
-	customerId int NULL,
-	CONSTRAINT PK__cart__3213E83FB0A13225 PRIMARY KEY (id),
-	CONSTRAINT FK__cart__customerId__0D7A0286 FOREIGN KEY (customerId) REFERENCES nextstore.dbo.customer(id) ON DELETE SET NULL
+	cartMasterId int FOREIGN KEY REFERENCES cartMaster(id)
 );
 
 
@@ -107,25 +136,6 @@ CREATE TABLE nextstore.dbo.customerAddress (
 	CONSTRAINT PK__customer__3213E83FFEE64773 PRIMARY KEY (id),
 	CONSTRAINT FK__customerA__custo__0A9D95DB FOREIGN KEY (customerId) REFERENCES nextstore.dbo.customer(id) ON DELETE SET NULL
 );
-
-
--- nextstore.dbo.orderDetail definition
-
--- Drop table
-
--- DROP TABLE nextstore.dbo.orderDetail GO
-
-CREATE TABLE nextstore.dbo.orderDetail (
-	id int IDENTITY(1,1) NOT NULL,
-	productId int NULL,
-	productName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-	qty int NULL,
-	price int NULL,
-	orderMasterId int NULL,
-	CONSTRAINT PK__orderDet__3213E83F4619239D PRIMARY KEY (id),
-	CONSTRAINT FK__orderDeta__order__15DA3E5D FOREIGN KEY (orderMasterId) REFERENCES nextstore.dbo.orderMaster(id)
-);
-
 
 -- nextstore.dbo.shop definition
 

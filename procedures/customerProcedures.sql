@@ -1,5 +1,5 @@
 ------------Get Customer Details
-Create Procedure dbo.spInitializeCustomer
+CREATE Procedure dbo.spInitializeCustomer
 @custId int
 As
 Begin 
@@ -8,17 +8,19 @@ Begin
 		Select 
 			name,
 			mobile,
-			carts = (
-				select * from cart
-				where cart.customerId = @custId
-				For Json PATH, INCLUDE_NULL_VALUES
+			cart = (
+				select cm.shopId, cm.customerId, cartDetail.* 
+				from cartMaster cm
+				inner join cartDetail on cartDetail.cartMasterId = cm.id
+				where cm.customerId = 1 and cm.status = 0
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
 			),
-			addresses = (
+			address = (
 				select * from customerAddress
 				where customerId = @custId
 				For Json PATH, INCLUDE_NULL_VALUES				
 			),
-			orders = (
+			[order] = (
 				select 
 				TOP 3 
 				* 
@@ -26,10 +28,19 @@ Begin
 				where orderMaster.customerId = @custId
 				And orderMaster.status in ('pending', 'accepted')
 				For Json PATH, INCLUDE_NULL_VALUES				
+			),
+			recentOrder = (
+				select 
+				TOP 3 
+				* 
+				from orderMaster
+				where orderMaster.customerId = @custId
+				And orderMaster.status in ('completed')
+				For Json PATH, INCLUDE_NULL_VALUES							
 			)
 		from customer
 		where id = @custId
-		For Json Auto, WITHOUT_ARRAY_WRAPPER	
+		For Json Auto, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER	
 	)
 	
 	select @result=json from x;

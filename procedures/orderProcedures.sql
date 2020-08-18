@@ -1,13 +1,17 @@
---Create new orderMaster and add children orderdetails
 CREATE PROCEDURE dbo.spCreateNewOrder
 @json NVARCHAR(max),
 @fcmToken NVARCHAR(255) OUTPUT
 AS
 BEGIN
-DECLARE @orderMasterId INT;
-DECLARE @createdAt datetimeoffset;
-SET @createdAt = GETUTCDATE();
 
+DECLARE @orderMasterId INT;
+DECLARE @createdAt datetimeoffset = GETUTCDATE();
+
+DECLARE @customerId INT;
+SET @customerId = JSON_VALUE(@json, '$.master.customerId');
+-- update cartMaster table to identify fulfilled carts
+UPDATE cartMaster set status = 1 where customerId = @customerId;
+-- insert into ordermaster
 insert into orderMaster (customerId, shopId, createdAt)
   select json.customerId, json.shopId, @createdAt as createdAt
   from openjson(@json, '$.master')
@@ -29,12 +33,12 @@ INSERT into orderDetail (productId, productName, price, qty, orderMasterId)
     qty INT '$.qty'
   )json
 
---send back the fcmToken for the shop with provided shopId
 select @fcmToken=fcmToken from shop where id in (
-  select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
+	select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
 )
 END
 
+GO;
 -----------------------------------------------------
 
 --BULK CREATE orderDetail records
@@ -55,6 +59,7 @@ INSERT into orderDetail (productId, productName, qty, price, orderMasterId )
 
 END
 
+GO;
 -------------------------------------------------------
 
 --BULK UPDATE orderDetail table
@@ -84,6 +89,7 @@ ON
 
 END
 
+GO;
 --------------------------------------------------------
 
 --accept Order with orderId
@@ -106,6 +112,8 @@ select @fcmToken=fcmToken from customer where id in (
   select customerId from dbo.orderMaster where id = @orderId
 )  
 END
+
+GO;
 
 --------------------------------------------------------
 
