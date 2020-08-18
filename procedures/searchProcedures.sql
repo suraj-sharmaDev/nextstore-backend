@@ -58,7 +58,8 @@ BEGIN
 	select 
 	subCategory.categoryId as categoryId,
 	subCategory.id as subCategoryId,
-	subCategoryChild.id as subCategoryChildId
+	subCategoryChild.id as subCategoryChildId,
+	subCategoryChild.name as title
 	INTO #Categories
 	from 
 	subCategoryChild
@@ -72,6 +73,7 @@ BEGIN
 		categoryId = categoryId,
 		subCategoryId = subCategoryId,
 		subCategoryChildId = subCategoryChildId,
+		title = title,
 		data = (
 			select id, name, image, price from #Products
 			where subCategoryChildId = C.subCategoryChildId
@@ -120,7 +122,7 @@ BEGIN
 		category nvarchar(50),
 		onlineStatus bit,
 		image nvarchar(100),
-		distance DECIMAL(3, 3)
+		distance FLOAT
 	);
 	DECLARE @searchFlag INT; --to check if product exist in shop
 	INSERT Into @stagingTable exec spfindShopsNearby @custLat, @custLng;
@@ -198,7 +200,7 @@ BEGIN
 		category nvarchar(50),
 		onlineStatus bit,
 		image nvarchar(100),
-		distance DECIMAL(3, 3)
+		distance FLOAT
 	);
 	DECLARE @searchFlag INT; --to check if product exist in shop
 	INSERT Into @stagingTable exec spfindShopsNearby @custLat, @custLng;

@@ -6,6 +6,10 @@ BEGIN
 --will create json output for shops complete details
 
 	declare @tableId int;
+	
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
 
 	If @shopId % 20 = 0
 		SET @tableId =  @shopId/20;
@@ -64,7 +68,7 @@ BEGIN
 		select json from x;
 	
 	UPDATE #Results SET shopInfo = (
-		SELECT id, name, category, onlineStatus 
+		SELECT id, name, category, CONCAT(@baseUrl,[image]) as [image], onlineStatus 
 		from shop where id = @shopId
 		for JSON AUTO, WITHOUT_ARRAY_WRAPPER
 	)
@@ -186,7 +190,7 @@ BEGIN
 		category nvarchar(50),
 		onlineStatus bit,
 		image nvarchar(100),
-		distance DECIMAL(3, 3)
+		distance FLOAT
 	);
 
 	DECLARE shopCursor CURSOR 
@@ -203,8 +207,10 @@ BEGIN
 				geography::Point(latitude, longitude, 4326)
 			) from shopAddress
 			where shopAddress.shopId = @id;
+			-- convert meters to KMs
+			SET @distance = ROUND(@distance/1000, 2);
 			--check if distance is less than the coverage of shop
-			If(@distance<=@coverage)
+			If(@distance <= @coverage)
 			begin
 				--if user is within coverage distance add shop to output table
 				INSERT INTO @shopsTable(shopId, name, category, onlineStatus, image, distance) 
@@ -406,7 +412,7 @@ BEGIN
 			select * from #AllOffers
 			FOR JSON PATH, INCLUDE_NULL_VALUES 			
 		)
-		For Json PATH, WITHOUT_ARRAY_WRAPPER	
+		For Json PATH, WITHOUT_ARRAY_WRAPPER, INCLUDE_NULL_VALUES	
 	)
 	
 	select json from x;	
