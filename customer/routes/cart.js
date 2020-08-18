@@ -12,10 +12,9 @@ router.get('/:customerId', (req, res, next)=>{
 router.post('/:customerId', async(req, res, next)=>{
 	const t = await sequelize.transaction();
 	try {
-		await sequelize.query('exec spbulkCreateCart :json, :customerId', { 
+		await sequelize.query('exec spbulkCreateCart :json', { 
 			replacements: { 
-				json: JSON.stringify(req.body),
-				customerId: req.params.customerId 
+				json: JSON.stringify(req.body)
 			}
 		});		
 		await t.commit();
