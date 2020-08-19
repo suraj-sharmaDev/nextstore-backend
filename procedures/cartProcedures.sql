@@ -27,3 +27,32 @@ BEGIN
 	  )json
 
 END
+
+GO;
+---------------------------------------------
+---------------- Get Customer Cart Data-------
+
+CREATE Procedure dbo.spGetCustomerCart
+@custId int
+As
+Begin 
+	Declare @result nvarchar(max);
+	with x(json) as (
+		Select
+			id as customerId,
+			cart = (
+				select cm.shopId, cartDetail.* 
+				from cartMaster cm
+				inner join cartDetail on cartDetail.cartMasterId = cm.id
+				where cm.customerId = 1 and cm.status = 0
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
+			)
+		from customer
+		where id = @custId
+		For Json Auto, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER	
+	)
+	
+	select @result=json from x;
+	select @result;
+	RETURN
+End

@@ -4,9 +4,23 @@ const {cart, sequelize} = require('../models');
 const router = express.Router();
 
 router.get('/:customerId', (req, res, next)=>{
-	cart.findAll({where: {customerId : req.params.customerId}})
-	.then((result)=> res.json(result))
-	.catch((err)=>res.json(err))
+	try {
+		const cart = await sequelize.query('EXEC spGetCustomerCart :customerId', { 
+			replacements: { 
+				customerId: req.params.customerId
+			}
+			}).spread((value, created)=>{
+				//since the return data will be string and not parsed
+				//lets parse it
+				return value;
+			})	
+
+		res.send(cart);
+	} catch(e) {
+		await t.rollback();
+		res.send({error: true, message: 'json_incomplete'});
+		console.log(e);
+	}
 })
 
 router.post('/:customerId', async(req, res, next)=>{

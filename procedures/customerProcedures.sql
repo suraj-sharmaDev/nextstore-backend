@@ -12,7 +12,7 @@ Begin
 				select cm.shopId, cm.customerId, cartDetail.* 
 				from cartMaster cm
 				inner join cartDetail on cartDetail.cartMasterId = cm.id
-				where cm.customerId = 1 and cm.status = 0
+				where cm.customerId = @custId and cm.status = 0
 				FOR JSON AUTO, INCLUDE_NULL_VALUES
 			),
 			address = (
