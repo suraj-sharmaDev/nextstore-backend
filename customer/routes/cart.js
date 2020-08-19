@@ -3,21 +3,23 @@ const {cart, sequelize} = require('../models');
 
 const router = express.Router();
 
-router.get('/:customerId', (req, res, next)=>{
+router.get('/:customerId', async(req, res, next)=>{
 	try {
 		const cart = await sequelize.query('EXEC spGetCustomerCart :customerId', { 
 			replacements: { 
 				customerId: req.params.customerId
 			}
 			}).spread((value, created)=>{
-				//since the return data will be string and not parsed
-				//lets parse it
-				return value;
+				var obj = Object.values(value[0]);
+				if(obj[0]){
+					return(JSON.parse(obj))
+				}else{
+					return {error: true, reason: 'unknown customer Id'};
+				}
 			})	
 
 		res.send(cart);
 	} catch(e) {
-		await t.rollback();
 		res.send({error: true, message: 'json_incomplete'});
 		console.log(e);
 	}
