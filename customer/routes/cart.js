@@ -25,7 +25,7 @@ router.get('/:customerId', async(req, res, next)=>{
 	}
 })
 
-router.post('/:customerId', async(req, res, next)=>{
+router.post('/', async(req, res, next)=>{
 	try {
 		await sequelize.query('exec spbulkCreateCart :json', { 
 			replacements: { 
@@ -39,11 +39,13 @@ router.post('/:customerId', async(req, res, next)=>{
 	}
 })
 
-router.put('/', async(req, res, next)=>{
+router.put('/:customerId/:shopId', async(req, res, next)=>{
 	try {
-		await sequelize.query('exec spUpdateCart :json', { 
+		await sequelize.query('exec spUpdateCart :json, :customerId, :shopId', { 
 			replacements: { 
-				json: JSON.stringify(req.body)
+				json: JSON.stringify(req.body),
+				customerId: req.params.customerId,
+				shopId: req.params.shopId
 			}
 		});
 		res.send({message: 'updated'});
@@ -53,11 +55,13 @@ router.put('/', async(req, res, next)=>{
 	}
 })
 
-router.delete('/', async(req, res, next)=>{
+router.delete('/:customerId/:shopId', async(req, res, next)=>{
 	try {
-		await sequelize.query('exec spDeleteCart :json', { 
+		await sequelize.query('exec spDeleteCart :json, :customerId, :shopId', { 
 			replacements: { 
-				json: JSON.stringify(req.body)
+				json: JSON.stringify(req.body),
+				customerId: req.params.customerId,
+				shopId: req.params.shopId				
 			}
 		});
 		res.send({message: 'deleted'});

@@ -204,7 +204,7 @@ Cart
    GET
 
 2. Create cart for customer with customerId
-	http://35.230.117.116/customerApi/cart/customerId
+	http://35.230.117.116/customerApi/cart
 	POST : JSON
 	```javascript
 	{
@@ -231,16 +231,23 @@ Cart
 	}
 	```
 3. Update some of item in cart table using cartId
-   http://35.230.117.116/customerApi/cart/cartId
+   http://35.230.117.116/customerApi/cart/customerId/shopId
    PUT : JSON
    ```javascript
+	[
 	{
-	"qty": 10
-	}   
+		"productId" : 1,
+		"qty" : 1
+	},
+	{
+		"productId" : 2,
+		"qty" : 2
+	}  
+	]
    ```
 
 4. Delete some or all items in cartTable using cartId
-   http://35.230.117.116/customerApi/cart
+   http://35.230.117.116/customerApi/cart/customerId/shopId
    DELETE : JSON
    ```javascript
 	[1, 2, 3]

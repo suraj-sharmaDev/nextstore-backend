@@ -72,40 +72,67 @@ GO;
 -----------------------------------------------------------
 ----------------update cart items---------------------------
 CREATE PROCEDURE dbo.spUpdateCart
-@json NVARCHAR(MAX)
+@json NVARCHAR(MAX),
+@customerId int,
+@shopId int
 AS
 BEGIN
-	with stagingTable as (
-	  SELECT * from OPENJSON(@json)
-	    with (
-	      id INT '$.id',
-	      qty INT '$.qty'
-	    )
-	)
+	DECLARE @cartMasterId INT = 0;
+	-- find cartMasterId
+	SELECT @cartMasterId = id from cartMaster
+		where customerId = @customerId and shopId = @shopId
+		and status = 0;
+
+	IF @cartMasterId > 0
+	BEGIN
+		with stagingTable as (
+		  SELECT *, @cartMasterId as cartMasterId from OPENJSON(@json)
+		    with (
+		      productId INT '$.productId',
+		      qty INT '$.qty'
+		    )
+		)
+		
+		UPDATE
+		    dbo.cartDetail 
+		SET
+		    dbo.cartDetail.qty = s.qty
+		FROM
+		    dbo.cartDetail t
+		INNER JOIN
+		    stagingTable s
+		ON 
+		    s.productId = t.productId
+		AND 
+			s.cartMasterId = t.cartMasterId 
+	END
 	
-	UPDATE
-	    dbo.cartDetail 
-	SET
-	    dbo.cartDetail.qty = s.qty
-	FROM
-	    dbo.cartDetail t
-	INNER JOIN
-	    stagingTable s
-	ON 
-	    s.id = t.id;
 END
 
 GO;
 -----------------------------------------------------------
 ----------------delete cart items---------------------------
+
 CREATE PROCEDURE dbo.spDeleteCart
-@json NVARCHAR(MAX)
+@json NVARCHAR(MAX),
+@customerId int,
+@shopId int
 AS
 BEGIN
-	DELETE FROM cartDetail where id in (
-		SELECT id from openjson(@json)
-		with (
-			id INT '$'
-		)
-	)
+	DECLARE @cartMasterId INT = 0;
+	-- find cartMasterId
+	SELECT @cartMasterId = id from cartMaster
+		where customerId = @customerId and shopId = @shopId
+		and status = 0;
+
+	IF @cartMasterId > 0
+	BEGIN
+		DELETE FROM cartDetail where cartMasterId = @cartMasterId and 
+		productId in (
+			SELECT id from openjson(@json)
+			with (
+				id INT '$'
+			)
+		)	
+	END
 END
