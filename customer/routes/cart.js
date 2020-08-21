@@ -26,44 +26,43 @@ router.get('/:customerId', async(req, res, next)=>{
 })
 
 router.post('/:customerId', async(req, res, next)=>{
-	const t = await sequelize.transaction();
 	try {
 		await sequelize.query('exec spbulkCreateCart :json', { 
 			replacements: { 
 				json: JSON.stringify(req.body)
 			}
-		});		
-		await t.commit();
+		});
 		res.send({message: 'created'});
 	} catch(e) {
-		await t.rollback();
 		res.send({error: true, message: 'json_incomplete'});
 		console.log(e);
 	}
 })
 
-router.put('/:cartId', async(req, res, next)=>{
+router.put('/', async(req, res, next)=>{
 	try {
-		await cart.update({...req.body}, {where: { id: req.params.cartId}});
+		await sequelize.query('exec spUpdateCart :json', { 
+			replacements: { 
+				json: JSON.stringify(req.body)
+			}
+		});
 		res.send({message: 'updated'});
 	} catch(e) {
-		res.send({error: true})
-		// statements
+		res.send({error: true, message: 'json_incomplete'});
 		console.log(e);
 	}
 })
 
 router.delete('/', async(req, res, next)=>{
-	const t = await sequelize.transaction();
 	try {
-		await cart.destroy({where: {id : req.body}});
-		await t.commit();
+		await sequelize.query('exec spDeleteCart :json', { 
+			replacements: { 
+				json: JSON.stringify(req.body)
+			}
+		});
 		res.send({message: 'deleted'});
-		// statements
 	} catch(e) {
-		await t.rollback();
-		res.send({error: true})
-		// statements
+		res.send({error: true, message: 'json_incomplete'});
 		console.log(e);
 	}
 })

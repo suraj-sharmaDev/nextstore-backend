@@ -4,28 +4,38 @@ CREATE PROCEDURE dbo.spbulkCreateCart
 AS
 BEGIN
 	DECLARE @cartMasterId INT;
-	-- first insert into cartMaster
-	INSERT into cartMaster (customerId, shopId)
-	  select json.customerId, json.shopId 
-	  from openjson(@json, '$.master')
-	  with(
-	    customerId INT '$.customerId',
-		shopId INT '$.shopId'
-	  )json
-	  
-	SET @cartMasterId = SCOPE_IDENTITY();
+	DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
+	DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
 
+	-- first check if the customer already has items from the shop
+	SELECT @cartMasterId = id from cartMaster 
+		where customerId = @customerId 
+		and shopId = @shopId and status = 0;
+	
+	IF @cartMasterId IS NULL
+	BEGIN
+		-- First time cart being added
+		INSERT into cartMaster (customerId, shopId)
+		  select json.customerId, json.shopId 
+		  from openjson(@json, '$.master')
+		  with(
+		    customerId INT '$.customerId',
+			shopId INT '$.shopId'
+		  )json
+		  
+		SET @cartMasterId = SCOPE_IDENTITY();		
+	END
+	-- after cartMasterId is found insert into cartDetail
 	INSERT into cartDetail (productId, name, image, price, qty, cartMasterId)
-	  select json.productId, json.name, json.image, json.price, json.qty, @cartMasterId as cartMasterId 
-	  from openjson(@json, '$.detail')
-	  with(
-	    productId INT '$.productId',
-	    name nvarchar(100) '$.name',
-	    image nvarchar(180) '$.image',
-	    price INT '$.price',
-	    qty INT '$.qty'
-	  )json
-
+		select json.productId, json.name, json.image, json.price, json.qty, @cartMasterId as cartMasterId 
+		from openjson(@json, '$.detail')
+		with(
+			productId INT '$.productId',
+			name nvarchar(100) '$.name',
+			image nvarchar(180) '$.image',
+			price INT '$.price',
+			qty INT '$.qty'
+		)json	
 END
 
 GO;
@@ -44,7 +54,7 @@ Begin
 				select cm.shopId, cartDetail.* 
 				from cartMaster cm
 				inner join cartDetail on cartDetail.cartMasterId = cm.id
-				where cm.customerId = 1 and cm.status = 0
+				where cm.customerId = 1 and cm.status = 0 and cartDetail.qty > 0
 				FOR JSON AUTO, INCLUDE_NULL_VALUES
 			)
 		from customer
@@ -56,3 +66,46 @@ Begin
 	select @result;
 	RETURN
 End
+
+GO;
+
+-----------------------------------------------------------
+----------------update cart items---------------------------
+CREATE PROCEDURE dbo.spUpdateCart
+@json NVARCHAR(MAX)
+AS
+BEGIN
+	with stagingTable as (
+	  SELECT * from OPENJSON(@json)
+	    with (
+	      id INT '$.id',
+	      qty INT '$.qty'
+	    )
+	)
+	
+	UPDATE
+	    dbo.cartDetail 
+	SET
+	    dbo.cartDetail.qty = s.qty
+	FROM
+	    dbo.cartDetail t
+	INNER JOIN
+	    stagingTable s
+	ON 
+	    s.id = t.id;
+END
+
+GO;
+-----------------------------------------------------------
+----------------delete cart items---------------------------
+CREATE PROCEDURE dbo.spDeleteCart
+@json NVARCHAR(MAX)
+AS
+BEGIN
+	DELETE FROM cartDetail where id in (
+		SELECT id from openjson(@json)
+		with (
+			id INT '$'
+		)
+	)
+END
