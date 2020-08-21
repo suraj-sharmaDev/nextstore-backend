@@ -25,7 +25,7 @@ router.get('/:customerId', async(req, res, next)=>{
 	}
 })
 
-router.post('/', async(req, res, next)=>{
+router.post('/:customerId?', async(req, res, next)=>{
 	try {
 		await sequelize.query('exec spbulkCreateCart :json', { 
 			replacements: { 
