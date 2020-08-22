@@ -398,6 +398,10 @@ Customer
 	}
 	```
 
+7. Delete customer Address
+	http://35.230.117.116/customerApi/address/addressId
+	DELETE
+
 Search Operations
 ------------------
 

@@ -65,5 +65,20 @@ router.put('/:addrId', (req, res, next)=>{
 	})
 })
 
+//delete addresses
+router.delete('/:addrId', (req, res, next)=>{
+	address.destroy({
+		where: {
+			id: req.params.addrId
+		}
+	})
+	.then((result)=>{
+		res.json({deleted: true})
+	})
+	.catch((err)=>{
+		res.json(err)
+	})
+})
+
 module.exports = router;
 
