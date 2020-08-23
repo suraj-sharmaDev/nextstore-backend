@@ -134,7 +134,25 @@ CREATE PROCEDURE dbo.spGetFavouriteShops
 @customerId int
 AS
 BEGIN
-	SELECT id, shopId, [timestamp] from favourite where customerId = @customerId;
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
+
+	SELECT 
+	f.id, 
+	f.shopId,
+	s.name,
+	s.onlineStatus,
+	CONCAT(@baseUrl,s.[image]) as [image],
+	s.rating,
+	s.category,
+	a.latitude,
+	a.longitude,
+	f.[timestamp] 
+	from favourite as f 
+	INNER JOIN shop as s on s.id = f.shopId
+	INNER JOIN shopAddress as a on a.shopId = f.shopId
+	where f.customerId = @customerId;
 	RETURN;
 END
 

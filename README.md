@@ -410,6 +410,10 @@ Customer
 	http://35.230.117.116/customerApi/favourite/customerId/shopId
 	POST
 
+9. 	Delete shop from favourite
+	http://35.230.117.116/customerApi/favourite/customerId/shopId
+	DELETE
+
 Search Operations
 ------------------
 
