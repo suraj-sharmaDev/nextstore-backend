@@ -246,7 +246,7 @@ Cart
 	]
    ```
 
-4. Delete some or all items in cartTable using cartId
+4. Delete some or all items in cartTable using productId
    http://35.230.117.116/customerApi/cart/customerId/shopId
    DELETE : JSON
    ```javascript
@@ -401,6 +401,14 @@ Customer
 7. Delete customer Address
 	http://35.230.117.116/customerApi/address/addressId
 	DELETE
+
+8. Get favourite shops for customer
+	http://35.230.117.116/customerApi/favourite/customerId
+	GET
+
+9. 	Add shop as favourite
+	http://35.230.117.116/customerApi/favourite/customerId/shopId
+	POST
 
 Search Operations
 ------------------

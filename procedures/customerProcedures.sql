@@ -8,6 +8,11 @@ Begin
 		Select 
 			name,
 			mobile,
+			favourite = (
+				select id, shopId from favourite
+				where customerId = @custId
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
+			),
 			cart = (
 				select cm.shopId, cm.customerId, cartDetail.* 
 				from cartMaster cm
@@ -92,6 +97,7 @@ GO;
 
 ----------------------------------------------------------------------
 -- verify the customer with otp
+
 CREATE PROCEDURE dbo.spVerifyCustomerOtp
 @customerId int,
 @otp NVARCHAR(20)
@@ -118,3 +124,47 @@ BEGIN
 		select 'late' as message;	
 	END
 END
+
+GO;
+
+----------------------------------------------------------------------
+-- Get all shops marked as favourites
+
+CREATE PROCEDURE dbo.spGetFavouriteShops
+@customerId int
+AS
+BEGIN
+	SELECT id, shopId, [timestamp] from favourite where customerId = @customerId;
+	RETURN;
+END
+
+GO;
+
+----------------------------------------------------------------------
+-- Add shop to favourites
+
+CREATE PROCEDURE dbo.spAddShopAsFavourite
+@customerId int,
+@shopId int
+AS
+BEGIN
+	INSERT INTO favourite (customerId, shopId) VALUES (@customerId, @shopId);
+	RETURN;
+END
+
+GO;
+
+----------------------------------------------------------------------
+-- Remove shop from favourites
+
+CREATE PROCEDURE dbo.spDeleteShopFromFavourite
+@customerId int,
+@shopId int
+AS
+BEGIN
+	DELETE FROM favourite where customerId = @customerId and shopId = @shopId;
+	RETURN;
+END
+
+
+GO;

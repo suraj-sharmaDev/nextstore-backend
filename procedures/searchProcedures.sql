@@ -105,7 +105,8 @@ BEGIN
 	DECLARE @category NVARCHAR(30);
 	DECLARE @image NVARCHAR(100);
 	DECLARE @onlineStatus bit;
-	
+	DECLARE @rating INT;
+
 	DECLARE @tableId int;
 	DECLARE @tableName varchar(100);
 	DECLARE @query NVARCHAR(MAX);
@@ -122,16 +123,18 @@ BEGIN
 		category nvarchar(50),
 		onlineStatus bit,
 		image nvarchar(100),
+		rating INT,
 		distance FLOAT
 	);
+
 	DECLARE @searchFlag INT; --to check if product exist in shop
 	INSERT Into @stagingTable exec spfindShopsNearby @custLat, @custLng;
 
 	Declare shopCursor cursor for
-		select shopId, name, category, onlineStatus, image from @stagingTable
+		select shopId, name, category, onlineStatus, image, rating from @stagingTable
 	Open shopCursor 
 	
-	Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image 
+	Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @rating 
 	
 	While(@@FETCH_STATUS=0)
 	Begin

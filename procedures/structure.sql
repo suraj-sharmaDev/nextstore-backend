@@ -152,10 +152,19 @@ CREATE TABLE nextstore.dbo.shop (
 	coverage int NULL,
 	merchantId int NULL,
 	[image] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	rating int DEFAULT 0,
 	CONSTRAINT PK__shop__3213E83FAF52DF09 PRIMARY KEY (id),
 	CONSTRAINT FK__shop__merchantId__0B5CAFEA FOREIGN KEY (merchantId) REFERENCES nextstore.dbo.merchant(id) ON DELETE SET NULL
 );
 
+-- nextstore.dbo.favourite definition
+
+CREATE TABLE nextstore.dbo.favourite (
+	id int IDENTITY(1,1) NOT NULL,
+	customerId int NULL FOREIGN KEY REFERENCES customer(id),
+	shopId int NULL FOREIGN KEY REFERENCES shop(id),
+	[timestamp] DATETIME default CURRENT_TIMESTAMP
+);
 
 -- nextstore.dbo.shopAddress definition
 

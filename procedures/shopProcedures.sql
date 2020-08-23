@@ -178,6 +178,7 @@ BEGIN
 	DECLARE @image NVARCHAR(100);
 	DECLARE @onlineStatus bit;
 	DECLARE @coverage INT;
+	DECLARE @rating INT;
 
 	Declare @baseUrl varchar(200);
 	--get baseUrl as local variable
@@ -190,15 +191,16 @@ BEGIN
 		category nvarchar(50),
 		onlineStatus bit,
 		image nvarchar(100),
+		rating INT,
 		distance FLOAT
 	);
 
 	DECLARE shopCursor CURSOR 
 		FOR
-			SELECT id, name, category, onlineStatus, image, coverage FROM shop;
+			SELECT id, name, category, onlineStatus, image, coverage, rating FROM shop;
 		
 	Open shopCursor
-		Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @coverage;
+		Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @coverage, @rating;
 		WHILE @@FETCH_STATUS = 0
 		begin
 			
@@ -213,11 +215,11 @@ BEGIN
 			If(@distance <= @coverage)
 			begin
 				--if user is within coverage distance add shop to output table
-				INSERT INTO @shopsTable(shopId, name, category, onlineStatus, image, distance) 
-				values (@id, @name, @category, @onlineStatus, CONCAT(@baseUrl, @image), @distance);
+				INSERT INTO @shopsTable(shopId, name, category, onlineStatus, image, rating, distance) 
+				values (@id, @name, @category, @onlineStatus, CONCAT(@baseUrl, @image), @rating, @distance);
 			end
 			
-			Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @coverage;
+			Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @coverage, @rating;
 		end
 		
 	Close shopCursor
@@ -381,6 +383,7 @@ BEGIN
 			category NVARCHAR(80),
 			onlineStatus BIT,
 			image NVARCHAR(200),
+			rating INT,
 			distance FLOAT
 	    )
 	    
@@ -412,7 +415,7 @@ BEGIN
 			select * from #AllOffers
 			FOR JSON PATH, INCLUDE_NULL_VALUES 			
 		)
-		For Json PATH, WITHOUT_ARRAY_WRAPPER, INCLUDE_NULL_VALUES	
+		For Json PATH, WITHOUT_ARRAY_WRAPPER	
 	)
 	
 	select json from x;	
