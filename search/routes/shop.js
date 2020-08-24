@@ -16,7 +16,7 @@ router.get('/:shopId', async(req, res, next)=>{
 								}
 							}).spread((user, created)=>{
 								var obj = Object.values(user[0]);
-								if(obj){
+								if(obj[0]){
 									return JSON.parse(obj);
 								}else{
 									return {error: true, reason: 'no_values'};
