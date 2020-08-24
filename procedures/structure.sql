@@ -48,6 +48,8 @@ CREATE TABLE nextstore.dbo.merchant (
 	firstName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	lastName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	mobile nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	email nvarchar(40) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[password] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	createdAt datetimeoffset NOT NULL,
 	updatedAt datetimeoffset NOT NULL,
 	CONSTRAINT PK__merchant__3213E83F68F8C78B PRIMARY KEY (id)

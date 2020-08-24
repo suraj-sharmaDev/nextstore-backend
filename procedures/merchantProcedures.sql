@@ -1,4 +1,45 @@
-------------Get Merchant and shop Details
+---------------------------------------------------------
+--procedure to find or create a customer along with otp--
+
+CREATE PROCEDURE dbo.spLoginMerchant
+@email nvarchar(30),
+@password nvarchar(30)
+AS
+BEGIN
+	DECLARE @merchantId int;
+	DECLARE @password_hash NVARCHAR(500) = HASHBYTES('MD5', @password);
+
+	SELECT @merchantId = id FROM merchant 
+	WHERE 
+		email = @email;
+	
+	IF (@merchantId > 0)
+		BEGIN 
+			-- Email matches to one of user
+			-- check if password matches too
+			IF EXISTS (SELECT id from merchant where id = @merchantId and password = @password_hash)
+			BEGIN 
+				SELECT 
+				m.id, CONCAT(m.firstName , m.lastName ) as [name], m.mobile
+				from merchant m 
+				where m.id = @merchantId
+			END
+			ELSE
+			BEGIN 
+				SELECT 'password_mismatch' as message, 'TRUE' as 'error';				
+			END
+		END
+	ELSE 
+	BEGIN 
+		-- neither email nor password matches
+		SELECT 'email_password_mismatch' as message, 'TRUE' as 'error';
+	END
+END
+
+GO;
+
+------------Get Merchant and shop Details---------
+
 CREATE Procedure dbo.spGetMerchantShops
 @merchId int
 As
@@ -8,7 +49,12 @@ Begin
 	--get baseUrl as local variable
 	Select @baseUrl=baseUrl from appConfig;
 	with x(json) as (
-		Select * from merchant
+		Select 
+		* 
+		from 
+		(
+			SELECT id, firstName, lastName, mobile from merchant
+		) as merchant
 		inner join
 		(
 		select 
@@ -34,6 +80,7 @@ Begin
 	select @result;
 	RETURN
 End
+
 
 
 

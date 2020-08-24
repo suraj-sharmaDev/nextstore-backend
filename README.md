@@ -67,6 +67,15 @@ merchant
 	35.230.117.116/merchantApi/merchant/merchId
 	PUT : JSON
 
+3. Login Merchant
+	35.230.117.116/merchantApi/login
+	POST : JSON
+	{
+	"email": "suraj@gmail.com",
+	"password": "hello"
+	}
+
+
 Shop
 ----
 
