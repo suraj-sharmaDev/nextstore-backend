@@ -3,14 +3,15 @@ const {shop, address, sequelize} = require('../models');
 
 const router = express.Router();
 
-router.get('/:shopId/:basicInfo?', async(req, res, next)=>{
+router.get('/:shopId/:param?', async(req, res, next)=>{
 	//this api is called at landing page of shop where only list of categories will be shown
 	//basically this api should integrate category, subcategory and subcategory child
 
 	//same api can be used to get basic shopInfo by passing basicInfo params
 	try {
 		let content = null;
-		if(!req.params.basicInfo){
+		if(!req.params.param){
+			// if there was not param
 			content = await sequelize.query(
 				'exec spCreateShopContent :shopId;', 
 				{ 
@@ -22,7 +23,7 @@ router.get('/:shopId/:basicInfo?', async(req, res, next)=>{
 				var categories = JSON.parse(user[0].categories);
 				return {shop, categories}
 			})
-		}else{
+		}else if (req.params.param === 'basic'){
 			content = await sequelize.query(
 				'exec spShopBasicInfo :shopId;', 
 				{ 
@@ -31,6 +32,24 @@ router.get('/:shopId/:basicInfo?', async(req, res, next)=>{
 				//since the return data will be string and not parsed
 				//lets parse it
 				return value[0];
+			})			
+		}else{
+			content = await sequelize.query(
+				'exec spGetProductsInSubCategory :shopId, :subCategoryId', 
+				{ 
+					replacements: { 
+						shopId: req.params.shopId,
+						subCategoryId: req.params.param 
+					}
+			}).spread((product, created)=>{
+				//since the return data will be string and not parsed
+				//lets parse it
+				var obj = Object.values(product[0])[0];
+				if(obj){
+					return JSON.parse(obj);
+				}else{
+					return {error: true, reason: 'Either shopId or subCategoryId does not exist'}
+				}
 			})			
 		}
 		res.send(content);
@@ -41,35 +60,35 @@ router.get('/:shopId/:basicInfo?', async(req, res, next)=>{
 	}
 });
 
-router.get('/:shopId/:subCategoryId', async(req, res, next)=>{
-	const shopId = req.params.shopId;
-	const subCategoryId = req.params.subCategoryId;
-	try {
+// router.get('/:shopId/:subCategoryId', async(req, res, next)=>{
+// 	const shopId = req.params.shopId;
+// 	const subCategoryId = req.params.subCategoryId;
+// 	try {
 
-		const products = await sequelize.query(
-						'exec spGetProductsInSubCategory :shopId, :subCategoryId', 
-						{ 
-							replacements: { 
-								shopId: shopId,
-								subCategoryId: subCategoryId 
-							}
-					}).spread((product, created)=>{
-						//since the return data will be string and not parsed
-						//lets parse it
-						var obj = Object.values(product[0])[0];
-						if(obj){
-							return JSON.parse(obj);
-						}else{
-							return {error: true, reason: 'Either shopId or subCategoryId does not exist'}
-						}
-					})
-		res.send(products);
-	} catch(e) {
-		// statements
-		res.send({error: true});
-		console.log(e);
-	}
-})
+// 		const products = await sequelize.query(
+// 						'exec spGetProductsInSubCategory :shopId, :subCategoryId', 
+// 						{ 
+// 							replacements: { 
+// 								shopId: shopId,
+// 								subCategoryId: subCategoryId 
+// 							}
+// 					}).spread((product, created)=>{
+// 						//since the return data will be string and not parsed
+// 						//lets parse it
+// 						var obj = Object.values(product[0])[0];
+// 						if(obj){
+// 							return JSON.parse(obj);
+// 						}else{
+// 							return {error: true, reason: 'Either shopId or subCategoryId does not exist'}
+// 						}
+// 					})
+// 		res.send(products);
+// 	} catch(e) {
+// 		// statements
+// 		res.send({error: true});
+// 		console.log(e);
+// 	}
+// })
 
 router.post('/:merchId', async(req, res, next)=>{
 	//add new shop for a merchant
