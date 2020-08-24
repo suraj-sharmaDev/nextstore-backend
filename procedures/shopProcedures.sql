@@ -1,10 +1,26 @@
+-- Get basic information of shop
+CREATE PROCEDURE dbo.spShopBasicInfo
+@shopId INT
+AS
+BEGIN
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
+
+	SELECT s.id, s.name, s.category, CONCAT(@baseUrl, s.[image]) as [image], s.onlineStatus,
+	a.pickupAddress as pickupAddress
+	from shop as s 
+	INNER JOIN shopAddress as a on a.shopId = s.id
+	where s.id = @shopId
+END
+
+GO;
+
 --Get all categories, subCategories and subCategorychild for any shop
 CREATE PROCEDURE dbo.spCreateShopContent
 @shopId INT
 AS
 BEGIN
---will create json output for shops complete details
-
 	declare @tableId int;
 	
 	Declare @baseUrl varchar(200);
@@ -68,9 +84,12 @@ BEGIN
 		select json from x;
 	
 	UPDATE #Results SET shopInfo = (
-		SELECT id, name, category, CONCAT(@baseUrl,[image]) as [image], onlineStatus 
-		from shop where id = @shopId
-		for JSON AUTO, WITHOUT_ARRAY_WRAPPER
+		SELECT s.id, s.name, s.category, CONCAT(@baseUrl, s.[image]) as [image], s.onlineStatus,
+		a.pickupAddress as pickupAddress
+		from shop as s 
+		INNER JOIN shopAddress as a on a.shopId = s.id
+		where s.id = @shopId
+		for JSON PATH, WITHOUT_ARRAY_WRAPPER
 	)
 	
 	select * from #Results

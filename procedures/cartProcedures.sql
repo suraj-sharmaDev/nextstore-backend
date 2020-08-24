@@ -6,7 +6,16 @@ BEGIN
 	DECLARE @cartMasterId INT;
 	DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
 	DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
+	DECLARE @prevShopId INT = JSON_VALUE(@json, '$.master.prevShopId');
 
+	--if prevShopId is NOT NULL we need disable the cart with that shopId
+	IF @prevShopId IS NOT NULL
+	BEGIN
+		UPDATE cartMaster SET status = 1
+		where customerId = @customerId 
+		and shopId = @prevShopId and status = 0;		
+	END
+	
 	-- first check if the customer already has items from the shop
 	SELECT @cartMasterId = id from cartMaster 
 		where customerId = @customerId 
@@ -35,7 +44,7 @@ BEGIN
 			image nvarchar(180) '$.image',
 			price INT '$.price',
 			qty INT '$.qty'
-		)json	
+		)json		
 END
 
 GO;

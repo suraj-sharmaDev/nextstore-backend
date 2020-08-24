@@ -146,6 +146,7 @@ BEGIN
 	CONCAT(@baseUrl,s.[image]) as [image],
 	s.rating,
 	s.category,
+	s.coverage,
 	a.latitude,
 	a.longitude,
 	f.[timestamp] 

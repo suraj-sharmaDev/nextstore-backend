@@ -73,6 +73,9 @@ Shop
 1. Get content of shop with shopId
 	http://35.230.117.116/merchantApi/shop/shopId
 
+	To get basic shopInfo
+	http://35.230.117.116/merchantApi/shop/shopId/basic
+
 2. Get products of shop with shopId, for subCategoryId
 	http://35.230.117.116/merchantApi/shop/shopId/subCategoryId
 
@@ -209,8 +212,9 @@ Cart
 	```javascript
 	{
 	"master":{
-		"shopId": 1,
-		"customerId": 1
+		"shopId": 2,
+		"customerId": 1,
+		"prevShopId": 1 //this is optional, needed only if to replace cartItems from other shop
 	},
 	"detail": [
 		{

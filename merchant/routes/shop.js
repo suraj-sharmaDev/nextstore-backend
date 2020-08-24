@@ -3,23 +3,37 @@ const {shop, address, sequelize} = require('../models');
 
 const router = express.Router();
 
-router.get('/:shopId', async(req, res, next)=>{
+router.get('/:shopId/:basicInfo?', async(req, res, next)=>{
 	//this api is called at landing page of shop where only list of categories will be shown
 	//basically this api should integrate category, subcategory and subcategory child
-	try {
 
-		const categories = await sequelize.query(
-						'exec spCreateShopContent :shopId;', 
-						{ 
-							replacements: { shopId: req.params.shopId }
-					}).spread((user, created)=>{
-						//since the return data will be string and not parsed
-						//lets parse it
-						var shop = JSON.parse(user[0].shopInfo);
-						var categories = JSON.parse(user[0].categories);
-						return {shop, categories}
-					})
-		res.send(categories);
+	//same api can be used to get basic shopInfo by passing basicInfo params
+	try {
+		let content = null;
+		if(!req.params.basicInfo){
+			content = await sequelize.query(
+				'exec spCreateShopContent :shopId;', 
+				{ 
+					replacements: { shopId: req.params.shopId }
+			}).spread((user, created)=>{
+				//since the return data will be string and not parsed
+				//lets parse it
+				var shop = JSON.parse(user[0].shopInfo);
+				var categories = JSON.parse(user[0].categories);
+				return {shop, categories}
+			})
+		}else{
+			content = await sequelize.query(
+				'exec spShopBasicInfo :shopId;', 
+				{ 
+					replacements: { shopId: req.params.shopId }
+			}).spread((value, created)=>{
+				//since the return data will be string and not parsed
+				//lets parse it
+				return value[0];
+			})			
+		}
+		res.send(content);
 	} catch(e) {
 		// statements
 		res.send({error: true});

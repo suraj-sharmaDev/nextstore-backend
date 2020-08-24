@@ -7,18 +7,19 @@ BEGIN
 DECLARE @orderMasterId INT;
 DECLARE @createdAt datetimeoffset = GETUTCDATE();
 
-DECLARE @customerId INT;
-SET @customerId = JSON_VALUE(@json, '$.master.customerId');
+DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
+DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
+
 -- update cartMaster table to identify fulfilled carts
-UPDATE cartMaster set status = 1 where customerId = @customerId;
+
+UPDATE cartMaster set status = 1 
+where customerId = @customerId and shopId = @shopId and status = 0;
+
 -- insert into ordermaster
+
 insert into orderMaster (customerId, shopId, createdAt)
-  select json.customerId, json.shopId, @createdAt as createdAt
-  from openjson(@json, '$.master')
-    with(
-      customerId int '$.customerId',
-      shopId int '$.shopId'
-    )json
+VALUES (@customerId, @shopId, @createdAt);
+
 --then bulk insert into orderDetail with the orderMasterId
 SET @orderMasterId = SCOPE_IDENTITY();
 
