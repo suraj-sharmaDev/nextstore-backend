@@ -164,7 +164,7 @@ BEGIN
 		begin
 			Delete from @stagingTable where shopId=@id
 		end
-		Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image
+		Fetch next from shopCursor into @id, @name, @category, @onlineStatus, @image, @rating
 	END
 	SELECT * FROM @stagingTable;
 END
