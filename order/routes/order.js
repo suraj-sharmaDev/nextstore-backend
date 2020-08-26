@@ -36,7 +36,9 @@ router.post('/:orderId?', async(req, res, next)=>{
 							replacements: { json: JSON.stringify(req.body) }
 						}).spread((user, created)=>{ return user[0] })
 			const type = 'new_order';
-			sendMessage(shop.fcmToken, type);
+			if(shop.fcmToken!= null){
+				sendMessage(shop.fcmToken, type);
+			}
 		}else{
 			await sequelize.query('exec spbulkCreateOrderDetail :json, :orderMasterId', { 
 				replacements: 
