@@ -1,11 +1,11 @@
 
 ----------------------------------------------------------
 CREATE PROCEDURE dbo.spCreateNewOrder
-@json NVARCHAR(max),
-@fcmToken NVARCHAR(255) OUTPUT
+@json NVARCHAR(max)
 AS
 BEGIN
 
+DECLARE @fcmToken NVARCHAR(250);
 DECLARE @orderMasterId INT;
 DECLARE @createdAt datetimeoffset = GETUTCDATE();
 
@@ -38,7 +38,9 @@ INSERT into orderDetail (productId, productName, price, qty, orderMasterId)
 
 select @fcmToken=fcmToken from shop where id in (
 	select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
-)
+);
+
+select @fcmToken as fcmToken, @orderMasterId as orderMasterId;
 END
 
 GO;
