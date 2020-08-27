@@ -77,7 +77,12 @@ router.post('/:orderId?', async(req, res, next)=>{
 			const type = 'new_order';
 			orderMasterId = shop.orderMasterId;
 			if(shop.fcmToken!= null){
-				sendMessage(shop.fcmToken, type);
+				let data = {
+					fcmToken: shop.fcmToken,
+					orderId: orderMasterId,
+					type: type
+				}
+				sendMessage(data);
 			}
 		}else{
 			await sequelize.query('exec spbulkCreateOrderDetail :json, :orderMasterId', { 

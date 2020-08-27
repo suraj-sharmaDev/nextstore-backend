@@ -12,14 +12,17 @@ var options = {
 	timeToLive: 60 * 60  //1 hour validity
 };
 
-const createPayload = (type) => {
+const createPayload = (data) => {
 	var payload = {};
-	switch (type) {
+	switch (data.type) {
 		case 'new_order':
 			payload = {
 				notification: {
 					title: "New Order",
 					body: "You have received a new order!"
+				},
+				data: {
+					orderId: data.orderId.toString()
 				}
 			};
 			break;
@@ -51,9 +54,9 @@ const createPayload = (type) => {
 	return payload;
 }
 
-const sendMessage = (fcmToken, type) => {
+const sendMessage = (data) => {
 	var error = true;
-	admin.messaging().sendToDevice(fcmToken, createPayload(type), options)
+	admin.messaging().sendToDevice(data.fcmToken, createPayload(data), options)
 	.then(function(response) {
 		error = false;
 		console.log("Successfully sent message:", response);

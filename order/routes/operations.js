@@ -12,7 +12,11 @@ router.get('/acceptOrder/:orderId', async(req, res, next)=>{
 						}).spread((user, created)=>{ return user[0] })
 		const type = 'accept_order';
 		if(customer.fcmToken!= null){
-			sendMessage(customer.fcmToken, type);
+			let data = {
+				fcmToken: customer.fcmToken,
+				type: type
+			}
+			sendMessage(data);
 		}
 		res.send({message : 'accepted'});
 	} catch(e) {
@@ -31,7 +35,11 @@ router.get('/rejectOrder/:orderId', async(req, res, next)=>{
 					}).spread((user, created)=>{ return user[0] })
 		const type = 'reject_order';
 		if(customer.fcmToken!= null){
-			sendMessage(customer.fcmToken, type);
+			let data = {
+				fcmToken: customer.fcmToken,
+				type: type
+			}
+			sendMessage(data);
 		}
 		res.send({message : 'rejected'});
 	} catch(e) {
