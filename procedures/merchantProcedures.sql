@@ -20,7 +20,7 @@ BEGIN
 			IF EXISTS (SELECT id from merchant where id = @merchantId and password = @password_hash)
 			BEGIN 
 				SELECT 
-				m.id, CONCAT(m.firstName , m.lastName ) as [name], m.mobile
+				m.id, CONCAT(m.firstName , ' ', m.lastName ) as [name], m.mobile
 				from merchant m 
 				where m.id = @merchantId
 			END
