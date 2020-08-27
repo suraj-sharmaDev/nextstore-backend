@@ -49,7 +49,7 @@ router.get('/:shopId/:status/:page/:startDate?/:endDate?', async(req, res, next)
 					if(obj){
 						return JSON.parse(obj);
 					}else{
-						return {error: true, reason: 'Either shopId or subCategoryId does not exist'}
+						return [];
 					}
             });
 		res.send(orders);
