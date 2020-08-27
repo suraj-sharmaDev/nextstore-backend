@@ -6,12 +6,14 @@ const router = express.Router();
 router.get('/acceptOrder/:orderId', async(req, res, next)=>{
 	try {
 		const customer = await sequelize.query(
-						'DECLARE @fcmToken NVARCHAR(255); exec spAcceptOrder :orderId, @fcmToken OUTPUT; select @fcmToken as fcmToken;', 
+						'exec spAcceptOrder :orderId', 
 						{ 
 							replacements: { orderId: req.params.orderId }
-					}).spread((user, created)=>{ return user[0] })
+						}).spread((user, created)=>{ return user[0] })
 		const type = 'accept_order';
-		sendMessage(customer.fcmToken, type);
+		if(customer.fcmToken!= null){
+			sendMessage(customer.fcmToken, type);
+		}
 		res.send({message : 'accepted'});
 	} catch(e) {
 		// statements
@@ -23,12 +25,14 @@ router.get('/acceptOrder/:orderId', async(req, res, next)=>{
 router.get('/rejectOrder/:orderId', async(req, res, next)=>{
 	try {
 		const customer = await sequelize.query(
-						'DECLARE @fcmToken NVARCHAR(255); exec spRejectOrder :orderId, @fcmToken OUTPUT; select @fcmToken as fcmToken;', 
+						'exec spRejectOrder :orderId', 
 						{ 
 							replacements: { orderId: req.params.orderId }
 					}).spread((user, created)=>{ return user[0] })
 		const type = 'reject_order';
-		sendMessage(customer.fcmToken, type);
+		if(customer.fcmToken!= null){
+			sendMessage(customer.fcmToken, type);
+		}
 		res.send({message : 'rejected'});
 	} catch(e) {
 		// statements
