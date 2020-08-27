@@ -272,6 +272,10 @@ Order
 1. Get Order Details
 	http://35.230.117.116/orderApi/order/orderId
 
+	#Get Order belonging to shop
+	http://35.230.117.116/orderApi/order/shopId/orderStatus/pageNo/startDate?/endDate?
+	where startDate and endDate are optional parameters
+
 2. Create New Order
 	http://35.230.117.116/orderApi/order
 	POST : JSON
@@ -279,6 +283,7 @@ Order
 	{
 	  "master": {
 		"customerId": 1,
+		"deliveryAddress": "{\"latitude\": 9.0, \"longitude\": 72.0}",
 		"shopId": 1
 	  },
 	  "detail":[

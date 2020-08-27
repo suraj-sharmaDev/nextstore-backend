@@ -11,6 +11,7 @@ DECLARE @createdAt datetimeoffset = GETUTCDATE();
 
 DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
 DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
+DECLARE @deliveryAddress NVARCHAR(250) = JSON_VALUE(@json, '$.master.deliveryAddress');
 
 -- update cartMaster table to identify fulfilled carts
 
@@ -19,8 +20,8 @@ where customerId = @customerId and shopId = @shopId and status = 0;
 
 -- insert into ordermaster
 
-insert into orderMaster (customerId, shopId, createdAt)
-VALUES (@customerId, @shopId, @createdAt);
+insert into orderMaster (customerId, shopId, deliveryAddress, createdAt)
+VALUES (@customerId, @shopId, @deliveryAddress, @createdAt);
 
 --then bulk insert into orderDetail with the orderMasterId
 SET @orderMasterId = SCOPE_IDENTITY();
@@ -42,6 +43,7 @@ select @fcmToken=fcmToken from shop where id in (
 
 select @fcmToken as fcmToken, @orderMasterId as orderMasterId;
 END
+
 
 GO;
 -----------------------------------------------------
@@ -121,8 +123,7 @@ END
 GO;
 
 --------------------------------------------------------
-
---reject Order with orderId
+------reject Order with orderId-------------------------
 
 CREATE PROCEDURE dbo.spRejectOrder
 @orderId INT, @fcmToken NVARCHAR(255) OUTPUT
@@ -141,4 +142,105 @@ WHERE
 select @fcmToken=fcmToken from customer where id in (
   select customerId from dbo.orderMaster where id = @orderId
 )  
+END
+
+GO;
+
+-------------------------------------------------------------------
+------------Get Orders for shops belonging to any of 4 criteria----
+
+CREATE Procedure dbo.spGetShopOrders
+@shopId INT,
+@status NVARCHAR(30),
+@page INT,
+@startDate datetimeoffset,
+@endDate datetimeoffset
+As
+BEGIN
+	-- this procedure gives 15 orders belonging to shopId
+	-- orders with status pending, accepted, rejected or all
+	DECLARE @offset INT = 15 * (@page - 1);
+	IF (@startDate is not NULL and @endDate is not NULL)
+	BEGIN
+		IF (@status = 'all')
+		BEGIN 
+			;with x(json) as (
+				SELECT 
+				*,
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					and ( createdAt >= @startDate and createdAt <= @endDate)
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from orderMaster
+				where shopId = @shopId 
+				ORDER BY id 
+				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
+			)
+			select json as [json] from x;
+		END
+		ELSE 
+		BEGIN 
+			;with x(json) as (
+				SELECT 
+				*,
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					and ( createdAt >= @startDate and createdAt <= @endDate)
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from orderMaster
+				where shopId = @shopId 
+				and 
+				status = @status
+				ORDER BY id 
+				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
+			)
+			select json as [json] from x;
+		END
+	END
+	ELSE
+	BEGIN
+		IF (@status = 'all')
+		BEGIN
+			;with x(json) as (
+				SELECT 
+				*,
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from orderMaster
+				where shopId = @shopId 
+				ORDER BY id 
+				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
+			)
+			select json as [json] from x;
+		END
+		ELSE
+		BEGIN
+			;with x(json) as (
+				SELECT 
+				*,
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from orderMaster
+				where shopId = @shopId 
+				and status = @status
+				ORDER BY id 
+				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
+			)
+			select json as [json] from x;
+		END
+	END	
 END

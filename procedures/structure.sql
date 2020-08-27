@@ -66,8 +66,9 @@ CREATE TABLE nextstore.dbo.orderMaster (
 	id int IDENTITY(1,1) NOT NULL,
 	customerId int NULL,
 	shopId int NULL,
-	status nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	createdAt datetimeoffset NULL,
+	deliveryAddress NVARCHAR(250) NULL,
 	CONSTRAINT PK__orderMas__3213E83F7DB14EFF PRIMARY KEY (id)
 );
 

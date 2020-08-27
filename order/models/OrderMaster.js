@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(20),
       defaultValue: "pending"
     },
+    deliveryAddress: DataTypes.STRING(250),
     createdAt: DataTypes.DATE
   }, {
   	// freezeTableName : true,
