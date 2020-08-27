@@ -170,11 +170,11 @@ BEGIN
 				items = (
 					select * from orderDetail
 					where orderMasterId = orderMaster.id
-					and ( createdAt >= @startDate and createdAt <= @endDate)
 					FOR JSON PATH, INCLUDE_NULL_VALUES
 				)
 				from orderMaster
 				where shopId = @shopId 
+				and ( createdAt >= @startDate and createdAt <= @endDate)				
 				ORDER BY id 
 				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
 				FOR JSON AUTO, INCLUDE_NULL_VALUES
@@ -189,13 +189,13 @@ BEGIN
 				items = (
 					select * from orderDetail
 					where orderMasterId = orderMaster.id
-					and ( createdAt >= @startDate and createdAt <= @endDate)
 					FOR JSON PATH, INCLUDE_NULL_VALUES
 				)
 				from orderMaster
 				where shopId = @shopId 
 				and 
 				status = @status
+				and ( createdAt >= @startDate and createdAt <= @endDate)				
 				ORDER BY id 
 				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
 				FOR JSON AUTO, INCLUDE_NULL_VALUES
