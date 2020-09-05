@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const createError = require('http-errors');
 
-const {shop} = require('./routes');
+const {shop, service} = require('./routes');
 
 const app = express();
 const port = process.env.PORT || 3003;
@@ -11,6 +11,7 @@ const port = process.env.PORT || 3003;
 const jsonParser = express.json();
 
 app.use('/shop', jsonParser, shop);
+app.use('/service', jsonParser, service);
 
 app.get('/', (req, res)=>{
 	res.send({path: 404})

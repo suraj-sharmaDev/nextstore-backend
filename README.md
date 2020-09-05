@@ -119,6 +119,25 @@ Shop
 	  }
 	}
 	```
+
+Services
+--------
+
+1. Get All Services Categorically
+	http://35.230.117.116/searchApi/service
+
+2. Get Service Item for the service Category
+	http://35.230.117.116/searchApi/service/serviceItem/CategoryId
+
+3. Get available repair and packages for service Item
+	http://35.230.117.116/searchApi/service/serviceDetails/ServiceItemId
+
+4. Get package rate for packages
+	http://localhost/searchApi/service/packageRate/PackageId
+
+5. Get Service charge and Repair Parts Rate for RepairItemId
+	http://localhost/searchApi/service/repairParts/RepairItemId
+
 category
 --------
 
