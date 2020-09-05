@@ -3,7 +3,7 @@ const path = require('path');
 const {sequelize} = require('./models');
 const createError = require('http-errors');
 
-const {merchant, login, shop, category, product} = require('./routes');
+const {merchant, login, shop, service, category, product} = require('./routes');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -15,6 +15,7 @@ const urlEncoded = express.urlencoded({extended : false});
 app.use('/merchant', jsonParser, merchant);
 app.use('/login', jsonParser, login);
 app.use('/shop', jsonParser, shop);
+app.use('/service', jsonParser, service);
 app.use('/category', jsonParser, category);
 app.use('/product', jsonParser, product);
 

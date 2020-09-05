@@ -150,7 +150,7 @@ CREATE TABLE nextstore.dbo.shop (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	category nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-	onlineStatus bit NULL,
+	onlineStatus bit DEFAULT 1,
 	fcmToken nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	coverage int NULL,
 	merchantId int NULL,
@@ -160,10 +160,28 @@ CREATE TABLE nextstore.dbo.shop (
 	CONSTRAINT FK__shop__merchantId__0B5CAFEA FOREIGN KEY (merchantId) REFERENCES nextstore.dbo.merchant(id) ON DELETE SET NULL
 );
 
+-- nextstore.dbo.serviceProvider definition
+
+-- Drop table
+
+-- DROP TABLE nextstore.dbo.serviceProvider GO
+
+CREATE TABLE nextstore.dbo.serviceProvider (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	name nvarchar(255) NULL,
+	categoryId int NULL FOREIGN KEY REFERENCES nxtServiceCategory(CategoryId) ON DELETE SET NULL,
+	onlineStatus bit DEFAULT 1,
+	fcmToken nvarchar(255) NULL,
+	coverage int NULL,
+	merchantId int NULL FOREIGN KEY REFERENCES merchant(id) ON DELETE SET NULL,
+	[image] nvarchar(100) NULL,
+	rating int DEFAULT 0
+);
+
 -- nextstore.dbo.favourite definition
 
 CREATE TABLE nextstore.dbo.favourite (
-	id int IDENTITY(1,1) NOT NULL,
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	customerId int NULL FOREIGN KEY REFERENCES customer(id),
 	shopId int NULL FOREIGN KEY REFERENCES shop(id),
 	[timestamp] DATETIME default CURRENT_TIMESTAMP
@@ -185,6 +203,19 @@ CREATE TABLE nextstore.dbo.shopAddress (
 	CONSTRAINT FK__shopAddre__shopI__0E391C95 FOREIGN KEY (shopId) REFERENCES nextstore.dbo.shop(id)
 );
 
+-- nextstore.dbo.serviceProviderAddress definition
+
+-- Drop table
+
+-- DROP TABLE nextstore.dbo.serviceProviderAddress GO
+
+CREATE TABLE nextstore.dbo.serviceProviderAddress (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	pickupAddress nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	latitude float NULL,
+	longitude float NULL,
+	serviceProviderId int NULL FOREIGN KEY REFERENCES nextstore.dbo.serviceProvider(id)
+);
 
 -- nextstore.dbo.subCategory definition
 

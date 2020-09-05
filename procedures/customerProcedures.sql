@@ -28,11 +28,16 @@ Begin
 			[order] = (
 				select 
 				TOP 3 
-				* 
+				orderMaster.*,
+				items.productId,
+				items.productName,
+				items.price,
+				items.qty 
 				from orderMaster
+				INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
 				where orderMaster.customerId = @custId
 				And orderMaster.status in ('pending', 'accepted')
-				For Json PATH, INCLUDE_NULL_VALUES				
+				For Json AUTO, INCLUDE_NULL_VALUES				
 			),
 			recentOrder = (
 				select 
