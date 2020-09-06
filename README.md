@@ -133,10 +133,30 @@ Services
 	http://35.230.117.116/searchApi/service/serviceDetails/ServiceItemId
 
 4. Get package rate for packages
-	http://localhost/searchApi/service/packageRate/PackageId
+	http://35.230.117.116/searchApi/service/packageRate/PackageId
 
 5. Get Service charge and Repair Parts Rate for RepairItemId
-	http://localhost/searchApi/service/repairParts/RepairItemId
+	http://35.230.117.116/searchApi/service/repairParts/RepairItemId
+
+6. Add a serviceProvider to a merchantId
+	http://35.230.117.116/merchantApi/service
+	POST : JSON
+	```javascript
+	{
+		"detail": {
+			"name": "Motor House",
+			"categoryId": 1,
+			"coverage": 10,
+			"merchantId": 1
+		},
+		"address": {
+			"pickupAddress": "Near mavelikkara junction",
+			"latitude": 9.230385,
+			"longitude": 76.515898
+		}
+	}
+	```	
+7. 
 
 category
 --------

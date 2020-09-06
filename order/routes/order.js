@@ -68,7 +68,7 @@ router.post('/:orderId?', async(req, res, next)=>{
 			//after new order is created notification should be sent to merchant 
 			//for receiving new order
 			const shop = await sequelize.query(
-						'DECLARE @fcmToken NVARCHAR(255); exec spCreateNewOrder :json', 
+						'exec spCreateNewOrder :json', 
 						{ 
 							replacements: { json: JSON.stringify(req.body) }
 						}).spread((user, created)=>{ 

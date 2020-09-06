@@ -315,3 +315,62 @@ CREATE TABLE nextstore.dbo.notifications (
   received_status bit null,  
   createdAt datetimeoffset NULL
 );
+
+-- nextstore.dbo.quoteMaster definition
+
+-- Drop table
+
+-- DROP TABLE nextstore.dbo.quoteMaster GO
+
+CREATE TABLE nextstore.dbo.quoteMaster (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	customerId int NULL,
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'pending', --can be pending, accepted, rejected or completed
+	[type] NVARCHAR(30) NULL,	--can be repair or package
+	createdAt datetimeoffset NULL,
+	deliveryAddress NVARCHAR(250) NULL
+);
+
+
+-- nextstore.dbo.quoteDetail definition
+
+-- Drop table
+
+-- DROP TABLE nextstore.dbo.quoteDetail GO
+
+-- This table is filled by user
+CREATE TABLE nextstore.dbo.quoteDetail (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	productId int NULL,
+	productName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[json] NVARCHAR(1000) NULL, --this can be json data or text
+	remark NVARCHAR(500) NULL, -- this is user given comments
+	[type] NVARCHAR(30) NULL, -- can be null or image
+	[image] NVARCHAR(100) NULL, --if type is image then file url, used for storing bill image
+	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id)
+);
+
+-- nextstore.dbo.quotedServiceProviders definition
+
+-- Drop table
+
+-- DROP TABLE nextstore.dbo.quotedServiceProviders GO
+
+CREATE TABLE nextstore.dbo.quotedServiceProviders (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	serviceProviderId int NULL FOREIGN KEY REFERENCES serviceProvider(id),
+	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id),
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, --can be pending, rejected or accepted
+	createdAt datetimeoffset NULL
+);
+
+--- when merchant accpets above then he call bid
+-- customer can accept the bids
+CREATE TABLE nextstore.dbo.quotationBiddings (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	serviceProviderId int NULL FOREIGN KEY REFERENCES serviceProvider(id),
+	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id),
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,  -- can be pending, rejected or accepted
+	[json] NVARCHAR(1000) NULL,
+	createdAt datetimeoffset NULL
+);
