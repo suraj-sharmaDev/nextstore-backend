@@ -18,6 +18,26 @@ router.get('/', async(req, res, next)=>{
 	}
 });
 
+router.get('/services/:lat/:lng', async(req, res, next)=>{
+    //get all services near the user with latitude and longitude
+	try {
+        const services = await sequelize.query('exec spGetAllServicesNearUser :custLat, :custLng', {
+                replacements: {
+                    custLat: req.params.lat,
+                    custLng: req.params.lng
+                }
+            })
+            .spread((value, created)=>
+            {
+                return value;
+            });
+		res.send(services);
+	} catch(e) {
+		res.send({error : true});
+		console.log(e);
+	}
+});
+
 router.get('/:type/:id', async(req, res, next)=>{
     //get all services
 	try {

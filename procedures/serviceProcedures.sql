@@ -34,12 +34,117 @@ BEGIN
 END
 
 GO;
+
+----------Get all service providers nearby-------------
+-------------------------------------------------------
+
+CREATE PROCEDURE dbo.spfindServiceProvidersNearby
+@custLat FLOAT,
+@custLng FLOAT,
+@categoryId INT
+AS
+BEGIN
+	DECLARE @id INT;
+	DECLARE @onlineStatus bit;
+	DECLARE @fcmToken NVARCHAR(255);
+	DECLARE @coverage INT;
+	DECLARE @shopCategoryId INT;
+
+	DECLARE @distance FLOAT;
+	DECLARE @serviceProviderTable table (
+		id INT,
+		categoryId INT,
+		onlineStatus bit,
+		fcmToken NVARCHAR(255),
+		coverage INT,
+		distance FLOAT
+	);
+
+	IF @categoryId IS NULL
+	BEGIN
+		DECLARE shopCursor CURSOR 
+		FOR				
+			SELECT id, categoryId, onlineStatus, fcmToken, coverage FROM serviceProvider
+	END
+	ELSE
+	BEGIN
+		DECLARE shopCursor CURSOR 
+		FOR				
+			SELECT id, categoryId, onlineStatus, fcmToken, coverage FROM serviceProvider
+			WHERE categoryId = @categoryId
+	END
+		
+	Open shopCursor
+		Fetch next from shopCursor into @id, @shopCategoryId, @onlineStatus, @fcmToken, @coverage;
+		WHILE @@FETCH_STATUS = 0
+		begin
+			
+			--find distance between shop and customer
+			SELECT @distance = geography::Point(@custLat, @custLng, 4326).STDistance(
+				geography::Point(latitude, longitude, 4326)
+			) from serviceProviderAddress
+			where serviceProviderAddress.serviceProviderId = @id;
+			-- convert meters to KMs
+			SET @distance = ROUND(@distance/1000, 2);
+			--check if distance is less than the coverage of shop
+			If(@distance <= @coverage)
+			begin
+				--if user is within coverage distance add shop to output table
+				INSERT INTO @serviceProviderTable(id, categoryId, onlineStatus, fcmToken, 
+					coverage, distance) 
+				values (@id, @shopCategoryId, @onlineStatus, @fcmToken, @coverage, @distance);
+			end
+			
+			Fetch next from shopCursor into @id, @shopCategoryId, @onlineStatus, @fcmToken, @coverage;
+		end
+		
+	Close shopCursor
+	Deallocate shopCursor
+	--output all found shops
+	select * from @serviceProviderTable
+END
+
+GO;
+
 --------Get all services-----------------------------
 
 CREATE PROCEDURE dbo.spGetAllServices
 AS
 BEGIN
 	SELECT * FROM nxtServiceCategory;
+END
+
+GO;
+
+--------Get all services Near the User-----------------------------
+-------------------------------------------------------------------
+
+CREATE PROCEDURE dbo.spGetAllServicesNearUser
+@custLat FLOAT,
+@custLng FLOAT
+AS
+BEGIN
+	IF OBJECT_ID('tempdb..#NearByServiceProviders') IS NOT NULL
+	    Truncate TABLE #NearByServiceProviders
+	else
+	    CREATE TABLE #NearByServiceProviders
+	    (
+			id int,
+			categoryId int,
+			onlineStatus BIT,
+			fcmToken NVARCHAR(255),
+			coverage INT,
+			distance FLOAT
+	    )
+	
+	INSERT INTO #NearByServiceProviders
+		exec spfindServiceProvidersNearby @custLat, @custLng, NULL;
+	
+	SELECT * from nxtServiceCategory
+	where nxtServiceCategory.CategoryId in (
+		SELECT DISTINCT categoryId from  #NearByServiceProviders
+	);
+	
 END
 
 GO;

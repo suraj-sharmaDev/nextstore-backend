@@ -4,24 +4,14 @@ const sendMessage = require('../middleware/firebase');
 const router = express.Router();
 
 
-router.get('/:serviceProviderId/:status/:page/:startDate?/:endDate?', async(req, res, next)=>{
-	//get quotes belonging to serviceProvider with serviceProviderId
-	//based on status
-    const serviceProviderId = req.params.serviceProviderId;
-    const status = req.params.status;
-    const page = req.params.page;
-    const startDate = req.params.startDate;
-    const endDate = req.params.endDate;
+router.get('/:quoteMasterId', async(req, res, next)=>{
+	//Get detail of quote using quoteMasterId
 	try {
-		const quotes = await sequelize.query(
-                'exec spGetServiceProviderQuotes :serviceProviderId, :status, :page, :startDate, :endDate', 
+		const quoteDetail = await sequelize.query(
+                'exec spGetQuoteDetails :quoteMasterId', 
                 { 
                     replacements: { 
-                        serviceProviderId: serviceProviderId, 
-                        status: status, 
-                        page: page, 
-                        startDate: startDate? startDate: null, 
-                        endDate: endDate? endDate : null
+                        quoteMasterId: req.params.quoteMasterId
                     }
             }).spread((quotes, message)=>{
 					//since the return data will be string and not parsed
@@ -33,49 +23,42 @@ router.get('/:serviceProviderId/:status/:page/:startDate?/:endDate?', async(req,
 						return [];
 					}
             });
-		res.send(quotes);
+		res.send(quoteDetail);
 	} catch(e) {
 		res.send({error : true});
 		console.log(e);
 	}
 });
 
-router.post('/:quoteId?', async(req, res, next)=>{
-	//when quoteId is not passed a new quote will be created
-	//else details will be added to existent quotes
-	let quoteMasterId = null;
+router.post('/', async(req, res, next)=>{
+	//create a new quote by customer
 	try {
-		if(!req.params.quoteId){
-			//after new quote is created notification should be sent to merchant 
-			//for receiving new quote
-			const serviceProvider = await sequelize.query(
-						'exec spCreateNewQuote :json', 
-						{ 
-							replacements: { json: JSON.stringify(req.body) }
-						}).spread((user, created)=>{ 
-							return user[0]; 
-						})
-			const type = 'new_quote';
-			quoteMasterId = serviceProvider.quoteMasterId;
-			if(serviceProvider.fcmToken!= null){
-				let data = {
-					fcmToken: serviceProvider.fcmToken,
-					quoteId: quoteMasterId,
-					type: type
-				}
-				console.log(data);
-				// sendMessage(data);
-			}
-		}else{
-			await sequelize.query('exec spbulkCreateQuoteDetail :json, :quoteMasterId', { 
-				replacements: 
-				{ 
-					json: JSON.stringify(req.body), 
-					quoteMasterId: req.params.quoteId
+		const serviceProvider = await sequelize.query(
+			'exec spCreateNewQuote :json', 
+			{ 
+				replacements: { json: JSON.stringify(req.body) }
+			}).spread((user, created)=>{
+				return (user); 
+			})
+		const type = 'new_quote';
+		if(serviceProvider.length > 0){
+			let fcmToken = [];
+			serviceProvider.map((s)=>{
+				if(s.fcmToken != null){
+					fcmToken.push(s.fcmToken)
 				}
 			});
+			//send push notification to service providers only if valid fcmToken available
+			if(fcmToken.length > 0){
+				let data = {
+					fcmToken: fcmToken,
+					type: type
+				}
+				sendMessage(data);
+			}
 		}
-		res.send({message : 'created', quoteId: quoteMasterId});
+		//send api request back to client
+		res.send({message : 'created'});
 	} catch(e) {
 		// statements
 		res.send({error : true});

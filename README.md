@@ -126,6 +126,9 @@ Services
 1. Get All Services Categorically
 	http://35.230.117.116/searchApi/service
 
+	#Get All Services Categorically and near the user
+	http://35.230.117.116/searchApi/service/services/9.230385/76.515898
+
 2. Get Service Item for the service Category
 	http://35.230.117.116/searchApi/service/serviceItem/CategoryId
 
@@ -156,7 +159,6 @@ Services
 		}
 	}
 	```	
-7. 
 
 category
 --------
@@ -392,6 +394,68 @@ Order
 8. Reject Order
 	http://35.230.117.116/orderApi/operations/rejectOrder/orderId
 
+Quote
+--------
+#Shops will have order and services will have quotes
+
+1. Get Quote Details
+	http://35.230.117.116/orderApi/quote/quoteId
+
+2. Post a quote by user
+	http://35.230.117.116/orderApi/quote
+	POST : JSON
+	```javascript
+	{
+	"master": {
+		"customerId": 1,
+		"deliveryAddress": "{\"latitude\": 9.230385, \"longitude\": 76.515898}",
+		"type": "repair",
+		"categoryId": 1
+	},
+	"detail":[
+		{
+			"productId": 119,
+			"productName" : "DV Bellow"
+		},
+		{
+			"productId": 120,
+			"productName" : "DV Assembly"
+		}    
+	]
+	}	
+	```
+3. Bid the quote by service provider
+	http://35.230.117.116/orderApi/operations/bidQuote/quoteId/serviceProviderId
+	POST : JSON
+	```javascript
+	{
+		"master":{
+			"totalAmount": 800,
+			"serviceCharge": 300,
+			"discount": 300
+		},
+		"detail": [
+			{
+				"productId": 119,
+				"productName": "DV Bellow",
+				"mrp": 200,
+				"serviceCharge": 300
+			},
+			{
+				"productId": 120,
+				"productName": "DV Assembly",
+				"mrp": 300,
+				"serviceCharge": 300
+			}
+		]
+	}
+	```
+4. Reject Quote by service provider
+	http://35.230.117.116/orderApi/operations/rejectQuote/quoteId/serviceProviderId
+
+5. Accept Service Provider biddings by customer
+	http://35.230.117.116/orderApi/operations/acceptQuote/quoteBiddingId/serviceProviderId
+
 Customer
 --------
 
@@ -485,6 +549,9 @@ Search Operations
 
 4. Find all shops within x km radius that has products from subCategoryChildId
 	http://35.230.117.116/searchApi/shop/9.230385/76.515898/subCategoryChildId
+
+5. Services available within x km radius of coordinates
+	http://35.230.117.116/searchApi/service/services/9.230385/76.515898
 
 Author : Suraj Sharma
 --------------------------

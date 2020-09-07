@@ -203,6 +203,7 @@ BEGIN
 		category nvarchar(50),
 		onlineStatus bit,
 		image nvarchar(100),
+		rating INT,
 		distance FLOAT
 	);
 	DECLARE @searchFlag INT; --to check if product exist in shop

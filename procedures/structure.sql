@@ -327,8 +327,9 @@ CREATE TABLE nextstore.dbo.quoteMaster (
 	customerId int NULL,
 	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'pending', --can be pending, accepted, rejected or completed
 	[type] NVARCHAR(30) NULL,	--can be repair or package
-	createdAt datetimeoffset NULL,
-	deliveryAddress NVARCHAR(250) NULL
+	[image] NVARCHAR(100) NULL, --if type is image then file url, used for storing bill image,	
+	deliveryAddress NVARCHAR(250) NULL,
+	createdAt datetimeoffset NULL
 );
 
 
@@ -345,8 +346,7 @@ CREATE TABLE nextstore.dbo.quoteDetail (
 	productName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[json] NVARCHAR(1000) NULL, --this can be json data or text
 	remark NVARCHAR(500) NULL, -- this is user given comments
-	[type] NVARCHAR(30) NULL, -- can be null or image
-	[image] NVARCHAR(100) NULL, --if type is image then file url, used for storing bill image
+	[image] NVARCHAR(100) NULL, --if type is image then file url, used for storing user request	
 	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id)
 );
 
@@ -360,7 +360,7 @@ CREATE TABLE nextstore.dbo.quotedServiceProviders (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	serviceProviderId int NULL FOREIGN KEY REFERENCES serviceProvider(id),
 	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id),
-	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, --can be pending, rejected or accepted
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'pending', --can be pending, rejected or accepted
 	createdAt datetimeoffset NULL
 );
 
@@ -370,7 +370,7 @@ CREATE TABLE nextstore.dbo.quotationBiddings (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	serviceProviderId int NULL FOREIGN KEY REFERENCES serviceProvider(id),
 	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id),
-	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,  -- can be pending, rejected or accepted
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'pending',  -- can be pending, rejected or accepted
 	[json] NVARCHAR(1000) NULL,
 	createdAt datetimeoffset NULL
 );
