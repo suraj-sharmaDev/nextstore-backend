@@ -37,6 +37,10 @@ INSERT into orderDetail (productId, productName, price, qty, orderMasterId)
     qty INT '$.qty'
   )json
 
+ ---all the products ordered will be sent for recommendation---
+ EXEC spInsertRecommendedProduct @shopId, @json;  
+ --------------------------------------------------------------
+ 
 select @fcmToken=fcmToken from shop where id in (
 	select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
 );

@@ -21,9 +21,8 @@ CREATE PROCEDURE dbo.spCreateShopContent
 @shopId INT
 AS
 BEGIN
-	declare @tableId int;
-	
-	Declare @baseUrl varchar(200);
+	DECLARE @tableId int;
+	DECLARE @baseUrl varchar(200);
 	--get baseUrl as local variable
 	Select @baseUrl=baseUrl from appConfig;
 
@@ -54,9 +53,26 @@ BEGIN
 	    CREATE TABLE #Results
 	    (
 	    	shopInfo NVARCHAR(MAX),
-			categories NVARCHAR(MAX)
+			categories NVARCHAR(MAX),
+			recommends NVARCHAR(MAX)
 	    )
-	
+	    
+	IF OBJECT_ID('tempdb..#Recommends') IS NOT NULL
+	    Truncate TABLE #Recommends
+	else
+	    CREATE TABLE #Recommends
+	    (
+			id INT,
+		    shopId INT,
+			productId INT,
+			name NVARCHAR(100),
+			productMasterId INT,			
+			image NVARCHAR(200),
+			price INT
+	    )	    
+
+	INSERT INTO #Recommends EXEC spGetRecommendedProducts @shopId;
+
 	;With x(json) as
 	(
 		SELECT  
@@ -92,6 +108,11 @@ BEGIN
 		for JSON PATH, WITHOUT_ARRAY_WRAPPER
 	)
 	
+	UPDATE #Results SET recommends = (
+		SELECT * from #Recommends
+		FOR JSON PATH
+	);
+
 	select * from #Results
 END
 

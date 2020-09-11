@@ -280,6 +280,14 @@ CREATE TABLE nextstore.dbo.product1 (
 	CONSTRAINT FK__product__shopId__214BF109 FOREIGN KEY (shopId) REFERENCES nextstore.dbo.shop(id)
 );
 
+-- nextstore.dbo.recommendedProducts definition
+CREATE TABLE nextstore.dbo.recommendedProducts (
+	id int IDENTITY(1,1) NOT NULL,
+	shopId int NOT NULL FOREIGN KEY REFERENCES shop(id),
+	productId int NOT NULL,
+	[count] int DEFAULT 1
+);
+
 -- nextstore.dbo.offers definition
 
 CREATE TABLE nextstore.dbo.offers (

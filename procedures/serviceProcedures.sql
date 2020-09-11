@@ -214,17 +214,17 @@ BEGIN
 		with x(json) as
 		(
 			SELECT 
-				repairPartsRate = (
+				spairPartsRate = (
 					SELECT
 					SparePartName,
-					convert(numeric(38,0),cast(Moped_Min AS float)) as Moped_Min,
-					convert(numeric(38,0),cast(Moped_Max AS float)) as Moped_Max,
-					convert(numeric(38,0),cast(CC_150_180_Min AS float)) as CC_150_180_Min,
-					convert(numeric(38,0),cast(CC_150_180_Max AS float)) as CC_150_180_Max,
-					convert(numeric(38,0),cast(CC_Above_180_Min AS float)) as CC_Above_180_Min,
-					convert(numeric(38,0),cast(CC_150_180_Max AS float)) as CC_Above_180_Max,
-					convert(numeric(38,0),cast(Bullet_Min AS float)) as Bullet_Min,
-					convert(numeric(38,0),cast(Bullet_Max AS float)) as Bullet_Max,
+					convert(numeric(38,0),cast(Moped_Min AS float)) as moped_Min,
+					convert(numeric(38,0),cast(Moped_Max AS float)) as moped_Max,
+					convert(numeric(38,0),cast(CC_150_180_Min AS float)) as below_180_cc_min,
+					convert(numeric(38,0),cast(CC_150_180_Max AS float)) as below_180_cc_max,
+					convert(numeric(38,0),cast(CC_Above_180_Min AS float)) as above_180_cc_min,
+					convert(numeric(38,0),cast(CC_150_180_Max AS float)) as above_180_cc_max,
+					convert(numeric(38,0),cast(Bullet_Min AS float)) as bullet_min,
+					convert(numeric(38,0),cast(Bullet_Max AS float)) as bullet_max,
 					Active 
 					FROM TwoWheelerSparePartRate
 					FOR JSON PATH, INCLUDE_NULL_VALUES	

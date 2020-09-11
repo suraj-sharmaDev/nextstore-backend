@@ -21,7 +21,8 @@ router.get('/:shopId/:param?', async(req, res, next)=>{
 				//lets parse it
 				var shop = JSON.parse(user[0].shopInfo);
 				var categories = JSON.parse(user[0].categories);
-				return {shop, categories}
+				var recommends = JSON.parse(user[0].recommends);
+				return {shop, categories, recommends}
 			})
 		}else if (req.params.param === 'basic'){
 			content = await sequelize.query(
