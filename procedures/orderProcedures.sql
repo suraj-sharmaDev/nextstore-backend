@@ -4,49 +4,65 @@ CREATE PROCEDURE dbo.spCreateNewOrder
 @json NVARCHAR(max)
 AS
 BEGIN
+	DECLARE @fcmToken NVARCHAR(250);
+	DECLARE @orderMasterId INT;
+	DECLARE @createdAt datetimeoffset = GETUTCDATE();
 
-DECLARE @fcmToken NVARCHAR(250);
-DECLARE @orderMasterId INT;
-DECLARE @createdAt datetimeoffset = GETUTCDATE();
+	DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
+	DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
+	DECLARE @deliveryAddress NVARCHAR(250) = JSON_VALUE(@json, '$.master.deliveryAddress');
 
-DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
-DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
-DECLARE @deliveryAddress NVARCHAR(250) = JSON_VALUE(@json, '$.master.deliveryAddress');
+	-- update cartMaster table to identify fulfilled carts
 
--- update cartMaster table to identify fulfilled carts
+	UPDATE cartMaster set status = 1 
+	where customerId = @customerId and shopId = @shopId and status = 0;
 
-UPDATE cartMaster set status = 1 
-where customerId = @customerId and shopId = @shopId and status = 0;
+	-- insert into ordermaster
 
--- insert into ordermaster
+	insert into orderMaster (customerId, shopId, deliveryAddress, createdAt)
+	VALUES (@customerId, @shopId, @deliveryAddress, @createdAt);
 
-insert into orderMaster (customerId, shopId, deliveryAddress, createdAt)
-VALUES (@customerId, @shopId, @deliveryAddress, @createdAt);
+	--then bulk insert into orderDetail with the orderMasterId
+	SET @orderMasterId = SCOPE_IDENTITY();
 
---then bulk insert into orderDetail with the orderMasterId
-SET @orderMasterId = SCOPE_IDENTITY();
+	INSERT into orderDetail (productId, productName, price, qty, orderMasterId)
+	select json.productId, json.productName, json.price, json.qty, 
+	@orderMasterId as orderMasterId
+	from openjson(@json, '$.detail')
+	with(
+		productId INT '$.productId',
+		productName nvarchar(100) '$.productName',
+		price INT '$.price',
+		qty INT '$.qty'
+	)json
 
-INSERT into orderDetail (productId, productName, price, qty, orderMasterId)
-  select json.productId, json.productName, json.price, json.qty, 
-  @orderMasterId as orderMasterId
-  from openjson(@json, '$.detail')
-  with(
-    productId INT '$.productId',
-    productName nvarchar(100) '$.productName',
-    price INT '$.price',
-    qty INT '$.qty'
-  )json
+	---all the products ordered will be sent for recommendation---
+	EXEC spInsertRecommendedProduct @shopId, @json;  
+	--------------------------------------------------------------
+	
+	select @fcmToken=fcmToken from shop where id in (
+		select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
+	);
 
- ---all the products ordered will be sent for recommendation---
- EXEC spInsertRecommendedProduct @shopId, @json;  
- --------------------------------------------------------------
- 
-select @fcmToken=fcmToken from shop where id in (
-	select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
-);
-
-select @fcmToken as fcmToken, @orderMasterId as orderMasterId;
+	;with x(json) as (
+		SELECT [orderMaster].[id], 
+			[orderMaster].[customerId], 
+			[orderMaster].[shopId], 
+			[orderMaster].[status], 
+			[orderMaster].[deliveryAddress], 
+			[items].[productId] AS [productId], 
+			[items].[productName] AS [productName], 
+			[items].[price] AS [price], 
+			[items].[qty] AS [qty] 
+			FROM [orderMaster] AS [orderMaster] 
+			LEFT OUTER JOIN [orderDetail] AS [items] 
+			ON [orderMaster].[id] = [items].[orderMasterId] 
+			WHERE [orderMaster].[id] = @orderMasterId
+		FOR JSON AUTO
+	)
+	select @fcmToken as fcmToken, @orderMasterId as orderMasterId, json as orderDetail from x;
 END
+
 
 
 GO;

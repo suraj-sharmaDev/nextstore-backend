@@ -63,6 +63,7 @@ router.post('/:orderId?', async(req, res, next)=>{
 	//when orderId is not passed a new orderwill be created
 	//else orders will be added to existent order
 	let orderMasterId = null;
+	let orderDetail = null;
 	try {
 		if(!req.params.orderId){
 			//after new order is created notification should be sent to merchant 
@@ -76,6 +77,7 @@ router.post('/:orderId?', async(req, res, next)=>{
 						})
 			const type = 'new_order';
 			orderMasterId = shop.orderMasterId;
+			orderDetail = JSON.parse(shop.orderDetail);
 			if(shop.fcmToken!= null){
 				let data = {
 					fcmToken: shop.fcmToken,
@@ -84,16 +86,17 @@ router.post('/:orderId?', async(req, res, next)=>{
 				}
 				sendMessage(data);
 			}
-		}else{
-			await sequelize.query('exec spbulkCreateOrderDetail :json, :orderMasterId', { 
-				replacements: 
-				{ 
-					json: JSON.stringify(req.body), 
-					orderMasterId: req.params.orderId
-				}
-			});
 		}
-		res.send({message : 'created', orderId: orderMasterId});
+		// else{
+		// 	await sequelize.query('exec spbulkCreateOrderDetail :json, :orderMasterId', { 
+		// 		replacements: 
+		// 		{ 
+		// 			json: JSON.stringify(req.body), 
+		// 			orderMasterId: req.params.orderId
+		// 		}
+		// 	});
+		// }
+		res.send({message : 'created', orderDetail: orderDetail});
 	} catch(e) {
 		// statements
 		res.send({error : true});
