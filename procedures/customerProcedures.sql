@@ -1,4 +1,5 @@
 ------------Get Customer Details
+------------Get Customer Details
 CREATE Procedure dbo.spInitializeCustomer
 @custId int
 As
@@ -26,16 +27,20 @@ Begin
 				For Json PATH, INCLUDE_NULL_VALUES				
 			),
 			[order] = (
-				select 
-				TOP 3 
+				select
 				orderMaster.*,
 				items.productId,
 				items.productName,
 				items.price,
 				items.qty 
-				from orderMaster
+				from 
+				(
+					SELECT orderMaster.*, shop.name from orderMaster
+					INNER JOIN shop on shop.id = orderMaster.shopId
+					where orderMaster.customerId = @custId
+				)
+				as orderMaster				
 				INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
-				where orderMaster.customerId = @custId
 				And orderMaster.status in ('pending', 'accepted')
 				For Json AUTO, INCLUDE_NULL_VALUES				
 			),

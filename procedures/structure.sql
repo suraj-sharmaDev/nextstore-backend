@@ -8,6 +8,14 @@ CREATE TABLE nextstore.dbo.appConfig (
 	stateId int DEFAULT 0
 );
 
+-- nextstore.dbo.admin definition
+
+CREATE TABLE nextstore.dbo.adminTable (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[username] nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[password] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+);
+
 -- nextstore.dbo.category definition
 
 CREATE TABLE nextstore.dbo.category (

@@ -1,5 +1,5 @@
 ---------------------------------------------------------
---procedure to find or create a customer along with otp--
+------procedure to login merchant -----------------------
 
 CREATE PROCEDURE dbo.spLoginMerchant
 @email nvarchar(30),

@@ -1,4 +1,7 @@
-
+INSERT INTO adminTable (username, password) VALUES
+(
+    'admin', HASHBYTES('MD5', 'hello')
+);
 INSERT INTO category (name) VALUES
 ('Babycare'),
 ('Organic'),

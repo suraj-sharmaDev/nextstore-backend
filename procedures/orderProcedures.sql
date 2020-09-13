@@ -45,20 +45,22 @@ BEGIN
 	);
 
 	;with x(json) as (
-		SELECT [orderMaster].[id], 
-			[orderMaster].[customerId], 
-			[orderMaster].[shopId], 
-			[orderMaster].[status], 
-			[orderMaster].[deliveryAddress], 
-			[items].[productId] AS [productId], 
-			[items].[productName] AS [productName], 
-			[items].[price] AS [price], 
-			[items].[qty] AS [qty] 
-			FROM [orderMaster] AS [orderMaster] 
-			LEFT OUTER JOIN [orderDetail] AS [items] 
-			ON [orderMaster].[id] = [items].[orderMasterId] 
+		select
+		orderMaster.*,
+		items.productId,
+		items.productName,
+		items.price,
+		items.qty 
+		from 
+		(
+			SELECT orderMaster.*, shop.name from orderMaster
+			INNER JOIN shop on shop.id = orderMaster.shopId
 			WHERE [orderMaster].[id] = @orderMasterId
-		FOR JSON AUTO
+		)
+		as orderMaster				
+		INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
+		And orderMaster.status in ('pending', 'accepted')
+		For Json AUTO, INCLUDE_NULL_VALUES	
 	)
 	select @fcmToken as fcmToken, @orderMasterId as orderMasterId, json as orderDetail from x;
 END

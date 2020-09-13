@@ -19,7 +19,12 @@ module.exports = {
       name: 'search',
       script: './search/app.js',
       watch: '.'
-    }        
+    },
+    {
+      name: 'admin',
+      script: './admin/app.js',
+      watch: '.'
+    }    
   ],
 
   deploy : {

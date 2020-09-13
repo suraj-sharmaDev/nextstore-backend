@@ -144,7 +144,8 @@ BEGIN
 	TRUNCATE TABLE #DistTemp
 	ELSE
 		CREATE TABLE #DistTemp (
-			id int,
+			productMasterId int,
+			productId int,
 			name varchar(200),
 			image varchar(200),
 			subCategoryChildId int,
@@ -153,7 +154,8 @@ BEGIN
 	
 	declare @query nvarchar(max) = N'
 		select 
-		productMaster.id,
+		productMaster.id as productMasterId,
+		product.id as productId,
 		productMaster.name,
 		CONCAT(@baseUrl, productMaster.image),
 		productMaster.subCategoryChildId,
@@ -176,7 +178,8 @@ BEGIN
 		scc.subCategoryId as subCategoryId,
 		scc.subCategoryChildId as subCategoryChildId,
 		scc.title as title,
-		data.id as productId,
+		data.productMasterId as productMasterId,
+		data.productId as productId,
 		data.name as name,
 		data.image as image,
 		data.price as price
