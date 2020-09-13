@@ -1,5 +1,5 @@
 const express = require('express');
-const path = require('path');
+const cors = require('cors');
 const {sequelize} = require('./models');
 const createError = require('http-errors');
 
@@ -7,7 +7,7 @@ var {login, address, cart, verification, favourite} = require('./routes');
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+app.use(cors());
 //create a middleware for each route
 const jsonParser = express.json();
 const urlEncoded = express.urlencoded({extended : false});

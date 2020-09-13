@@ -73,7 +73,7 @@ server{
 
 	location /assets/ {
         #change this to the location of images
-        
+        #root "/home/suraj/nextstore-server/";
         #root "/home/suraj/Desktop/localhost/";
     }
 
