@@ -319,7 +319,8 @@ BEGIN
 				mrp int NULL,
 				price int NULL,
 				shopId int NULL FOREIGN KEY REFERENCES shop(id),
-				productMasterId int NULL FOREIGN KEY REFERENCES productMaster(id)
+				productMasterId int NULL FOREIGN KEY REFERENCES productMaster(id),
+				stock int DEFAULT 1
 			);
 			
 			INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
@@ -355,7 +356,7 @@ BEGIN
 	DECLARE @tableName varchar(100) = N'product'+ cast(@tableId as varchar);
 
 	IF OBJECT_ID('tempdb..#Product') IS NOT NULL
-	DROP TABLE #Product;
+	TRUNCATE TABLE #Product;
 	
 	
 	SELECT * INTO #Product FROM OPENJSON(@json)
@@ -363,7 +364,8 @@ BEGIN
 			id int,
 			mrp int,
 			price int,
-			productMasterId int
+			productMasterId int,
+			stock int
 		);
 	
 	SET @query = N'
@@ -377,7 +379,10 @@ BEGIN
 			ELSE '+@tableName+'.price END,
 		'+@tableName+'.productMasterId = 
 			CASE WHEN (#Product.productMasterId IS NOT NULL) THEN #Product.productMasterId
-			ELSE '+@tableName+'.productMasterId END
+			ELSE '+@tableName+'.productMasterId END,
+		'+@tableName+'.stock =
+			CASE WHEN (#Product.stock IS NOT NULL) THEN #Product.stock
+			ELSE '+@tableName+'.stock END
 		FROM '+@tableName+', #Product 
 		WHERE #Product.id = '+@tableName+'.id';
 	

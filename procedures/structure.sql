@@ -283,6 +283,7 @@ CREATE TABLE nextstore.dbo.product1 (
 	price int NULL,
 	shopId int NULL,
 	productMasterId int NULL,
+	stock int DEFAULT 1,
 	CONSTRAINT PK__product__3213E83F16B61479 PRIMARY KEY (id),
 	CONSTRAINT FK__product__product__22401542 FOREIGN KEY (productMasterId) REFERENCES nextstore.dbo.productMaster(id),
 	CONSTRAINT FK__product__shopId__214BF109 FOREIGN KEY (shopId) REFERENCES nextstore.dbo.shop(id)
