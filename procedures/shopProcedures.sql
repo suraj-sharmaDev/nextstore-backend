@@ -146,8 +146,14 @@ BEGIN
 		CREATE TABLE #DistTemp (
 			productMasterId int,
 			productId int,
-			name varchar(200),
-			image varchar(200),
+			[name] varchar(200),
+			[image] varchar(180),
+			[bigImage1] nvarchar(180),
+			[bigImage2] nvarchar(180),
+			[bigImage3] nvarchar(180),
+			[bigImage4] nvarchar(180),
+			[bigImage5] nvarchar(180),
+			[bigImage6] nvarchar(180),
 			subCategoryChildId int,
 			price int
 		);
@@ -157,7 +163,13 @@ BEGIN
 		productMaster.id as productMasterId,
 		product.id as productId,
 		productMaster.name,
-		CONCAT(@baseUrl, productMaster.image),
+		COALESCE(@baseUrl + productMaster.image, null) as image,
+		COALESCE(@baseUrl + productMaster.bigImage1, null) as bigImage1,
+		COALESCE(@baseUrl + productMaster.bigImage2, null) as bigImage2,
+		COALESCE(@baseUrl + productMaster.bigImage3, null) as bigImage3,
+		COALESCE(@baseUrl + productMaster.bigImage4, null) as bigImage4,
+		COALESCE(@baseUrl + productMaster.bigImage5, null) as bigImage5,
+		COALESCE(@baseUrl + productMaster.bigImage6, null) as bigImage6,
 		productMaster.subCategoryChildId,
 		product.price
 		from productMaster
@@ -180,8 +192,14 @@ BEGIN
 		scc.title as title,
 		data.productMasterId as productMasterId,
 		data.productId as productId,
-		data.name as name,
-		data.image as image,
+		data.name as [name],
+		data.image as [image],
+		data.bigImage1 as [bigImage1],
+		data.bigImage2 as [bigImage2],
+		data.bigImage3 as [bigImage3],
+		data.bigImage4 as [bigImage4],
+		data.bigImage5 as [bigImage5],
+		data.bigImage6 as [bigImage6],												
 		data.price as price
 		from (
 			select 

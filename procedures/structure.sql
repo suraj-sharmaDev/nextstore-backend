@@ -265,6 +265,12 @@ CREATE TABLE nextstore.dbo.productMaster (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[image] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[bigImage1] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[bigImage2] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[bigImage3] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[bigImage4] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[bigImage5] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[bigImage6] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,	
 	subCategoryChildId int NULL,
 	CONSTRAINT PK__productM__3213E83FBAAA4E7D PRIMARY KEY (id),
 	CONSTRAINT FK__productMa__subCa__1E6F845E FOREIGN KEY (subCategoryChildId) REFERENCES nextstore.dbo.subCategoryChild(id)
