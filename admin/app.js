@@ -1,17 +1,21 @@
 const express = require('express');
 const cors = require('cors');
 const createError = require('http-errors');
-
-const {admin} = require('./routes');
-
+const {admin, product, shopOffer} = require('./routes');
+const bodyParser = require('body-parser');
+const upload = require('./middleware/fileUpload');
 const app = express();
 const port = process.env.PORT || 3004;
 app.use(cors());
 
+
 //create a middleware for each route
 const jsonParser = express.json();
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/admin', jsonParser, admin);
+app.use('/product', upload, product);
+app.use('/shopOffer', upload, shopOffer);
 
 app.get('/', (req, res)=>{
 	res.send({path: 404})

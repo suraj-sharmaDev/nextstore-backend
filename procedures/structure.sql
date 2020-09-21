@@ -313,6 +313,14 @@ CREATE TABLE nextstore.dbo.offers (
 	createdAt datetime default CURRENT_TIMESTAMP
 );
 
+-- nextstore.dbo.shopOffers definition
+
+CREATE TABLE nextstore.dbo.shopOffers (
+	id int IDENTITY(1,1) NOT NULL,
+	shopId int NOT NULL FOREIGN KEY REFERENCES shop(id),
+	offer_image varchar(100) NOT NULL,
+	createdAt datetime default CURRENT_TIMESTAMP
+);
 
 -- nextstore.dbo.coupons definition
 
