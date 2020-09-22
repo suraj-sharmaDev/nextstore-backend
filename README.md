@@ -39,13 +39,13 @@ The database mandatory is sql server v. 2019
 Local Server to nginx map
 =========================
 
-127.0.0.1:3000 : 35.230.117.116/customerApi
+127.0.0.1:3000 : nxtshops.com/customerApi
 
-127.0.0.1:3001 : 35.230.117.116/merchantApi
+127.0.0.1:3001 : nxtshops.com/merchantApi
 
-127.0.0.1:3002 : 35.230.117.116/orderApi
+127.0.0.1:3002 : nxtshops.com/orderApi
 
-127.0.0.1:3003 : 35.230.117.116/searchApi
+127.0.0.1:3003 : nxtshops.com/searchApi
 
 -------------------------
 API LISTS
@@ -55,7 +55,7 @@ merchant
 --------
 
 1. create Merchant
-	35.230.117.116/merchantApi/merchant
+	nxtshops.com/merchantApi/merchant
 	POST : JSON
 	{
 	"firstName": "suraj",
@@ -64,11 +64,11 @@ merchant
 	}
 
 2. update Merchant
-	35.230.117.116/merchantApi/merchant/merchId
+	nxtshops.com/merchantApi/merchant/merchId
 	PUT : JSON
 
 3. Login Merchant
-	35.230.117.116/merchantApi/login
+	nxtshops.com/merchantApi/login
 	POST : JSON
 	{
 	"email": "suraj@gmail.com",
@@ -80,31 +80,39 @@ Shop
 ----
 
 1. Get content of shop with shopId
-	http://35.230.117.116/merchantApi/shop/shopId
+	https://nxtshops.com/merchantApi/shop/shopId
 
 	To get basic shopInfo
-	http://35.230.117.116/merchantApi/shop/shopId/basic
+	https://nxtshops.com/merchantApi/shop/shopId/basic
 
 2. Get products of shop with shopId, for subCategoryId
-	http://35.230.117.116/merchantApi/shop/shopId/subCategoryId
+	https://nxtshops.com/merchantApi/shop/shopId/subCategoryId
 
 3. Create Shop
-	35.230.117.116/merchantApi/shop/merchId
-	POST : JSON
-	```javascript
-	{
-	  "name":"Kirana",
-	  "category":"wholesale",
-	  "coverage": 8,
-	  "address":{
-	    "pickupAddress": "Near mavelikkara junction",
-	    "latitude": 8.230385,
-	    "longitude": 76.515898
-	  }
-	}
-	```
+	nxtshops.com/merchantApi/shop/merchId
+	POST : FORMDATA
+
+		type => shop
+		
+		json => {"shop":{"name":"arvees","onlineStatus":0},"address":{"pickupAddress":"Nearmavelikkarajunction","latitude":9.230385,"longitude":76.515898}}
+
+		image => TYPE_FILE
+
 4. Update Shop
-	35.230.117.116/merchantApi/shop/shopId
+	nxtshops.com/merchantApi/shop/merchId/shopId
+	This api can be called in two ways
+	One with file as formData or without file as raw json
+	With Formdata
+	-------------
+	PUT : FORMDATA
+		type => shop
+		
+		json => {"shop":{"name":"arvees","onlineStatus":0},"address":{"pickupAddress":"Nearmavelikkarajunction","latitude":9.230385,"longitude":76.515898}}
+
+		image => TYPE_FILE
+
+	With Raw Json
+	-------------
 	PUT : JSON
 	```javascript
 	{
@@ -124,25 +132,25 @@ Services
 --------
 
 1. Get All Services Categorically
-	http://35.230.117.116/searchApi/service
+	https://nxtshops.com/searchApi/service
 
 	#Get All Services Categorically and near the user
-	http://35.230.117.116/searchApi/service/services/9.230385/76.515898
+	https://nxtshops.com/searchApi/service/services/9.230385/76.515898
 
 2. Get Service Item for the service Category
-	http://35.230.117.116/searchApi/service/serviceItem/CategoryId
+	https://nxtshops.com/searchApi/service/serviceItem/CategoryId
 
 3. Get available repair and packages for service Item
-	http://35.230.117.116/searchApi/service/serviceDetails/ServiceItemId
+	https://nxtshops.com/searchApi/service/serviceDetails/ServiceItemId
 
 4. Get package rate for packages
-	http://35.230.117.116/searchApi/service/packageRate/PackageId
+	https://nxtshops.com/searchApi/service/packageRate/PackageId
 
 5. Get Service charge and Repair Parts Rate for RepairItemId
-	http://35.230.117.116/searchApi/service/repairParts/RepairItemId
+	https://nxtshops.com/searchApi/service/repairParts/RepairItemId
 
 6. Add a serviceProvider to a merchantId
-	http://35.230.117.116/merchantApi/service
+	https://nxtshops.com/merchantApi/service
 	POST : JSON
 	```javascript
 	{
@@ -164,13 +172,13 @@ category
 --------
 
 1. Get All Category
-	http://35.230.117.116/merchantApi/category
+	https://nxtshops.com/merchantApi/category
 
 2. Get category with Id
-	http://35.230.117.116/merchantApi/category/category/categoryId
+	https://nxtshops.com/merchantApi/category/category/categoryId
 
 3. Create Category
-	35.230.117.116/merchantApi/category
+	nxtshops.com/merchantApi/category
 	POST : JSON
 	```javascript
 	{
@@ -178,7 +186,7 @@ category
 	}	
 	```
 4. Update Category
-	35.230.117.116/merchantApi/category/category/categoryId
+	nxtshops.com/merchantApi/category/category/categoryId
 	POST : JSON
 	```javascript
 	{
@@ -186,10 +194,10 @@ category
 	}		
 	```
 5. Get subCategory with Id
-	http://35.230.117.116/merchantApi/category/subCategory/subCategoryId
+	https://nxtshops.com/merchantApi/category/subCategory/subCategoryId
 
 6. Create SubCategory
-	35.230.117.116/customerApi/category/subCategory
+	nxtshops.com/customerApi/category/subCategory
 	PUT : JSON
 	```javascript
 	{
@@ -198,7 +206,7 @@ category
 	}	
 	```
 7. Update SubCategory
-	35.230.117.116/merchantApi/category/subCategory/subCategoryId
+	nxtshops.com/merchantApi/category/subCategory/subCategoryId
 	PUT : JSON
 	```javascript
 	{
@@ -207,10 +215,10 @@ category
 	```
 
 8. Get subCategoryChild with Id
-	http://35.230.117.116/merchantApi/category/subCategory/subCategoryId
+	https://nxtshops.com/merchantApi/category/subCategory/subCategoryId
 
 9. Create SubCategoryChild
-	35.230.117.116/merchantApi/category/subCategoryChild
+	nxtshops.com/merchantApi/category/subCategoryChild
 	```javascript
 	POST : JSON
 	{
@@ -219,7 +227,7 @@ category
 	}	
 	```
 10. Update Category
-	35.230.117.116/merchantApi/category/subCategoryChild/subCategoryChildId
+	nxtshops.com/merchantApi/category/subCategoryChild/subCategoryChildId
 	PUT : JSON
 	```javascript
 	{
@@ -231,7 +239,7 @@ Product
 ---------
 
 1. Create product
-	http://35.230.117.116/merchantApi/product/shopId
+	https://nxtshops.com/merchantApi/product/shopId
 	POST : JSON
 	```javascript
 	{
@@ -242,7 +250,7 @@ Product
 	```
 
 2. Update product
-	http://35.230.117.116/merchantApi/product/shopId/productId
+	https://nxtshops.com/merchantApi/product/shopId/productId
 	PUT : JSON
 	```javascript
 	{
@@ -253,11 +261,11 @@ Product
 Cart
 -------
 1. Get all items in cart for customerId
-   http://35.230.117.116/customerApi/cart/customerId
+   https://nxtshops.com/customerApi/cart/customerId
    GET
 
 2. Create cart for customer with customerId
-	http://35.230.117.116/customerApi/cart
+	https://nxtshops.com/customerApi/cart
 	POST : JSON
 	```javascript
 	{
@@ -285,7 +293,7 @@ Cart
 	}
 	```
 3. Update some of item in cart table using cartId
-   http://35.230.117.116/customerApi/cart/customerId/shopId
+   https://nxtshops.com/customerApi/cart/customerId/shopId
    PUT : JSON
    ```javascript
 	[
@@ -301,7 +309,7 @@ Cart
    ```
 
 4. Delete some or all items in cartTable using productId
-   http://35.230.117.116/customerApi/cart/customerId/shopId
+   https://nxtshops.com/customerApi/cart/customerId/shopId
    DELETE : JSON
    ```javascript
 	[1, 2, 3]
@@ -311,14 +319,14 @@ Order
 --------
 
 1. Get Order Details
-	http://35.230.117.116/orderApi/order/orderId
+	https://nxtshops.com/orderApi/order/orderId
 
 	#Get Order belonging to shop
-	http://35.230.117.116/orderApi/order/shopId/orderStatus/pageNo/startDate?/endDate?
+	https://nxtshops.com/orderApi/order/shopId/orderStatus/pageNo/startDate?/endDate?
 	where startDate and endDate are optional parameters
 
 2. Create New Order
-	http://35.230.117.116/orderApi/order
+	https://nxtshops.com/orderApi/order
 	POST : JSON
 	```javascript
 	{
@@ -344,7 +352,7 @@ Order
 	}
 	```
 3. Add orders to existent Order
-	http://35.230.117.116/orderApi/order/orderId
+	https://nxtshops.com/orderApi/order/orderId
 	POST : JSON
 	```javascript
 	[
@@ -363,7 +371,7 @@ Order
 	]
 	```
 4. Update some products in orders
-	http://35.230.117.116/orderApi/order
+	https://nxtshops.com/orderApi/order
 	PUT : JSON
 	//this will affect orderDetail Table
 	```javascript
@@ -379,30 +387,30 @@ Order
 	]
 	```
 5. Delete full Order
-	http://35.230.117.116/orderApi/order/orderId
+	https://nxtshops.com/orderApi/order/orderId
 	DELETE Method
 
 6. Delete particular products in order with known id for each added products in orderDetail
-	http://35.230.117.116/orderApi/order
+	https://nxtshops.com/orderApi/order
 	DELETE : JSON
 	```javascript
 	[1,2,3]
 	```
 7. Accept order
-	http://35.230.117.116/orderApi/operations/acceptOrder/orderId
+	https://nxtshops.com/orderApi/operations/acceptOrder/orderId
 
 8. Reject Order
-	http://35.230.117.116/orderApi/operations/rejectOrder/orderId
+	https://nxtshops.com/orderApi/operations/rejectOrder/orderId
 
 Quote
 --------
 #Shops will have order and services will have quotes
 
 1. Get Quote Details
-	http://35.230.117.116/orderApi/quote/quoteId
+	https://nxtshops.com/orderApi/quote/quoteId
 
 2. Post a quote by user
-	http://35.230.117.116/orderApi/quote
+	https://nxtshops.com/orderApi/quote
 	POST : JSON
 	```javascript
 	{
@@ -425,7 +433,7 @@ Quote
 	}	
 	```
 3. Bid the quote by service provider
-	http://35.230.117.116/orderApi/operations/bidQuote/quoteId/serviceProviderId
+	https://nxtshops.com/orderApi/operations/bidQuote/quoteId/serviceProviderId
 	POST : JSON
 	```javascript
 	{
@@ -451,20 +459,20 @@ Quote
 	}
 	```
 4. Reject Quote by service provider
-	http://35.230.117.116/orderApi/operations/rejectQuote/quoteId/serviceProviderId
+	https://nxtshops.com/orderApi/operations/rejectQuote/quoteId/serviceProviderId
 
 5. Accept Service Provider biddings by customer
-	http://35.230.117.116/orderApi/operations/acceptQuote/quoteBiddingId/serviceProviderId
+	https://nxtshops.com/orderApi/operations/acceptQuote/quoteBiddingId/serviceProviderId
 
 Customer
 --------
 
 1. Initialization of customer with customerId
-	http://35.230.117.116/customerApi/login/customerId
+	https://nxtshops.com/customerApi/login/customerId
 	GET
 
 2. Login or signup a user using mobile no.
-	http://35.230.117.116/customerApi/login/
+	https://nxtshops.com/customerApi/login/
 	POST : JSON
 	```javascript
 	{
@@ -472,7 +480,7 @@ Customer
 	}
 	```
 2. Verify the customer
-	http://35.230.117.116/customerApi/verify/
+	https://nxtshops.com/customerApi/verify/
 	POST : JSON
 	```javascript
 	{
@@ -481,7 +489,7 @@ Customer
 	}
 	```	
 3. Update user information like name or mobile
-	http://35.230.117.116/customerApi/login/customerId
+	https://nxtshops.com/customerApi/login/customerId
 	PUT : JSON
 	```javascript
 	{
@@ -491,11 +499,11 @@ Customer
 	```
 
 4. Get address for customer 
-	http://35.230.117.116/customerApi/address/customerId
+	https://nxtshops.com/customerApi/address/customerId
 	GET
 
 5. Add new address for customer
-	http://35.230.117.116/customerApi/address/
+	https://nxtshops.com/customerApi/address/
 	POST : JSON
 	```javascript
 	{
@@ -508,7 +516,7 @@ Customer
 	}
 	```
 6. Update customer Address
-	http://35.230.117.116/customerApi/address/addressId
+	https://nxtshops.com/customerApi/address/addressId
 	PUT : JSON
 	```javascript
 	{
@@ -520,38 +528,38 @@ Customer
 	```
 
 7. Delete customer Address
-	http://35.230.117.116/customerApi/address/addressId
+	https://nxtshops.com/customerApi/address/addressId
 	DELETE
 
 8. Get favourite shops for customer
-	http://35.230.117.116/customerApi/favourite/customerId
+	https://nxtshops.com/customerApi/favourite/customerId
 	GET
 
 9. 	Add shop as favourite
-	http://35.230.117.116/customerApi/favourite/customerId/shopId
+	https://nxtshops.com/customerApi/favourite/customerId/shopId
 	POST
 
 9. 	Delete shop from favourite
-	http://35.230.117.116/customerApi/favourite/customerId/shopId
+	https://nxtshops.com/customerApi/favourite/customerId/shopId
 	DELETE
 
 Search Operations
 ------------------
 
 1. Shops available within x km radius of coordinates
-	http://35.230.117.116/searchApi/shop/9.230385/76.515898
+	https://nxtshops.com/searchApi/shop/9.230385/76.515898
 
 2. Search for shops with product within x km radius
-	http://35.230.117.116/searchApi/shop/9.230385/76.515898?searchKey=value
+	https://nxtshops.com/searchApi/shop/9.230385/76.515898?searchKey=value
 
 3. Search for products in shop
-	http://35.230.117.116/searchApi/shop/1?searchKey=value
+	https://nxtshops.com/searchApi/shop/1?searchKey=value
 
 4. Find all shops within x km radius that has products from subCategoryChildId
-	http://35.230.117.116/searchApi/shop/9.230385/76.515898/subCategoryChildId
+	https://nxtshops.com/searchApi/shop/9.230385/76.515898/subCategoryChildId
 
 5. Services available within x km radius of coordinates
-	http://35.230.117.116/searchApi/service/services/9.230385/76.515898
+	https://nxtshops.com/searchApi/service/services/9.230385/76.515898
 
 Author : Suraj Sharma
 --------------------------

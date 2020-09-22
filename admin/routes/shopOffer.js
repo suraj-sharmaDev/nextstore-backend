@@ -9,7 +9,7 @@ router.get('/', (req, res, next)=>{
 
 router.post('/:shopId', async(req, res, next)=>{
     //for offers
-    let error = false;
+    let error = true;
     let status = null;
     let files = [];
     let insertData = {
@@ -23,23 +23,26 @@ router.post('/:shopId', async(req, res, next)=>{
     //since file has been uploaded lets insert into our database
     for (let index = 0; index < files.length; index++) {
         const file = files[index];
-        insertData.offer_image = file.path.split('assets/images/').slice(1).join('.');;
+        insertData.offer_image = file.path.split('assets/images/').slice(1).join('.');
     }
-    //insert offer data in database
-    try {
-		status = await sequelize.query(
-            'exec spInsertInshopOffers :json', 
-            { 
-                replacements: { 
-                    json: JSON.stringify(insertData)
-                }
-        }).spread((value, message)=>{
-                //since the return data will be string and not parsed
-                //lets parse it
-                return value;
-        });
-    } catch (error) {
-        error = true;
+    if(files.length > 0){
+        //insert offer data in database
+        try {
+            status = await sequelize.query(
+                'exec spInsertInshopOffers :json', 
+                { 
+                    replacements: { 
+                        json: JSON.stringify(insertData)
+                    }
+            }).spread((value, message)=>{
+                    //since the return data will be string and not parsed
+                    //lets parse it
+                    return value;
+            });
+            error = false;
+        } catch (error) {
+            error = true;
+        }
     }
     if(error){
         res.send({error: true, message: 'not_created'})
@@ -92,4 +95,32 @@ router.put('/:offerId/:shopId', async(req, res, next)=>{
     }
 });
 
+router.delete('/:offerId', async(req, res, next)=>{
+    const {offerId} = req.params;
+    let status = null;
+    let error = true;
+    try {
+		status = await sequelize.query(
+            'exec spDeleteInshopOffers :offerId', 
+            { 
+                replacements: { 
+                    offerId: offerId
+                }
+        }).spread((value, message)=>{
+                //since the return data will be string and not parsed
+                //lets parse it
+                return value;
+        });
+        error = false;
+    } catch (error) {
+        error = true;
+    }
+    //after previous image is found delete it from filesystem
+    deleteFile(status[0].previousImage);
+    if(error){
+        res.send({error: true, message: 'not_deleted'})
+    }else{
+        res.send({error: false, message: 'deleted'})        
+    }    
+});
 module.exports = router;

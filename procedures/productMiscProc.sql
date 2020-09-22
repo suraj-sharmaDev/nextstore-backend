@@ -161,5 +161,23 @@ BEGIN
 	;
 	SELECT @prevImage as previousImage;
 END
+
+GO;
 -------------------------------------------------------------------------
 ---------------------Delete Shop Offers ---------------------------------
+
+CREATE PROCEDURE dbo.spDeleteInshopOffers
+@offerId INT
+AS
+BEGIN
+	DECLARE @prevImage NVARCHAR(100);
+
+    SELECT @prevImage = offer_image 
+    from shopOffers
+    where id = @offerId;
+
+	DELETE FROM shopOffers
+	where id = @offerId;
+	
+	SELECT @prevImage as previousImage;
+END
