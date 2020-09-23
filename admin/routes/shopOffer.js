@@ -3,7 +3,8 @@ const {sequelize} = require('../models');
 const router = express.Router();
 const deleteFile = require('../middleware/fileDelete');
 
-router.get('/', (req, res, next)=>{
+router.get('/:shopId?/:limit?', (req, res, next)=>{
+    //list out all offers belonging to shops
     res.send(__dirname+'../../assets');
 })
 
@@ -40,7 +41,7 @@ router.post('/:shopId', async(req, res, next)=>{
                     return value;
             });
             error = false;
-        } catch (error) {
+        } catch (err) {
             error = true;
         }
     }
@@ -82,7 +83,7 @@ router.put('/:offerId/:shopId', async(req, res, next)=>{
                 //lets parse it
                 return value;
         });
-    } catch (error) {
+    } catch (err) {
         error = true;
     }
     //after previous image is found delete it from filesystem
@@ -112,7 +113,7 @@ router.delete('/:offerId', async(req, res, next)=>{
                 return value;
         });
         error = false;
-    } catch (error) {
+    } catch (err) {
         error = true;
     }
     //after previous image is found delete it from filesystem

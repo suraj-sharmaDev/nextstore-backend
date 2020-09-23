@@ -1,3 +1,70 @@
+-- Get all shops either with filter parameter such as merchantId or onlineStatus 
+-- or merchant Name, shop Name, shopId
+CREATE PROCEDURE dbo.spGetShopsWithFilter
+@json NVARCHAR(MAX),
+@page INT
+AS
+BEGIN
+	-- this procedure gives 15 shops belonging abiding by certain search queries
+	DECLARE @offset INT = 15 * (@page - 1);	
+	DECLARE @onlineStatus INT = JSON_VALUE(@json, '$.onlineStatus');
+	DECLARE @shopName VARCHAR(100) = JSON_VALUE(@json, '$.shopName');
+	DECLARE @merchantId VARCHAR(40)  = JSON_VALUE(@json, '$.merchantId');
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
+
+	DECLARE @query NVARCHAR(500) = N'
+		SELECT 
+		shop.id,
+		shop.name,
+		shop.category,
+		shop.name,
+		shop.onlineStatus,
+		shop.coverage,
+		CONCAT(@baseUrl ,shop.image) as image,
+		shop.rating
+		FROM shop
+		INNER JOIN merchant on shop.merchantId = merchant.id
+		WHERE
+		1 = 1
+	';
+	IF @onlineStatus IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			and shop.onlineStatus = @onlineStatus
+		';
+	END
+	IF @shopName IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			and shop.name = @shopName 
+		';
+	END
+	IF @merchantId IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			and merchant.email = @merchantId 
+		';
+	END	
+	-- final modification to query for limiting output size
+	SET @query = @query + N'
+				ORDER BY id
+				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
+	';
+	-- Finally execute the query
+	EXEC sp_executeSql 
+		@query, 
+		N'@onlineStatus int, @shopName varchar(100), 
+		  @merchantId VARCHAR(40), @offset INT,
+		  @baseUrl varchar(200)
+		',
+		@onlineStatus, @shopName, @merchantId, @offset, @baseUrl
+	;
+END
+
+GO;
+
 -- Get basic information of shop
 CREATE PROCEDURE dbo.spShopBasicInfo
 @shopId INT

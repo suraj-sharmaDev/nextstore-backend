@@ -2,6 +2,39 @@
 --------Since products for shops are handled in shopProcedures-----------------
 
 --------------------------------------------------------------------
+----------------Search productMaster by keyword---------------------
+
+CREATE PROCEDURE dbo.spGetProductMasterByKeyword
+@searchTerm NVARCHAR(100)
+AS
+BEGIN
+	SELECT 
+	TOP 10
+	p.id as productId,
+	p.name,
+	p.image,
+	p.bigImage1,
+	p.bigImage2,
+	p.bigImage3,
+	p.bigImage4,
+	p.bigImage5,
+	p.bigImage6,
+	scc.name as subCategoryChildName,
+	scc.id as subCategoryChildId,
+	sc.name as subCategoryName,
+	sc.id as subCategoryId,
+	c2.name as categoryName,
+	c2.id as categoryId
+	FROM productMaster as p
+	INNER JOIN subCategoryChild scc on scc.id = p.subCategoryChildId
+	INNER JOIN subCategory sc on sc.id = scc.subCategoryId 
+	INNER JOIN category c2 on c2.id = sc.categoryId 
+	where p.name like '%' + @searchTerm + '%'
+END
+
+GO;
+
+--------------------------------------------------------------------
 --------------------Add new Product in productMaster----------------
 CREATE PROCEDURE dbo.spInsertInProductMaster
 @json NVARCHAR(max)

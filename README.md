@@ -127,6 +127,9 @@ Shop
 	  }
 	}
 	```
+5. Get all shops abiding to certain criteria or filtering
+	https://nxtshops.com/adminApi/shop/1?shopName=a&merchantId=b&onlineStatus=0/1
+	Page No is basically limit, each page will have max 15 shops
 
 Services
 --------
@@ -258,6 +261,11 @@ Product
 		"productMasterId" : 1
 	}	
 	```
+
+3. List all products with keyword
+	https://nxtshops.com/merchantApi/product?searchTerm=keyword
+	
+
 Cart
 -------
 1. Get all items in cart for customerId

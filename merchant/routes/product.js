@@ -3,13 +3,28 @@ const {productMaster, product, sequelize} = require('../models');
 
 const router = express.Router();
 
-router.get('/:shopId', async(req, res, next)=>{
-	res.send({message: "404 not found", note: "placeholder"});
+router.get('/', async(req, res, next)=>{
+	//when searching for product with productName 
+	//list out relatable products from productMaster
+	try {
+		const status = await sequelize.query(
+			'exec spGetProductMasterByKeyword :searchTerm', 
+			{ 
+				replacements: { 
+					searchTerm: req.query.searchTerm
+				}
+		}).spread((value, created)=>{
+			return value;
+		});
+		res.send(status);
+	} catch(e) {
+		res.send({error : true});
+		console.log(e);
+	}
 })
 
 router.post('/:shopId', async(req, res, next)=>{
 	try {
-
 		await sequelize.query(
 			'exec spInsertProductInShop :json', 
 			{ 
