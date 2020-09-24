@@ -19,6 +19,7 @@ The dependency of project is
 3. tedious
 4. sequelize
 5. firebase-admin
+6. multer
 
 The configuration for database is in sub folder config/config.jsom
 There are three flavours of configuration namely development, test, production.
@@ -128,7 +129,7 @@ Shop
 	}
 	```
 5. Get all shops abiding to certain criteria or filtering
-	https://nxtshops.com/adminApi/shop/1?shopName=a&merchantId=b&onlineStatus=0/1
+	https://nxtshops.com/adminApi/shop/pageNo?shopName=a&merchantId=b&onlineStatus=0/1
 	Page No is basically limit, each page will have max 15 shops
 
 Services

@@ -35,6 +35,13 @@ merchant
 	https://nxtshops.com/merchantApi/merchant/merchId
 	PUT : JSON
 
+4. View all merchants abiding to certain criteria or filtering
+    https://nxtshops.com/adminApi/shop/pageNo?merchId=x&merchName=b&merchEmail=c
+    Page No is basically limit, each page will have max 15 shops
+
+5. Get list of shops belonging to specific merchant
+    http://localhost/merchantApi/merchant/merchId
+
 Shop
 ----
 
@@ -86,6 +93,10 @@ Shop
 	  }
 	}
 	```
+5. Get all shops abiding to certain criteria or filtering
+	https://nxtshops.com/adminApi/shop/pageNo?shopName=a&merchantId=b&onlineStatus=0/1
+	Page No is basically limit, each page will have max 15 shops
+
 
 shop offers
 -----------

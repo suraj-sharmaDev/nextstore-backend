@@ -1,7 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const createError = require('http-errors');
-const { admin, product, shopOffer, shop, service } = require('./routes');
+const { admin, product, 
+		shopOffer, merchant,
+		shop, service 
+} = require('./routes');
 const bodyParser = require('body-parser');
 const upload = require('./middleware/fileUpload');
 const app = express();
@@ -17,6 +20,7 @@ app.use('/admin', jsonParser, admin);
 app.use('/product', upload, product);
 app.use('/shopOffer', upload, shopOffer);
 app.use('/shop', jsonParser, shop);
+app.use('/merchant', jsonParser, merchant);
 app.use('/service', jsonParser, service);
 
 app.get('/', (req, res) => {

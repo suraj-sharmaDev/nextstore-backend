@@ -1,3 +1,60 @@
+-- Get all shops either with filter parameter such as merchantId or onlineStatus 
+-- or merchant Name, shop Name, shopId
+CREATE PROCEDURE dbo.spGetMerchantsWithFilter
+@json NVARCHAR(MAX),
+@page INT
+AS
+BEGIN
+	-- this procedure gives 15 merchants belonging abiding by certain search queries
+	DECLARE @offset INT = 15 * (@page - 1);	
+	DECLARE @merchId INT = JSON_VALUE(@json, '$.merchId');
+	DECLARE @merchName VARCHAR(30) = JSON_VALUE(@json, '$.merchName');
+	DECLARE @merchEmail VARCHAR(40)  = JSON_VALUE(@json, '$.merchEmail');
+
+	DECLARE @query NVARCHAR(500) = N'
+		SELECT 
+		id,
+		CONCAT(firstName+'' '', lastName ) as fullName,
+		mobile,
+		email,
+		createdAt
+		FROM merchant
+		WHERE
+		1 = 1
+	';
+	IF @merchId IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			AND id = @merchId
+		';
+	END
+	IF @merchName IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			AND CONCAT(firstName+'' '', lastName ) like ''%''+@merchName+''%''
+		';
+	END	
+	IF @merchEmail IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			AND email = @merchEmail 
+		';
+	END
+	-- final modification to query for limiting output size
+	SET @query = @query + N'
+				ORDER BY id
+				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
+	';
+	-- Finally execute the query
+	EXEC sp_executeSql 
+		@query, 
+		N'@merchId int, @merchEmail VARCHAR(40), @merchName VARCHAR(30), @offset INT',
+		@merchId, @merchEmail, @merchName, @offset
+	;
+END
+
+GO;
+
 ---------------------------------------------------------
 ------procedure to login merchant -----------------------
 
