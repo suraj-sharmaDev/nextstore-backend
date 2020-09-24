@@ -238,6 +238,40 @@ category
 	}	
 	```
 
+Product Master
+--------------
+1. Create product in productMaster
+    https://nxtshops.com/adminApi/product
+    POST : FORMDATA
+        type: product
+        name : STRING
+        bigImage1: FILE         ---> optional
+        bigImage2: FILE         ---> optional
+        bigImage3: FILE         ---> optional
+        bigImage4: FILE         ---> optional
+        bigImage5: FILE         ---> optional
+        bigImage6: FILE         ---> optional
+        image: FILE
+        subCategoryChildId: INTEGER
+
+2. Update product in productMaster
+    https://nxtshops.com/adminApi/product/productMasterId
+
+    POST : FORMDATA
+        type: product         ---> optional
+        name : STRING         ---> optional
+        bigImage1: FILE         ---> optional
+        bigImage2: FILE         ---> optional
+        bigImage3: FILE         ---> optional
+        bigImage4: FILE         ---> optional
+        bigImage5: FILE         ---> optional
+        bigImage6: FILE         ---> optional
+        image: FILE         ---> optional
+        subCategoryChildId: INTEGER         ---> optional
+
+3. List all products in productMaster with keyword
+	https://nxtshops.com/merchantApi/product?searchTerm=keyword
+
 Product
 ---------
 
@@ -261,10 +295,6 @@ Product
 		"productMasterId" : 1
 	}	
 	```
-
-3. List all products with keyword
-	https://nxtshops.com/merchantApi/product?searchTerm=keyword
-	
 
 Cart
 -------

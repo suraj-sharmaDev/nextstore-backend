@@ -8,17 +8,22 @@ CREATE PROCEDURE dbo.spGetProductMasterByKeyword
 @searchTerm NVARCHAR(100)
 AS
 BEGIN
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;	
+
 	SELECT 
 	TOP 10
 	p.id as productId,
 	p.name,
-	p.image,
-	p.bigImage1,
-	p.bigImage2,
-	p.bigImage3,
-	p.bigImage4,
-	p.bigImage5,
-	p.bigImage6,
+	COALESCE(@baseUrl + p.image, null) as [image],
+	COALESCE(@baseUrl + p.image, null) as [image],
+	COALESCE(@baseUrl + p.bigImage1, null) as bigImage1,
+	COALESCE(@baseUrl + p.bigImage2, null) as bigImage2,
+	COALESCE(@baseUrl + p.bigImage3, null) as bigImage3,
+	COALESCE(@baseUrl + p.bigImage4, null) as bigImage4,
+	COALESCE(@baseUrl + p.bigImage5, null) as bigImage5,
+	COALESCE(@baseUrl + p.bigImage6, null) as bigImage6,
 	scc.name as subCategoryChildName,
 	scc.id as subCategoryChildId,
 	sc.name as subCategoryName,
@@ -141,7 +146,47 @@ GO;
 --------------------Delete Product in productMaster-----------------
 
 
+-------------------------------------------------------------------------
+--------------------Get all Shop Offers belonging to shop ---------------
 
+CREATE PROCEDURE dbo.spGetshopOffersForShop
+@shopId int,
+@page int
+AS
+BEGIN
+	DECLARE @offset INT = 15 * (@page - 1);		
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;	
+	DECLARE @query NVARCHAR(500) = N'
+		SELECT 
+		id,
+		shopId,
+		CONCAT(@baseUrl, offer_image ) as offer_image,
+		createdAt 
+		FROM shopOffers
+		where 1=1
+	';
+	if @shopId IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			AND shopId = @shopId
+		';
+	END
+	-- final modification to query for limiting output size	
+	SET @query = @query + N'
+		ORDER BY id
+		OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY	
+	';
+	-- Finally execute the query
+	EXEC sp_executeSql 
+		@query, 
+		N'@shopId int, @offset INT, @baseUrl varchar(200)',
+		@shopId, @offset, @baseUrl
+	;
+END
+
+GO;
 -------------------------------------------------------------------------
 --------------------Add new Shop Offers ---------------------------------
 
