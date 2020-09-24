@@ -36,11 +36,15 @@ merchant
 	PUT : JSON
 
 4. View all merchants abiding to certain criteria or filtering
-    https://nxtshops.com/adminApi/shop/pageNo?merchId=x&merchName=b&merchEmail=c
+    https://nxtshops.com/adminApi/merchant/pageNo?merchId=x&merchName=b&merchEmail=c
     Page No is basically limit, each page will have max 15 shops
+	#merchId is id of merchant which is integer
+	#merchEmail is email of merchant
+	e.g)https://nxtshops.com/adminApi/merchant/1?merchId=1&merchName=suraj&merchEmail=suraj123
 
 5. Get list of shops belonging to specific merchant
-    http://localhost/merchantApi/merchant/merchId
+    https://nxtshops.com/merchantApi/merchant/merchId
+	#merchId is id of merchant which is integer
 
 Shop
 ----
@@ -96,7 +100,8 @@ Shop
 5. Get all shops abiding to certain criteria or filtering
 	https://nxtshops.com/adminApi/shop/pageNo?shopName=a&merchantId=b&onlineStatus=0/1
 	Page No is basically limit, each page will have max 15 shops
-
+	#merchantId here is emailId which is string
+	e.g)https://nxtshops.com/adminApi/shop/1?shopName=Nxt Stores&merchantId=suraj123&onlineStatus=1
 
 shop offers
 -----------
