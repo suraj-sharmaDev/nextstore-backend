@@ -3,9 +3,34 @@ const {sequelize} = require('../models');
 const router = express.Router();
 const deleteFile = require('../middleware/fileDelete');
 
-router.get('/:shopId?/:limit?', (req, res, next)=>{
+router.get('/:page?/:shopId?', async(req, res, next)=>{
     //list out all offers belonging to shops
-    res.send(__dirname+'../../assets');
+    let error = true;
+    let status = null;
+    let page = req.params.page ? req.params.page : 1;
+    let shopId = req.params.shopId ? req.params.shopId : null;
+    try {
+        status = await sequelize.query(
+            'exec spGetshopOffersForShop :shopId, :page', 
+            { 
+                replacements: { 
+                    shopId: shopId,
+                    page: page
+                }
+        }).spread((value, message)=>{
+                //since the return data will be string and not parsed
+                //lets parse it
+                return value;
+        });
+        error = false;
+    } catch (err) {
+        error = true;
+    }
+    if(error){
+        res.send({error: true, message: 'db_error'});
+    }else{
+        res.send(status);
+    }
 })
 
 router.post('/:shopId', async(req, res, next)=>{

@@ -24,7 +24,11 @@ router.get('/:page?', async(req, res, next) => {
         error = true;
         console.log(err);
     }
-    res.send(status);
+    if(error){
+        res.send({error: true, message: 'db_error'});
+    }else{
+        res.send(status);
+    }
 })
 
 module.exports = router;
