@@ -14,7 +14,7 @@ BEGIN
 	--get baseUrl as local variable
 	Select @baseUrl=baseUrl from appConfig;
 
-	DECLARE @query NVARCHAR(500) = N'
+	DECLARE @query NVARCHAR(MAX) = N'
 		SELECT 
 		shop.id,
 		shop.name,

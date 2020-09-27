@@ -10,6 +10,27 @@ Shop
 2. Get products of shop with shopId, for subCategoryId
 	http://35.230.117.116/merchantApi/shop/shopId/subCategoryId
 
+Services
+--------
+
+1. Get All Services Categorically
+	https://nxtshops.com/searchApi/service
+
+	#Get All Services Categorically and near the user
+	https://nxtshops.com/searchApi/service/services/9.230385/76.515898
+
+2. Get Service Item for the service Category
+	https://nxtshops.com/searchApi/service/serviceItem/CategoryId
+
+3. Get available repair and packages for service Item
+	https://nxtshops.com/searchApi/service/serviceDetails/ServiceItemId
+
+4. Get package rate for packages
+	https://nxtshops.com/searchApi/service/packageRate/PackageId
+
+5. Get Service charge and Repair Parts Rate for RepairItemId
+	https://nxtshops.com/searchApi/service/repairParts/RepairItemId
+
 category
 --------
 

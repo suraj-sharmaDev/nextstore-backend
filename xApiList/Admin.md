@@ -234,7 +234,12 @@ Services
 		}
 	}
 	```	
-    
+5. Get all service providers abiding to certain criteria or filtering
+	https://nxtshops.com/adminApi/service/pageNo?providerName=a&merchantId=b&onlineStatus=0/1
+	Page No is basically limit, each page will have max 15 service providers
+	#merchantId here is emailId which is string
+	e.g)https://nxtshops.com/adminApi/service/1?onlineStatus=1&providerName=Motor House
+
 Product Master
 --------------
 1. Create product in productMaster
