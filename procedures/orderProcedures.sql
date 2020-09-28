@@ -185,87 +185,43 @@ BEGIN
 	-- this procedure gives 15 orders belonging to shopId
 	-- orders with status pending, accepted, rejected or all
 	DECLARE @offset INT = 15 * (@page - 1);
+	DECLARE @query NVARCHAR(MAX) = N'
+			;with x(json) as (
+				SELECT 
+				orderMaster.*,
+				customer.name as customerName,
+				customer.mobile as customerMobile,
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from orderMaster
+				INNER JOIN customer on customer.id = orderMaster.customerId 
+				where shopId = @shopId
+	';
+	
 	IF (@startDate is not NULL and @endDate is not NULL)
 	BEGIN
-		IF (@status = 'all')
-		BEGIN 
-			;with x(json) as (
-				SELECT 
-				*,
-				items = (
-					select * from orderDetail
-					where orderMasterId = orderMaster.id
-					FOR JSON PATH, INCLUDE_NULL_VALUES
-				)
-				from orderMaster
-				where shopId = @shopId 
-				and ( createdAt >= @startDate and createdAt <= @endDate)				
-				ORDER BY id 
-				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
-				FOR JSON AUTO, INCLUDE_NULL_VALUES
-			)
-			select json as [json] from x;
-		END
-		ELSE 
-		BEGIN 
-			;with x(json) as (
-				SELECT 
-				*,
-				items = (
-					select * from orderDetail
-					where orderMasterId = orderMaster.id
-					FOR JSON PATH, INCLUDE_NULL_VALUES
-				)
-				from orderMaster
-				where shopId = @shopId 
-				and 
-				status = @status
-				and ( createdAt >= @startDate and createdAt <= @endDate)				
-				ORDER BY id 
-				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
-				FOR JSON AUTO, INCLUDE_NULL_VALUES
-			)
-			select json as [json] from x;
-		END
+		SET @query = @query + '
+			and ( createdAt >= @startDate and createdAt <= @endDate)
+		';
 	END
-	ELSE
+	IF (@status <> 'all')
 	BEGIN
-		IF (@status = 'all')
-		BEGIN
-			;with x(json) as (
-				SELECT 
-				*,
-				items = (
-					select * from orderDetail
-					where orderMasterId = orderMaster.id
-					FOR JSON PATH, INCLUDE_NULL_VALUES
-				)
-				from orderMaster
-				where shopId = @shopId 
-				ORDER BY id 
-				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
-				FOR JSON AUTO, INCLUDE_NULL_VALUES
-			)
-			select json as [json] from x;
-		END
-		ELSE
-		BEGIN
-			;with x(json) as (
-				SELECT 
-				*,
-				items = (
-					select * from orderDetail
-					where orderMasterId = orderMaster.id
-					FOR JSON PATH, INCLUDE_NULL_VALUES
-				)
-				from orderMaster
-				where shopId = @shopId 
+		SET @query = @query + '
 				and status = @status
-				ORDER BY id 
-				OFFSET @offset ROWS FETCH NEXT 15 ROWS ONLY
-				FOR JSON AUTO, INCLUDE_NULL_VALUES
-			)
-			select json as [json] from x;
-		END
-	END	
+		';
+	END
+	-- finally query execution
+	SET @query = @query + '
+		FOR JSON PATH, INCLUDE_NULL_VALUES
+		)
+		SELECT json as [json] from x;
+	';
+	EXEC sp_executeSql 
+		@query, 
+		N'@shopId INT, @status NVARCHAR(30), @startDate datetimeoffset, @endDate datetimeoffset, @offset INT',
+		@shopId, @status, @startDate, @endDate, @offset
+	;
 END
