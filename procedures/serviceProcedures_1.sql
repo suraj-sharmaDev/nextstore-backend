@@ -140,6 +140,11 @@ BEGIN
 				where CategoryItemId = @categoryItemId
 				FOR JSON PATH, INCLUDE_NULL_VALUES	
 			),
+			symptoms = (
+				SELECT * FROM nxtServiceItemSymptoms
+				where CategoryItemId = @categoryItemId
+				FOR JSON PATH, INCLUDE_NULL_VALUES					
+			),
 			packages = (
 				SELECT * FROM nxtPackage np 
 				where CategoryItemId = @categoryItemId

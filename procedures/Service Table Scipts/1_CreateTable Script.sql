@@ -226,3 +226,12 @@ SET ANSI_PADDING OFF
 
 ALTER TABLE [dbo].[TwoWheelerSparePartRate] ADD  CONSTRAINT [DF_Repair_Rate_Active]  DEFAULT ((1)) FOR [Active]
 
+--------------------------------------------------------
+----------symptoms table -------------------------------
+
+CREATE TABLE [dbo].[nxtServiceItemSymptoms](
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	CategoryItemId int NOT NULL FOREIGN KEY REFERENCES nxtServiceItem(CategoryItemId),
+	[type] varchar(50) NULL,
+	[symptom] varchar(100) NULL	
+);
