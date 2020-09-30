@@ -43,7 +43,7 @@ router.get('/completeOrder/:orderId', async(req, res, next)=>{
 			}
 			sendMessage(data);
 		}
-		res.send({message : 'rejected'});
+		res.send({message : 'delivered'});
 	} catch(e) {
 		// statements
 		res.send({error: true});
