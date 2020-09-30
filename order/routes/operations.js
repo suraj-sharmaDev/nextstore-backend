@@ -27,6 +27,30 @@ router.get('/acceptOrder/:orderId', async(req, res, next)=>{
 	}
 })
 
+router.get('/completeOrder/:orderId', async(req, res, next)=>{
+	try {
+		const customer = await sequelize.query(
+						'exec spCompleteOrder :orderId', 
+						{ 
+							replacements: { orderId: req.params.orderId }
+					}).spread((user, created)=>{ return user[0] })
+		const type = 'complete_order';
+		if(customer.fcmToken!= null){
+			let data = {
+				fcmToken: customer.fcmToken,
+				orderId: req.params.orderId,
+				type: type
+			}
+			sendMessage(data);
+		}
+		res.send({message : 'rejected'});
+	} catch(e) {
+		// statements
+		res.send({error: true});
+		console.log(e);
+	}
+})
+
 router.get('/rejectOrder/:orderId', async(req, res, next)=>{
 	try {
 		const customer = await sequelize.query(
@@ -38,6 +62,7 @@ router.get('/rejectOrder/:orderId', async(req, res, next)=>{
 		if(customer.fcmToken!= null){
 			let data = {
 				fcmToken: customer.fcmToken,
+				orderId: req.params.orderId,
 				type: type
 			}
 			sendMessage(data);

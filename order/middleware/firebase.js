@@ -3,8 +3,8 @@ var admin = require("firebase-admin");
 var serviceAccount = require("../config/nextstore-firebase.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://nextstore-fb30e.firebaseio.com"
+	credential: admin.credential.cert(serviceAccount),
+	databaseURL: "https://nextstore-fb30e.firebaseio.com"
 });
 
 var options = {
@@ -36,7 +36,20 @@ const createPayload = (data) => {
 					sound: "default"
 				},
 				data: {
-					type: data.type,					
+					type: data.type,
+					orderId: data.orderId.toString()
+				}
+			};
+			break;
+		case 'complete_order':
+			payload = {
+				notification: {
+					title: "Order Delivered",
+					body: "You order has been delivered!",
+					sound: "default"
+				},
+				data: {
+					type: data.type,
 					orderId: data.orderId.toString()
 				}
 			};
@@ -49,7 +62,7 @@ const createPayload = (data) => {
 					sound: "default"
 				},
 				data: {
-					type: data.type,					
+					type: data.type,
 					orderId: data.orderId.toString()
 				}
 			};
@@ -63,7 +76,7 @@ const createPayload = (data) => {
 				},
 				data: {
 					type: data.type,
-				}				
+				}
 			};
 			break;
 		case 'bidded_quote':
@@ -101,7 +114,7 @@ const createPayload = (data) => {
 					type: data.type,
 				}
 			};
-			break;			
+			break;
 		default:
 			payload = {
 				notification: {
@@ -118,13 +131,13 @@ const createPayload = (data) => {
 const sendMessage = (data) => {
 	var error = true;
 	admin.messaging().sendToDevice(data.fcmToken, createPayload(data), options)
-	.then(function(response) {
-		error = false;
-		// console.log("Successfully sent message:", response);
-	})
-	.catch(function(error) {
-		console.log("Error sending message:", error);
-	});	
+		.then(function (response) {
+			error = false;
+			// console.log("Successfully sent message:", response);
+		})
+		.catch(function (error) {
+			console.log("Error sending message:", error);
+		});
 	return error;
 }
 module.exports = sendMessage;

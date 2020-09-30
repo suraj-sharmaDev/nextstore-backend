@@ -147,6 +147,32 @@ END
 GO;
 
 --------------------------------------------------------
+
+--compelete Order with orderId
+
+CREATE PROCEDURE dbo.spCompleteOrder
+@orderId INT
+AS
+BEGIN
+	DECLARE @fcmToken NVARCHAR(255);
+	UPDATE
+	    dbo.orderMaster 
+	SET
+	    dbo.orderMaster.status = 'completed'
+	WHERE
+	    dbo.orderMaster.id = @orderId
+	
+	--send back the fcmToken for the customer with provided orderId
+	
+	select @fcmToken=fcmToken from customer where id in (
+	  select customerId from dbo.orderMaster where id = @orderId
+	)
+	
+	select @fcmToken as fcmToken;
+END
+
+GO;
+--------------------------------------------------------
 ------reject Order with orderId-------------------------
 
 CREATE PROCEDURE dbo.spRejectOrder
