@@ -314,6 +314,9 @@ Order
 3. Reject Order
 	https://nxtshops.com/orderApi/operations/rejectOrder/orderId
 
+4. Complete order
+	https://nxtshops.com/orderApi/operations/completeOrder/orderId
+
 Quote
 --------
 #Shops will have order and services will have quotes
