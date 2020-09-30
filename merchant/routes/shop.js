@@ -75,12 +75,12 @@ router.post('/:merchId', upload, async(req, res, next)=>{
     //since file has been uploaded lets insert into our database
     for (let index = 0; index < files.length; index++) {
 		const file = files[index];
-		json['image'] = file.path.split('assets/images/').slice(1).join('.');
+		json.shop['image'] = file.path.split('assets/images/').slice(1).join('.');
 	}
 	const t = await sequelize.transaction();
 	try {
-		const result = await shop.create({...json, merchantId: req.params.merchId}, { transaction: t });
-		await result.createAddress({...req.body.address}, { transaction: t });
+		const result = await shop.create({...json.shop, merchantId: req.params.merchId}, { transaction: t });
+		await result.createAddress({...json.address}, { transaction: t });
 		await t.commit();
 		// //also have to add a
 		// console.log(result);

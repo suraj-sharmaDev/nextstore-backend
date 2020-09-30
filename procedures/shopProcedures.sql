@@ -254,7 +254,9 @@ BEGIN
 	with x(json) as (
 		select 
 		scc.categoryId as categoryId,
+		scc.categoryName as categoryName,
 		scc.subCategoryId as subCategoryId,
+		scc.subCategoryName as subCategoryName,
 		scc.subCategoryChildId as subCategoryChildId,
 		scc.title as title,
 		data.productMasterId as productMasterId,
@@ -271,7 +273,9 @@ BEGIN
 		from (
 			select 
 			category.id as categoryId,
+			category.name as categoryName,
 			subCategory.id as subCategoryId,
+			subCategory.name as subCategoryName,
 			subCategoryChild.id as subCategoryChildId,
 			subCategoryChild.name as title
 			from subCategoryChild
@@ -287,6 +291,7 @@ BEGIN
  RETURN
 
 END
+
 
 GO;
 

@@ -36,11 +36,11 @@ BEGIN
 	
 	DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
 	DECLARE @type VARCHAR(20) = JSON_VALUE(@json, '$.master.type');
-	DECLARE @deliveryAddress NVARCHAR(250) = JSON_VALUE(@json, '$.master.deliveryAddress');
+	DECLARE @deliveryAddress NVARCHAR(500) = JSON_QUERY(@json, '$.master.deliveryAddress');
 	DECLARE @categoryId INT = JSON_VALUE(@json, '$.master.categoryId');
 	--store customer latitude and longitude in variables
-	DECLARE @custLat FLOAT = JSON_VALUE(@deliveryAddress, '$.latitude');
-	DECLARE @custLng FLOAT = JSON_VALUE(@deliveryAddress, '$.longitude');
+	DECLARE @custLat FLOAT = JSON_VALUE(@deliveryAddress, '$.coordinate.latitude');
+	DECLARE @custLng FLOAT = JSON_VALUE(@deliveryAddress, '$.coordinate.longitude');
 
 	IF OBJECT_ID('tempdb..#NearByServiceProviders') IS NOT NULL
 	    Truncate TABLE #NearByServiceProviders
@@ -69,7 +69,7 @@ BEGIN
 	  with(
 	    productId INT '$.productId',
 	    productName nvarchar(100) '$.productName',
-	    [json] NVARCHAR(1000) '$.json'
+	    [json] NVARCHAR(MAX) AS JSON
 	  )json
 
 	 -- Find all service providers nearby to send them the quotations

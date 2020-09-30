@@ -1,5 +1,4 @@
 ------------Get Customer Details
-------------Get Customer Details
 CREATE Procedure dbo.spInitializeCustomer
 @custId int
 As
@@ -43,6 +42,21 @@ Begin
 				INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
 				And orderMaster.status in ('pending', 'accepted')
 				For Json AUTO, INCLUDE_NULL_VALUES				
+			),
+			quote = (
+				SELECT 
+				qm.id,
+				qm.status,
+				qm.[type],
+				qm.deliveryAddress,
+				quoteDetail.productId,
+				quoteDetail.productName,
+				quoteDetail.json 
+				from quoteMaster qm 
+				INNER JOIN quoteDetail on quoteDetail.quoteMasterId = qm.id 
+				where qm.customerId = 1
+				and qm.status in ('pending', 'accepted')
+				For Json AUTO, INCLUDE_NULL_VALUES
 			),
 			recentOrder = (
 				select 
