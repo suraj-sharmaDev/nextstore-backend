@@ -23,6 +23,7 @@ const createPayload = (data) => {
 					sound: "default"
 				},
 				data: {
+					type: data.type,
 					orderId: data.orderId.toString()
 				}
 			};
@@ -35,6 +36,7 @@ const createPayload = (data) => {
 					sound: "default"
 				},
 				data: {
+					type: data.type,					
 					orderId: data.orderId.toString()
 				}
 			};
@@ -47,8 +49,9 @@ const createPayload = (data) => {
 					sound: "default"
 				},
 				data: {
+					type: data.type,					
 					orderId: data.orderId.toString()
-				}				
+				}
 			};
 			break;
 		case 'new_quote':
@@ -57,7 +60,10 @@ const createPayload = (data) => {
 					title: "New Order",
 					body: "You have received a new order!",
 					sound: "default"
-				}
+				},
+				data: {
+					type: data.type,
+				}				
 			};
 			break;
 		case 'bidded_quote':
@@ -66,6 +72,9 @@ const createPayload = (data) => {
 					title: "Notification",
 					body: "You requirement has been bidded! Please check it.",
 					sound: "default"
+				},
+				data: {
+					type: data.type,
 				}
 			};
 			break;
@@ -75,6 +84,9 @@ const createPayload = (data) => {
 					title: "Extremely Sorry!",
 					body: "We were unable to fulfill your requirement!",
 					sound: "default"
+				},
+				data: {
+					type: data.type,
 				}
 			};
 			break;
@@ -84,6 +96,9 @@ const createPayload = (data) => {
 					title: "Accepted!",
 					body: "Your quote has been accepted! Please proceed further steps!",
 					sound: "default"
+				},
+				data: {
+					type: data.type,
 				}
 			};
 			break;			
