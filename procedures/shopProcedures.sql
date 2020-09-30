@@ -341,7 +341,9 @@ BEGIN
 			SELECT @distance = geography::Point(@custLat, @custLng, 4326).STDistance(
 				geography::Point(latitude, longitude, 4326)
 			) from shopAddress
-			where shopAddress.shopId = @id;
+			where shopAddress.shopId = @id
+			AND (shopAddress.latitude IS NOT NULL AND shopAddress.longitude IS NOT NULL) 
+			;
 			-- convert meters to KMs
 			SET @distance = ROUND(@distance/1000, 2);
 			--check if distance is less than the coverage of shop

@@ -19,7 +19,8 @@ const createPayload = (data) => {
 			payload = {
 				notification: {
 					title: "New Order",
-					body: "You have received a new order!"
+					body: "You have received a new order!",
+					sound: "default"
 				},
 				data: {
 					orderId: data.orderId.toString()
@@ -30,7 +31,11 @@ const createPayload = (data) => {
 			payload = {
 				notification: {
 					title: "Order Accepted",
-					body: "You order has been accepted!"
+					body: "You order has been accepted!",
+					sound: "default"
+				},
+				data: {
+					orderId: data.orderId.toString()
 				}
 			};
 			break;
@@ -38,15 +43,20 @@ const createPayload = (data) => {
 			payload = {
 				notification: {
 					title: "Order Rejected",
-					body: "You order has been rejected!"
-				}
+					body: "You order has been rejected!",
+					sound: "default"
+				},
+				data: {
+					orderId: data.orderId.toString()
+				}				
 			};
 			break;
 		case 'new_quote':
 			payload = {
 				notification: {
 					title: "New Order",
-					body: "You have received a new order!"
+					body: "You have received a new order!",
+					sound: "default"
 				}
 			};
 			break;
@@ -54,7 +64,8 @@ const createPayload = (data) => {
 			payload = {
 				notification: {
 					title: "Notification",
-					body: "You requirement has been bidded! Please check it."
+					body: "You requirement has been bidded! Please check it.",
+					sound: "default"
 				}
 			};
 			break;
@@ -62,7 +73,8 @@ const createPayload = (data) => {
 			payload = {
 				notification: {
 					title: "Extremely Sorry!",
-					body: "We were unable to fulfill your requirement!"
+					body: "We were unable to fulfill your requirement!",
+					sound: "default"
 				}
 			};
 			break;
@@ -70,7 +82,8 @@ const createPayload = (data) => {
 			payload = {
 				notification: {
 					title: "Accepted!",
-					body: "Your quote has been accepted! Please proceed further steps!"
+					body: "Your quote has been accepted! Please proceed further steps!",
+					sound: "default"
 				}
 			};
 			break;			
@@ -78,7 +91,8 @@ const createPayload = (data) => {
 			payload = {
 				notification: {
 					title: "New notification",
-					body: "You have received a new notification!"
+					body: "You have received a new notification!",
+					sound: "default"
 				}
 			};
 			break;

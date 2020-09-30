@@ -14,6 +14,7 @@ router.get('/acceptOrder/:orderId', async(req, res, next)=>{
 		if(customer.fcmToken!= null){
 			let data = {
 				fcmToken: customer.fcmToken,
+				orderId: req.params.orderId,
 				type: type
 			}
 			sendMessage(data);

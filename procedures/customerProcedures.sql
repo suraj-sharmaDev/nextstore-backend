@@ -37,10 +37,10 @@ Begin
 					SELECT orderMaster.*, shop.name from orderMaster
 					INNER JOIN shop on shop.id = orderMaster.shopId
 					where orderMaster.customerId = @custId
+					And orderMaster.status in ('pending', 'accepted')
 				)
 				as orderMaster				
 				INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
-				And orderMaster.status in ('pending', 'accepted')
 				For Json AUTO, INCLUDE_NULL_VALUES				
 			),
 			quote = (
@@ -54,18 +54,28 @@ Begin
 				quoteDetail.json 
 				from quoteMaster qm 
 				INNER JOIN quoteDetail on quoteDetail.quoteMasterId = qm.id 
-				where qm.customerId = 1
+				where qm.customerId = @custId
 				and qm.status in ('pending', 'accepted')
 				For Json AUTO, INCLUDE_NULL_VALUES
 			),
 			recentOrder = (
-				select 
-				TOP 3 
-				* 
-				from orderMaster
-				where orderMaster.customerId = @custId
-				And orderMaster.status in ('completed')
-				For Json PATH, INCLUDE_NULL_VALUES							
+				select
+				TOP 3
+				orderMaster.*,
+				items.productId,
+				items.productName,
+				items.price,
+				items.qty 
+				from 
+				(
+					SELECT orderMaster.*, shop.name, shop.category from orderMaster
+					INNER JOIN shop on shop.id = orderMaster.shopId
+					where orderMaster.customerId = @custId
+					And orderMaster.status in ('completed')
+				)
+				as orderMaster				
+				INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
+				For Json AUTO, INCLUDE_NULL_VALUES				
 			)
 		from customer
 		where id = @custId
