@@ -404,7 +404,10 @@ BEGIN
 	BEGIN
 		-- table exists first check if product with same productMasterId is already added
 		SET @query = N'
-			IF NOT EXISTS (SELECT * FROM '+@tableName+' WHERE productMasterId = @productMasterId)
+			IF NOT EXISTS (
+				SELECT * FROM '+@tableName+' WHERE productMasterId = @productMasterId
+				and shopId = @shopId
+			)
 			BEGIN
 				INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
 				(@mrp, @price, @shopId, @productMasterId)
