@@ -222,6 +222,8 @@ BEGIN
 			[bigImage5] nvarchar(180),
 			[bigImage6] nvarchar(180),
 			subCategoryChildId int,
+			stock int,
+			mrp int,
 			price int
 		);
 	
@@ -238,6 +240,8 @@ BEGIN
 		COALESCE(@baseUrl + productMaster.bigImage5, null) as bigImage5,
 		COALESCE(@baseUrl + productMaster.bigImage6, null) as bigImage6,
 		productMaster.subCategoryChildId,
+		product.stock,
+		product.mrp,
 		product.price
 		from productMaster
 		Inner join ' + @tableName +' as product on product.productMasterId = productMaster.id
@@ -268,7 +272,9 @@ BEGIN
 		data.bigImage3 as [bigImage3],
 		data.bigImage4 as [bigImage4],
 		data.bigImage5 as [bigImage5],
-		data.bigImage6 as [bigImage6],												
+		data.bigImage6 as [bigImage6],
+		data.stock as [stock],
+		data.mrp as mrp,
 		data.price as price
 		from (
 			select 
@@ -291,6 +297,7 @@ BEGIN
  RETURN
 
 END
+
 
 
 GO;
@@ -395,10 +402,13 @@ BEGIN
 	
 	IF OBJECT_ID(@tableName) IS NOT NULL
 	BEGIN
-		-- table exists then add the product
+		-- table exists first check if product with same productMasterId is already added
 		SET @query = N'
-			INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
-			(@mrp, @price, @shopId, @productMasterId)';
+			IF NOT EXISTS (SELECT * FROM '+@tableName+' WHERE productMasterId = @productMasterId)
+			BEGIN
+				INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
+				(@mrp, @price, @shopId, @productMasterId)
+			END';
 		SET @paramDef = N'@mrp int, @price int, @shopId int, @productMasterId int';
 		EXEC sp_executeSql @query, @paramDef, @mrp, @price, @shopId, @productMasterId;
 	END

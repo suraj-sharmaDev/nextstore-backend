@@ -34,7 +34,7 @@ Begin
 				items.qty 
 				from 
 				(
-					SELECT orderMaster.*, shop.name from orderMaster
+					SELECT orderMaster.*, shop.name, shop.category from orderMaster
 					INNER JOIN shop on shop.id = orderMaster.shopId
 					where orderMaster.customerId = @custId
 					And orderMaster.status in ('pending', 'accepted')
