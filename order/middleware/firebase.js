@@ -20,7 +20,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "New Order",
 					body: "You have received a new order!",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -33,7 +33,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "Order Accepted",
 					body: "You order has been accepted!",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -46,7 +46,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "Order Delivered",
 					body: "You order has been delivered!",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -59,7 +59,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "Order Rejected",
 					body: "You order has been rejected!",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -72,7 +72,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "New Order",
 					body: "You have received a new order!",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -84,7 +84,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "Notification",
 					body: "You requirement has been bidded! Please check it.",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -96,7 +96,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "Extremely Sorry!",
 					body: "We were unable to fulfill your requirement!",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -108,7 +108,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "Accepted!",
 					body: "Your quote has been accepted! Please proceed further steps!",
-					sound: "default"
+					sound: "notif.mp3"
 				},
 				data: {
 					type: data.type,
@@ -120,7 +120,7 @@ const createPayload = (data) => {
 				notification: {
 					title: "New notification",
 					body: "You have received a new notification!",
-					sound: "default"
+					sound: "notif.mp3"
 				}
 			};
 			break;
