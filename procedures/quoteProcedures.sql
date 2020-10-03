@@ -232,3 +232,64 @@ BEGIN
 	where id = @serviceProviderId;
 	
 END
+
+GO;
+
+-------------------------------------------------------------------
+------------Get Quotes for serviceProviders belonging to any of 4 criteria----
+
+CREATE Procedure dbo.spGetServiceProviderQuotes
+@serviceProviderId INT,
+@status NVARCHAR(30),
+@page INT,
+@startDate datetimeoffset,
+@endDate datetimeoffset
+AS
+BEGIN
+	-- this procedure gives 15 orders belonging to shopId
+	-- orders with status pending, accepted, rejected or all
+	DECLARE @offset INT = 15 * (@page - 1);
+	DECLARE @query NVARCHAR(MAX) = N'
+			;with x(json) as (
+				SELECT 
+				quoteMaster.*,
+				qS.serviceProviderId,
+				customer.name as customerName,
+				customer.mobile as customerMobile,
+				items = (
+					select * from quoteDetail
+					where quoteMasterId = quoteMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from quoteMaster
+				INNER JOIN customer on customer.id = quoteMaster.customerId
+				INNER JOIN quotedServiceProviders qS on 
+					qS.quoteMasterId = quoteMaster.id 
+				where qS.serviceProviderId = @serviceProviderId
+	';
+	
+	IF (@startDate is not NULL and @endDate is not NULL)
+	BEGIN
+		SET @query = @query + '
+			and ( quoteMaster.createdAt >= @startDate and quoteMaster.createdAt <= @endDate)
+		';
+	END
+	IF (@status <> 'all')
+	BEGIN
+		SET @query = @query + '
+				and quoteMaster.status = @status
+		';
+	END
+	-- finally query execution
+	SET @query = @query + '
+		FOR JSON PATH, INCLUDE_NULL_VALUES
+		)
+		SELECT json as [json] from x;
+	';
+	EXEC sp_executeSql 
+		@query, 
+		N'@serviceProviderId INT, @status NVARCHAR(30), @startDate datetimeoffset, @endDate datetimeoffset, @offset INT',
+		@serviceProviderId, @status, @startDate, @endDate, @offset
+	;
+--	SELECT @query ;
+END

@@ -405,3 +405,35 @@ CREATE TABLE nextstore.dbo.quotationBiddings (
 	[json] NVARCHAR(1000) NULL,
 	createdAt datetimeoffset NULL
 );
+
+---------Payment Tables -------------
+
+---------Order Payment Table---------
+CREATE TABLE nextstore.dbo.orderPayments (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	orderId int NOT NULL FOREIGN KEY REFERENCES orderMaster(id),
+	totalAmount int NOT NULL,
+	transactionId int NULL,
+	paymentMethod varchar(100) DEFAULT 'COD',
+	createdAt datetimeoffset NULL		
+);
+
+---------Quote Payment Table---------
+CREATE TABLE nextstore.dbo.quotePayments (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	quoteId int NOT NULL FOREIGN KEY REFERENCES quoteMaster(id),
+	quoteType varchar(100), ---can be package, repair or breakdown
+	totalAmount int NOT NULL,
+	transactionId int NULL,
+	paymentMethod varchar(100) DEFAULT 'COD',
+	createdAt datetimeoffset NULL		
+);
+
+
+----------Wallets--------------
+CREATE TABLE nextstore.dbo.wallet (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	customerId int FOREIGN KEY REFERENCES customer(id),
+	walletAmount int NOT NULL,
+	createdAt datetimeoffset NULL		
+);

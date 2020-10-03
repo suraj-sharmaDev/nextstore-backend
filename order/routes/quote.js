@@ -30,6 +30,42 @@ router.get('/:quoteMasterId', async(req, res, next)=>{
 	}
 });
 
+router.get('/:serviceProviderId/:status/:page/:startDate?/:endDate?', async(req, res, next)=>{
+	//get orders belonging to shop with shopId
+	//based on status
+    const serviceProviderId = req.params.serviceProviderId;
+    const status = req.params.status;
+    const page = req.params.page;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+	try {
+		const quotes = await sequelize.query(
+                'exec spGetServiceProviderQuotes :serviceProviderId, :status, :page, :startDate, :endDate', 
+                { 
+                    replacements: { 
+                        serviceProviderId: serviceProviderId, 
+                        status: status, 
+                        page: page, 
+                        startDate: startDate? startDate: null, 
+                        endDate: endDate? endDate : null
+                    }
+            }).spread((quotes, message)=>{
+					//since the return data will be string and not parsed
+					//lets parse it
+                    var obj = Object.values(quotes[0])[0];
+					if(obj){
+						return JSON.parse(obj);
+					}else{
+						return [];
+					}
+            });
+		res.send(quotes);
+	} catch(e) {
+		res.send({error : true});
+		console.log(e);
+	}
+});
+
 router.post('/', async(req, res, next)=>{
 	//create a new quote by customer
 	try {

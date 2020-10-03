@@ -323,6 +323,10 @@ Quote
 
 1. Get Quote Details
 	https://nxtshops.com/orderApi/quote/quoteId
+	
+	#Get quote belonging to serviceProvider
+	https://nxtshops.com/orderApi/quote/serviceProviderId/quoteStatus/pageNo/startDate?/endDate?
+	where startDate and endDate are optional parameters	
 
 2. Bid the quote by service provider
 	https://nxtshops.com/orderApi/operations/bidQuote/quoteId/serviceProviderId
