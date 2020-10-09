@@ -139,6 +139,44 @@ END
 GO;
 
 ------------------------------------------------------------------------
+---------------------Accept the quote-----------------------------------
+CREATE PROCEDURE dbo.spAcceptQuoteFromCustomer
+@quoteMasterId INT, 
+@serviceProviderId INT
+AS
+BEGIN
+	--set quoteMaster.status to accepted
+	--set quotedServiceProviders.status to accepted from this serviceProvider
+	--and set others to rejected
+	--this procedure is acted for packages and repairs where there is no biddings
+	DECLARE @fcmToken NVARCHAR(255);
+
+	UPDATE quoteMaster 
+	SET 
+		quoteMaster.status = 'accepted'
+	WHERE id = @quoteMasterId
+	
+	UPDATE
+	    dbo.quotedServiceProviders
+	SET
+	    dbo.quotedServiceProviders.status = CASE 
+	    	WHEN dbo.quotedServiceProviders.serviceProviderId = @serviceProviderId
+	    		THEN 'accepted'
+	    	ELSE
+	    		'rejected'
+	    END
+	WHERE
+	    dbo.quotedServiceProviders.quoteMasterId = @quoteMasterId
+
+	SELECT @fcmToken=fcmToken from customer
+	where customer.id = (
+		SELECT customerId from quoteMaster
+		where id = @quoteMasterId
+	);
+	
+	SELECT 1 as accepted, @fcmToken as fcmToken;	    
+END
+------------------------------------------------------------------------
 --------------------Reject the quote-----------------------------------
 
 CREATE PROCEDURE dbo.spRejectQuoteFromCustomer
@@ -254,11 +292,18 @@ BEGIN
 				SELECT 
 				quoteMaster.*,
 				qS.serviceProviderId,
+				qS.status as providerStatus,
 				customer.name as customerName,
 				customer.mobile as customerMobile,
 				items = (
 					select * from quoteDetail
 					where quoteMasterId = quoteMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				),
+				providerBids = (
+					select * from quotationBiddings
+					where quoteMasterId = quoteMaster.id
+					and serviceProviderId = @serviceProviderId
 					FOR JSON PATH, INCLUDE_NULL_VALUES
 				)
 				from quoteMaster
@@ -282,6 +327,9 @@ BEGIN
 	END
 	-- finally query execution
 	SET @query = @query + '
+		ORDER BY qS.id DESC
+		OFFSET @offset ROWS 
+		FETCH FIRST 15 ROWS ONLY	
 		FOR JSON PATH, INCLUDE_NULL_VALUES
 		)
 		SELECT json as [json] from x;

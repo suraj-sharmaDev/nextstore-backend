@@ -357,6 +357,8 @@ Quote
 3. Reject Quote by service provider
 	https://nxtshops.com/orderApi/operations/rejectQuote/quoteId/serviceProviderId
 
+4. Accept Quote by service provider
+	https://nxtshops.com/orderApi/operations/acceptQuote/quoteId/serviceProviderId
 
 
 Search Operations

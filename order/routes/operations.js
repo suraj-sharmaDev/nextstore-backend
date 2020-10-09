@@ -118,8 +118,40 @@ router.post('/bidQuote/:quoteMasterId/:serviceProviderId', async(req, res, next)
 	}
 })
 
+router.get('/acceptQuote/:quoteMasterId/:serviceProviderId', async(req, res, next)=>{
+	//accept the quote from customer by serviceProvider
+	try {
+		let message = '';
+		const customer = await sequelize.query(
+						'exec spAcceptQuoteFromCustomer :quoteMasterId, :serviceProviderId', 
+						{ 
+							replacements: { 
+								quoteMasterId: req.params.quoteMasterId,
+								serviceProviderId: req.params.serviceProviderId
+							}
+					}).spread((user, created)=>{ return user[0] })
+		if(customer.fcmToken){
+			//send notification to customer when quote is accepted
+			let data = {
+				fcmToken: customer.fcmToken,
+				type: 'bid_accepted'
+			}
+			sendMessage(data);
+		}
+		message = {
+			error: false,
+			message: 'bid_accepted'
+		};
+		res.send(message);
+	} catch (error) {
+		// statements
+		res.send({error: true});
+		console.log(e);		
+	}
+});
+
 router.get('/rejectQuote/:quoteMasterId/:serviceProviderId', async(req, res, next)=>{
-	//reject the bid
+	//reject the quote from customer by serviceProvider
 	try {
 		let message = '';
 		const customer = await sequelize.query(
@@ -131,7 +163,7 @@ router.get('/rejectQuote/:quoteMasterId/:serviceProviderId', async(req, res, nex
 							}
 					}).spread((user, created)=>{ return user[0] })
 		if(customer.fcmToken){
-			//send notification to customer when bid is complete
+			//send notification to customer when quote is rejected
 			let data = {
 				fcmToken: customer.fcmToken,
 				type: 'bid_rejected'
@@ -150,8 +182,8 @@ router.get('/rejectQuote/:quoteMasterId/:serviceProviderId', async(req, res, nex
 	}
 });
 
-router.get('/acceptQuote/:quoteBiddingId/:serviceProviderId', async(req, res, next)=>{
-	//accept the bid
+router.get('/acceptBid/:quoteBiddingId/:serviceProviderId', async(req, res, next)=>{
+	//accept the bid from serviceProvider by customer
 	try {
 		let message = '';
 		const serviceProvider = await sequelize.query(

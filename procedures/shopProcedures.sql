@@ -573,3 +573,13 @@ BEGIN
 	
 	select json from x;	
 END
+
+----------------------------------------------------------
+---------------Get shop statistics------------------------
+CREATE Procedure dbo.spGetShopStats
+@shopId INT,
+@startDate datetimeoffset,
+@endDate datetimeoffset
+As
+BEGIN
+END

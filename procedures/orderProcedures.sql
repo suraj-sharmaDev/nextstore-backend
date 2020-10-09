@@ -10,7 +10,7 @@ BEGIN
 
 	DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
 	DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
-	DECLARE @deliveryAddress NVARCHAR(250) = JSON_VALUE(@json, '$.master.deliveryAddress');
+	DECLARE @deliveryAddress NVARCHAR(500) = JSON_QUERY(@json, '$.master.deliveryAddress');
 
 	-- update cartMaster table to identify fulfilled carts
 
@@ -241,6 +241,9 @@ BEGIN
 	END
 	-- finally query execution
 	SET @query = @query + '
+		ORDER BY orderMaster.id DESC
+		OFFSET @offset ROWS 
+		FETCH FIRST 15 ROWS ONLY
 		FOR JSON PATH, INCLUDE_NULL_VALUES
 		)
 		SELECT json as [json] from x;
