@@ -192,7 +192,7 @@ Quote
 	```
 
 3. Accept Service Provider biddings by customer
-	https://nxtshops.com/orderApi/operations/acceptQuote/quoteBiddingId/serviceProviderId
+	https://nxtshops.com/orderApi/operations/acceptBid/quoteBiddingId/serviceProviderId
 
 
 Customer

@@ -234,7 +234,26 @@ Services
 		}
 	}
 	```	
-5. Get all service providers abiding to certain criteria or filtering
+7. Update a serviceProvider
+	https://nxtshops.com/merchantApi/service/serviceProviderId
+	PUT : JSON
+	```javascript
+	{
+		"detail": {
+			"name": "Motor House",
+			"categoryId": 1,
+			"coverage": 10,
+			"merchantId": 1
+		},
+		"address": {
+			"pickupAddress": "Near mavelikkara junction",
+			"latitude": 9.230385,
+			"longitude": 76.515898
+		}
+	}
+	```	
+
+8. Get all service providers abiding to certain criteria or filtering
 	https://nxtshops.com/adminApi/service/pageNo?providerName=a&merchantId=b&onlineStatus=0/1
 	Page No is basically limit, each page will have max 15 service providers
 	#merchantId here is emailId which is string

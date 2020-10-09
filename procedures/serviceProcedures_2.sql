@@ -98,3 +98,103 @@ END
 
 GO;
 
+-----------------------------------------------------------------
+--------------UPDATE SERVICE PROVIDER DETAIL --------------------
+CREATE PROCEDURE dbo.spUpdateServiceProvider
+@json NVARCHAR(max),
+@serviceProviderId INT
+AS
+BEGIN
+	DECLARE @detail NVARCHAR(MAX) = JSON_QUERY(@json, '$.detail');
+	DECLARE @address NVARCHAR(MAX) = JSON_QUERY(@json, '$.address');
+	DECLARE @query NVARCHAR(MAX);
+
+	IF OBJECT_ID('tempdb..#ServiceProviderDetailTemp') IS NOT NULL
+	DROP TABLE #ServiceProviderDetailTemp;
+
+	IF OBJECT_ID('tempdb..#ServiceProviderAddressTemp') IS NOT NULL
+	DROP TABLE #ServiceProviderAddressTemp;
+
+	IF @detail IS NOT NULL
+	BEGIN
+        select 
+        	@serviceProviderId as id,
+            json.name, json.categoryId,
+            json.coverage, json.merchantId, 
+            json.onlineStatus, json.fcmToken
+        INTO #ServiceProviderDetailTemp FROM OPENJSON(@detail)
+            with (
+                name nvarchar(100) '$.name', 
+                categoryId int '$.categoryId',
+                coverage int '$.coverage',
+                merchantId int '$.merchantId',
+                onlineStatus int '$.onlineStatus',
+                fcmToken nvarchar(255) '$.fcmToken'
+            )json
+        
+		SET @query = N'
+			UPDATE serviceProvider
+			SET
+                serviceProvider.name = CASE
+                WHEN (#ServiceProviderDetailTemp.name) IS NOT NULL THEN #ServiceProviderDetailTemp.name
+                ELSE serviceProvider.name
+                END,
+                serviceProvider.categoryId = CASE
+                WHEN (#ServiceProviderDetailTemp.categoryId) IS NOT NULL THEN #ServiceProviderDetailTemp.categoryId
+                ELSE serviceProvider.categoryId
+                END,                
+                serviceProvider.coverage = CASE
+                WHEN (#ServiceProviderDetailTemp.coverage) IS NOT NULL THEN #ServiceProviderDetailTemp.coverage
+                ELSE serviceProvider.coverage
+                END,                
+                serviceProvider.merchantId = CASE
+                WHEN (#ServiceProviderDetailTemp.merchantId) IS NOT NULL THEN #ServiceProviderDetailTemp.merchantId
+                ELSE serviceProvider.merchantId
+                END,                
+                serviceProvider.onlineStatus = CASE
+                WHEN (#ServiceProviderDetailTemp.onlineStatus) IS NOT NULL THEN #ServiceProviderDetailTemp.onlineStatus
+                ELSE serviceProvider.onlineStatus
+                END,                
+                serviceProvider.fcmToken = CASE
+                WHEN (#ServiceProviderDetailTemp.fcmToken) IS NOT NULL THEN #ServiceProviderDetailTemp.fcmToken
+                ELSE serviceProvider.fcmToken
+                END
+                FROM serviceProvider, #ServiceProviderDetailTemp 
+                WHERE #ServiceProviderDetailTemp.id = serviceProvider.id;
+		';
+	END
+	IF @address IS NOT NULL
+	BEGIN
+        select 
+        	@serviceProviderId as id,        
+            json.pickupAddress, json.latitude,
+            json.longitude
+        INTO #ServiceProviderAddressTemp FROM OPENJSON(@address)
+            with (
+                pickupAddress nvarchar(255) '$.pickupAddress', 
+                latitude float '$.latitude',
+                longitude float '$.longitude'
+            )json
+		SET @query = @query + N'
+            UPDATE serviceProviderAddress
+            SET 
+                serviceProviderAddress.pickupAddress = CASE
+                WHEN #ServiceProviderAddressTemp.pickupAddress IS NOT NULL THEN #ServiceProviderAddressTemp.pickupAddress
+                ELSE serviceProviderAddress.pickupAddress
+                END,                
+                serviceProviderAddress.latitude = CASE
+                WHEN #ServiceProviderAddressTemp.latitude IS NOT NULL THEN #ServiceProviderAddressTemp.latitude
+                ELSE serviceProviderAddress.latitude
+                END,                
+                serviceProviderAddress.longitude = CASE
+                WHEN #ServiceProviderAddressTemp.longitude IS NOT NULL THEN #ServiceProviderAddressTemp.longitude
+                ELSE serviceProviderAddress.longitude
+                END
+            FROM serviceProviderAddress, #ServiceProviderAddressTemp 
+            WHERE #ServiceProviderAddressTemp.id = serviceProviderAddress.id;                
+        ';
+	END
+ 	EXEC sp_executeSql @query;
+	SELECT @serviceProviderId as serviceProviderId;
+	RETURN;
+ END

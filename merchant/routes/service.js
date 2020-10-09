@@ -28,7 +28,23 @@ router.post('/', async(req, res, next)=>{
 });
 
 router.put('/:serviceProviderId', async(req, res, next)=>{
-    //update service Provider details
+	//update service Provider details
+	try {
+		const serviceProviderId = await sequelize.query(
+			'exec spUpdateServiceProvider :json, :serviceProviderId', 
+			{ 
+				replacements: { 
+					json: JSON.stringify(req.body),
+					serviceProviderId: req.params.serviceProviderId
+				}
+		    }).spread((value, created)=>{
+                return value[0];
+            });
+		res.send({error: false, message: 'updated', ...serviceProviderId});
+	} catch(e) {
+		res.send({error : true});
+		console.log(e);
+	}	
 });
 
 module.exports = router;
