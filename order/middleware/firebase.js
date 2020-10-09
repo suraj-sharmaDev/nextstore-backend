@@ -115,6 +115,18 @@ const createPayload = (data) => {
 				}
 			};
 			break;
+		case 'quote_completed':
+			payload = {
+				notification: {
+					title: "Completed!",
+					body: "Your quote has been delivered",
+					sound: "notif.mp3"
+				},
+				data: {
+					type: data.type,
+				}
+			};
+			break;
 		default:
 			payload = {
 				notification: {

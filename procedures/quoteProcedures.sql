@@ -238,6 +238,39 @@ END
 GO;
 
 ------------------------------------------------------------------------
+----------------Complete the quote from customer by serviceProvider-----
+CREATE PROCEDURE dbo.spCompleteQuoteFromCustomer
+@quoteMasterId INT, 
+@serviceProviderId INT
+AS
+BEGIN
+	--First the quoteMaster.status should be completed
+	--then the quotedServiceProviders.status should be completed
+	DECLARE @fcmToken NVARCHAR(255);
+	UPDATE quoteMaster
+	SET 
+		quoteMaster.status = 'completed'
+	WHERE quoteMaster.id = @quoteMasterId;
+	
+	UPDATE quotedServiceProviders 
+	SET
+		quotedServiceProviders.status = 'completed'
+	WHERE 
+		quotedServiceProviders.quoteMasterId = @quoteMasterId
+	AND 
+		quotedServiceProviders.serviceProviderId = @serviceProviderId;
+
+	--fetch fcmToken from database to notify the customer
+	SELECT @fcmToken=fcmToken from customer
+		where customer.id = (
+			SELECT customerId from quoteMaster
+			where id = @quoteMasterId
+		);	
+	
+	SELECT 1 as completed, @fcmToken as fcmToken;
+END
+
+------------------------------------------------------------------------
 --------------------Accept the Bidding By Customer----------------------
 
 CREATE PROCEDURE dbo.spAcceptBiddingFromServiceProvider

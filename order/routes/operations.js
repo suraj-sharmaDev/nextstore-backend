@@ -182,6 +182,39 @@ router.get('/rejectQuote/:quoteMasterId/:serviceProviderId', async(req, res, nex
 	}
 });
 
+router.get('/completeQuote/:quoteMasterId/:serviceProviderId', async(req, res, next)=>{
+	//reject the quote from customer by serviceProvider
+	try {
+		let message = '';
+		const customer = await sequelize.query(
+						'exec spCompleteQuoteFromCustomer :quoteMasterId, :serviceProviderId', 
+						{ 
+							replacements: { 
+								quoteMasterId: req.params.quoteMasterId,
+								serviceProviderId: req.params.serviceProviderId
+							}
+					}).spread((user, created)=>{ return user[0] })
+		console.log(customer);
+		if(customer.fcmToken){
+			//send notification to customer when quote is rejected
+			let data = {
+				fcmToken: customer.fcmToken,
+				type: 'quote_completed'
+			}
+			sendMessage(data);
+		}
+		message = {
+			error: false,
+			message: 'quote_completed'
+		};
+		res.send(message);
+	} catch (error) {
+		// statements
+		res.send({error: true});
+		console.log(e);		
+	}
+});
+
 router.get('/acceptBid/:quoteBiddingId/:serviceProviderId', async(req, res, next)=>{
 	//accept the bid from serviceProvider by customer
 	try {

@@ -360,6 +360,8 @@ Quote
 4. Accept Quote by service provider
 	https://nxtshops.com/orderApi/operations/acceptQuote/quoteId/serviceProviderId
 
+5. Complete Quote by service provider
+	https://nxtshops.com/orderApi/operations/completeQuote/quoteId/serviceProviderId
 
 Search Operations
 ------------------
