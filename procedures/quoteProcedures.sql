@@ -80,7 +80,8 @@ BEGIN
 		SELECT id as serviceProviderId, @quoteMasterId as quoteMasterId
 		FROM #NearByServiceProviders
 		
-	SELECT fcmToken from #NearByServiceProviders;
+	SELECT fcmToken from #NearByServiceProviders
+	WHERE fcmToken IS NOT NULL AND fcmToken <> '';
 	 
 END
 
@@ -306,7 +307,7 @@ END
 
 GO;
 
--------------------------------------------------------------------
+------------------------------------------------------------------------------
 ------------Get Quotes for serviceProviders belonging to any of 4 criteria----
 
 CREATE Procedure dbo.spGetServiceProviderQuotes
@@ -373,4 +374,62 @@ BEGIN
 		@serviceProviderId, @status, @startDate, @endDate, @offset
 	;
 --	SELECT @query ;
+END
+
+------------------------------------------------------------------------------
+------------Get Quotes for customer ------------------------------------------
+
+CREATE Procedure dbo.spGetCustomerQuotes
+@customerId INT,
+@page INT,
+@startDate datetimeoffset,
+@endDate datetimeoffset
+AS
+BEGIN
+	-- this procedure gives 15 quotes belonging to customerId
+	DECLARE @offset INT = 15 * (@page - 1);
+	DECLARE @status NVARCHAR(30) = N'completed';
+	DECLARE @query NVARCHAR(MAX) = N'
+			;with x(json) as (
+				SELECT 
+				quoteMaster.*,
+				sP.name as serviceProviderName,
+				items = (
+					select * from quoteDetail
+					where quoteMasterId = quoteMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from quoteMaster
+				INNER JOIN quotedServiceProviders qS on 
+					qS.quoteMasterId = quoteMaster.id
+					and qS.status = @status
+				INNER JOIN serviceProvider sP on
+					sP.id = qS.serviceProviderId
+				where quoteMaster.customerId = @customerId
+				and quoteMaster.status = @status
+	';
+	
+	IF (@startDate is not NULL and @endDate is not NULL)
+	BEGIN
+		SET @query = @query + '
+			and ( quoteMaster.createdAt >= @startDate and quoteMaster.createdAt <= @endDate)
+		';
+	END
+	-- finally query execution
+	SET @query = @query + '
+		ORDER BY quoteMaster.id DESC
+		OFFSET @offset ROWS 
+		FETCH FIRST 15 ROWS ONLY	
+		FOR JSON PATH, INCLUDE_NULL_VALUES
+		)
+		SELECT json as [json] from x;
+	';
+	EXEC sp_executeSql 
+		@query, 
+		N'@customerId INT, @status NVARCHAR(30), 
+		  @startDate datetimeoffset, @endDate datetimeoffset, 
+		  @offset INT
+		',
+		@customerId, @status, @startDate, @endDate, @offset
+	;
 END

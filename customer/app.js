@@ -3,7 +3,11 @@ const cors = require('cors');
 const {sequelize} = require('./models');
 const createError = require('http-errors');
 
-var {login, address, cart, verification, favourite} = require('./routes');
+var {
+	login, address, cart, 
+	verification, favourite,
+	order, quote
+} = require('./routes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,6 +21,8 @@ app.use('/address', jsonParser, address);
 app.use('/cart', jsonParser, cart);
 app.use('/verify', jsonParser, verification);
 app.use('/favourite', jsonParser, favourite);
+app.use('/order', jsonParser, order);
+app.use('/quote', jsonParser, quote);
 
 app.get('/', (req, res)=>{
 	sequelize.sync()

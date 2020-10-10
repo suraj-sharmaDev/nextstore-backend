@@ -88,6 +88,10 @@ Order
 
 1. Get Order Details
 	http://35.230.117.116/orderApi/order/orderId
+	
+	#Get Order belonging to Customer
+	https://nxtshops.com/customerApi/order/customerId/pageNo/startDate?/endDate?
+	where startDate and endDate are optional parameters
 
 2. Create New Order
 	http://35.230.117.116/orderApi/order
@@ -166,6 +170,10 @@ Quote
 
 1. Get Quote Details
 	https://nxtshops.com/orderApi/quote/quoteId
+
+	#Get Quote belonging to Customer
+	https://nxtshops.com/customerApi/quote/customerId/pageNo/startDate?/endDate?
+	where startDate and endDate are optional parameters
 
 2. Post a quote by user
 	https://nxtshops.com/orderApi/quote

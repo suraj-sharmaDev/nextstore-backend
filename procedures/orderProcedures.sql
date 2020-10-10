@@ -254,3 +254,62 @@ BEGIN
 		@shopId, @status, @startDate, @endDate, @offset
 	;
 END
+
+------------------------------------------------------------------------
+------------------Get Orders--------------------------------------------
+
+CREATE Procedure dbo.spGetCustomerOrders
+@customerId INT,
+@page INT,
+@startDate datetimeoffset,
+@endDate datetimeoffset
+As
+BEGIN
+	-- this procedure gives 15 orders belonging to customerId
+	DECLARE @offset INT = 15 * (@page - 1);
+	DECLARE @status NVARCHAR(20) = N'completed';
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;
+
+	DECLARE @query NVARCHAR(MAX) = N'
+			;with x(json) as (
+				SELECT 
+				orderMaster.*,
+				shop.name as shopName,
+				CONCAT(@baseUrl ,shop.image) as shopImage,
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from orderMaster
+				INNER JOIN shop on shop.id = orderMaster.shopId 
+				where orderMaster.customerId = @customerId
+                and orderMaster.status = @status
+	';	
+	IF (@startDate is not NULL and @endDate is not NULL)
+	BEGIN
+		SET @query = @query + '
+			and ( createdAt >= @startDate and createdAt <= @endDate)
+		';
+	END
+	-- finally query execution
+	SET @query = @query + '
+		ORDER BY orderMaster.id DESC
+		OFFSET @offset ROWS 
+		FETCH FIRST 15 ROWS ONLY
+		FOR JSON PATH, INCLUDE_NULL_VALUES
+		)
+		SELECT json as [json] from x;
+	';
+	EXEC sp_executeSql 
+		@query, 
+		N'@customerId INT, @status NVARCHAR(30), 
+		  @startDate datetimeoffset, 
+		  @endDate datetimeoffset, @offset INT,
+		  @baseUrl varchar(200)
+		',
+		@customerId, @status, @startDate, @endDate, @offset, @baseUrl
+	;
+END
