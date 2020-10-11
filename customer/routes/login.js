@@ -1,5 +1,6 @@
 const express = require('express');
-const {customer, orderMaster, cart, address, sequelize} = require('../models');
+const {customer, sequelize} = require('../models');
+const sendMessage = require('../middleware/sms');
 const router = express.Router();
 
 router.get('/:custId', async(req, res, next)=>{
@@ -40,7 +41,10 @@ router.post('/', async(req, res, next)=>{
 			});
 			// after getting result we have to send OTP to users mobile
 			//remaining
-			
+			sendMessage({
+				mobile: user.mobile, 
+				message: `Your nxtStores OTP is : ${user.otp}. Please DO NOT share this with anyone!.`
+			});
 			res.send(user);
 		}else{
 			res.json({error: true, message: 'invalid_number'});

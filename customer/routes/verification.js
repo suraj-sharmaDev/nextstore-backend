@@ -15,6 +15,11 @@ router.post('/', async(req, res, next)=>{
 		}).spread((value, created)=> {
             return value[0];
         });
+        if(user.message === 'verified'){
+            user = { error: false, message: 'verified'};
+        }else{
+            user = { error: true, message: 'try_again'};
+        }
     } 
     catch(e) {
         console.log(e)
