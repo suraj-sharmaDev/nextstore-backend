@@ -5,35 +5,52 @@
 ----------------Search productMaster by keyword---------------------
 
 CREATE PROCEDURE dbo.spGetProductMasterByKeyword
-@searchTerm NVARCHAR(100)
+@searchTerm NVARCHAR(100),
+@categoryId int
 AS
 BEGIN
 	Declare @baseUrl varchar(200);
 	--get baseUrl as local variable
 	Select @baseUrl=baseUrl from appConfig;	
-
-	SELECT 
-	TOP 10
-	p.id as productId,
-	p.name,
-	COALESCE(@baseUrl + p.image, null) as [image],
-	COALESCE(@baseUrl + p.bigImage1, null) as bigImage1,
-	COALESCE(@baseUrl + p.bigImage2, null) as bigImage2,
-	COALESCE(@baseUrl + p.bigImage3, null) as bigImage3,
-	COALESCE(@baseUrl + p.bigImage4, null) as bigImage4,
-	COALESCE(@baseUrl + p.bigImage5, null) as bigImage5,
-	COALESCE(@baseUrl + p.bigImage6, null) as bigImage6,
-	scc.name as subCategoryChildName,
-	scc.id as subCategoryChildId,
-	sc.name as subCategoryName,
-	sc.id as subCategoryId,
-	c2.name as categoryName,
-	c2.id as categoryId
-	FROM productMaster as p
-	INNER JOIN subCategoryChild scc on scc.id = p.subCategoryChildId
-	INNER JOIN subCategory sc on sc.id = scc.subCategoryId 
-	INNER JOIN category c2 on c2.id = sc.categoryId 
-	where p.name like '%' + @searchTerm + '%'
+	DECLARE @searchKey NVARCHAR(100) = '%' + @searchTerm + '%'; 
+	DECLARE @query NVARCHAR(MAX) = N'
+		SELECT 
+		TOP 10
+		p.id as productId,
+		p.name,
+		COALESCE(@baseUrl + p.image, null) as [image],
+		COALESCE(@baseUrl + p.bigImage1, null) as bigImage1,
+		COALESCE(@baseUrl + p.bigImage2, null) as bigImage2,
+		COALESCE(@baseUrl + p.bigImage3, null) as bigImage3,
+		COALESCE(@baseUrl + p.bigImage4, null) as bigImage4,
+		COALESCE(@baseUrl + p.bigImage5, null) as bigImage5,
+		COALESCE(@baseUrl + p.bigImage6, null) as bigImage6,
+		scc.name as subCategoryChildName,
+		scc.id as subCategoryChildId,
+		sc.name as subCategoryName,
+		sc.id as subCategoryId,
+		c2.name as categoryName,
+		c2.id as categoryId
+		FROM productMaster as p
+		INNER JOIN subCategoryChild scc on scc.id = p.subCategoryChildId
+		INNER JOIN subCategory sc on sc.id = scc.subCategoryId 
+		INNER JOIN category c2 on c2.id = sc.categoryId 
+		where p.name like @searchKey
+	';
+	if @categoryId IS NOT NULL
+	BEGIN
+		SET @query = @query + N'
+			and c2.id = @categoryId
+		';
+	END
+	-- Finally execute the query
+	EXEC sp_executeSql 
+		@query, 
+		N'@searchKey NVARCHAR(100), @baseUrl varchar(200), 
+		  @categoryId int
+		',
+		@searchKey, @baseUrl, @categoryId
+	;
 END
 
 GO;

@@ -8,10 +8,11 @@ router.get('/', async(req, res, next)=>{
 	//list out relatable products from productMaster
 	try {
 		const status = await sequelize.query(
-			'exec spGetProductMasterByKeyword :searchTerm', 
+			'exec spGetProductMasterByKeyword :searchTerm, :categoryId', 
 			{ 
 				replacements: { 
-					searchTerm: req.query.searchTerm
+					searchTerm: req.query.searchTerm,
+					categoryId: req.query.categoryId ? req.query.categoryId : null
 				}
 		}).spread((value, created)=>{
 			return value;

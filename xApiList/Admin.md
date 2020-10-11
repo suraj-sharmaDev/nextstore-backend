@@ -300,8 +300,9 @@ Product Master
         subCategoryChildId: INTEGER         ---> optional
 
 3. List all products in productMaster with keyword
-	https://nxtshops.com/merchantApi/product?searchTerm=keyword
-
+	https://nxtshops.com/merchantApi/product?searchTerm=keyword&categoryId=categoryId
+	where categoryId is optional
+	
 Product
 ---------
 
