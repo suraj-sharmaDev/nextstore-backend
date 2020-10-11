@@ -4,7 +4,7 @@ CREATE PROCEDURE dbo.spCreateNewOrder
 @json NVARCHAR(max)
 AS
 BEGIN
-	DECLARE @fcmToken NVARCHAR(250);
+	-- DECLARE @fcmToken NVARCHAR(250);
 	DECLARE @orderMasterId INT;
 	DECLARE @createdAt datetimeoffset = GETUTCDATE();
 
@@ -40,9 +40,9 @@ BEGIN
 	EXEC spInsertRecommendedProduct @shopId, @json;  
 	--------------------------------------------------------------
 	
-	select @fcmToken=fcmToken from shop where id in (
-		select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
-	);
+	-- select @fcmToken=fcmToken from shop where id in (
+	-- 	select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
+	-- );
 
 	;with x(json) as (
 		select
@@ -62,7 +62,24 @@ BEGIN
 		And orderMaster.status in ('pending', 'accepted')
 		For Json AUTO, INCLUDE_NULL_VALUES	
 	)
-	select @fcmToken as fcmToken, @orderMasterId as orderMasterId, json as orderDetail from x;
+
+	select 
+	(
+		SELECT fcmToken FROM (
+			SELECT fcmToken
+			FROM adminTable
+			where adminTable.fcmToken IS NOT NULL and adminTable.fcmToken <> ''	
+			UNION ALL			
+			select fcmToken 
+			from shop
+			where id = @shopId
+			and shop.fcmToken IS NOT NULL and shop.fcmToken <> ''
+		)A
+		FOR JSON PATH
+	) as fcmToken,
+	@orderMasterId as orderMasterId, 
+	json as orderDetail from x;
+
 END
 
 

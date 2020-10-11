@@ -9,6 +9,15 @@ Admin
 		"password": "hello"
 	}
 	```
+
+2. Update Admin Token
+	https://nxtshops.com/adminApi/admin/adminId
+	PUT : JSON
+	```javascript
+	{
+		"fcmToken": "_token_"
+	}
+	```
 merchant
 --------
 

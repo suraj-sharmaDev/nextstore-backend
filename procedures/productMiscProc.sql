@@ -17,7 +17,6 @@ BEGIN
 	p.id as productId,
 	p.name,
 	COALESCE(@baseUrl + p.image, null) as [image],
-	COALESCE(@baseUrl + p.image, null) as [image],
 	COALESCE(@baseUrl + p.bigImage1, null) as bigImage1,
 	COALESCE(@baseUrl + p.bigImage2, null) as bigImage2,
 	COALESCE(@baseUrl + p.bigImage3, null) as bigImage3,

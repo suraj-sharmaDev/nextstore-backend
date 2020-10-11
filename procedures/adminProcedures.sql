@@ -27,3 +27,17 @@ BEGIN
 END
 
 GO;
+
+-------------------------------------------------------------
+-------------Update fcmToken---------------------------------
+CREATE PROCEDURE dbo.spUpdateAdminToken
+@adminId int,
+@fcmToken NVARCHAR(255)
+AS
+BEGIN
+	Update adminTable
+	SET
+		fcmToken = @fcmToken
+	WHERE
+		id = @adminId
+END

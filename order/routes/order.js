@@ -79,8 +79,14 @@ router.post('/:orderId?', async(req, res, next)=>{
 			orderMasterId = shop.orderMasterId;
 			orderDetail = JSON.parse(shop.orderDetail);
 			if(shop.fcmToken!= null){
+				//fix the fcmTokens to array
+				let fcmTokens = [];
+				let parsedArray = JSON.parse(shop.fcmToken);
+				parsedArray.map((p)=>{
+					fcmTokens.push(p.fcmToken)
+				})
 				let data = {
-					fcmToken: shop.fcmToken,
+					fcmToken: fcmTokens,
 					orderId: orderMasterId,
 					type: type
 				}

@@ -24,5 +24,20 @@ router.post('/', async(req, res, next)=>{
 	}
 })
 
+router.put('/:adminId', async(req, res, next)=>{
+    //update admin fcmToken
+	try {
+        await sequelize.query('exec spUpdateAdminToken :adminId, :fcmToken', {
+            replacements: {
+                adminId: req.params.adminId,
+                fcmToken: req.body.fcmToken
+            }});
+		res.json({error: false, message: "updated_token"});
+	} catch(e) {
+		res.send({error : true});
+		console.log(e);
+	}
+})
+
 module.exports = router;
 

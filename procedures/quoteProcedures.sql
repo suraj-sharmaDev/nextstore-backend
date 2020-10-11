@@ -75,13 +75,17 @@ BEGIN
 	 -- Find all service providers nearby to send them the quotations
 	INSERT INTO #NearByServiceProviders
 		exec spfindServiceProvidersNearby @custLat, @custLng, @categoryId; 
-	
+
 	INSERT INTO quotedServiceProviders (serviceProviderId, quoteMasterId )
 		SELECT id as serviceProviderId, @quoteMasterId as quoteMasterId
 		FROM #NearByServiceProviders
 		
 	SELECT fcmToken from #NearByServiceProviders
-	WHERE fcmToken IS NOT NULL AND fcmToken <> '';
+	WHERE fcmToken IS NOT NULL AND fcmToken <> ''
+	UNION ALL
+	SELECT adminTable.fcmToken
+	FROM adminTable
+	where adminTable.fcmToken IS NOT NULL and adminTable.fcmToken <> ''	;
 	 
 END
 
