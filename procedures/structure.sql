@@ -286,8 +286,8 @@ CREATE TABLE nextstore.dbo.productMaster (
 
 CREATE TABLE nextstore.dbo.product1 (
 	id int IDENTITY(1,1) NOT NULL,
-	mrp int NULL,
-	price int NULL,
+	mrp float NULL,
+	price float NULL,
 	shopId int NULL,
 	productMasterId int NULL,
 	stock int DEFAULT 1,

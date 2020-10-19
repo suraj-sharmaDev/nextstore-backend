@@ -24,10 +24,13 @@ BEGIN
 	else
 		CREATE TABLE #Products 
 		(
-			id int,
+			productMasterId int,
+			productId int,
 			name varchar(100),
 			image varchar(200),
 			subCategoryChildId int,
+			stock int,
+			mrp int,
 			price int
 		 )
 		 
@@ -37,10 +40,14 @@ BEGIN
 	----all matching products added to temp table #Products
 	Declare @search varchar(100) = '''%' + @keyword + '%''';
 	SET @query = N'
-		select productMaster.id as id,
+		select 
+		productMaster.id as productMasterId,
+		product.id as productId,
 		productMaster.name as name, 
 		CONCAT(@baseUrl ,productMaster.image) as image, 
 		productMaster.subCategoryChildId as subCategoryChildId,
+		product.stock as stock,
+		product.mrp as mrp,
 		product.price as price
 		From
 			productMaster
@@ -75,7 +82,15 @@ BEGIN
 		subCategoryChildId = subCategoryChildId,
 		title = title,
 		data = (
-			select id, name, image, price from #Products
+			select 
+			productMasterId, 
+			productId, 
+			name, 
+			image,
+			stock,
+			mrp,
+			price 
+			from #Products
 			where subCategoryChildId = C.subCategoryChildId
 			FOR JSON PATH, INCLUDE_NULL_VALUES 
 		)

@@ -263,19 +263,24 @@ BEGIN
 		scc.subCategoryName as subCategoryName,
 		scc.subCategoryChildId as subCategoryChildId,
 		scc.title as title,
-		data.productMasterId as productMasterId,
-		data.productId as productId,
-		data.name as [name],
-		data.image as [image],
-		data.bigImage1 as [bigImage1],
-		data.bigImage2 as [bigImage2],
-		data.bigImage3 as [bigImage3],
-		data.bigImage4 as [bigImage4],
-		data.bigImage5 as [bigImage5],
-		data.bigImage6 as [bigImage6],
-		data.stock as [stock],
-		data.mrp as mrp,
-		data.price as price
+		data = (
+			SELECT 			
+				productMasterId,
+				productId,
+				[name],
+				[image],
+				[bigImage1],
+				[bigImage2],
+				[bigImage3],
+				[bigImage4],
+				[bigImage5],
+				[bigImage6],
+				[stock],
+				mrp,
+				price
+				FROM #DistTemp where subCategoryChildId = scc.subCategoryChildId
+				FOR JSON AUTO, INCLUDE_NULL_VALUES
+		)
 		from (
 			select 
 			category.id as categoryId,
@@ -289,7 +294,6 @@ BEGIN
 			inner join category on category.id = subCategory.categoryId
 			where subCategoryChild.subCategoryId = @subCategoryId
 		) as scc
-		inner join #DistTemp as data on data.subCategoryChildId = scc.subCategoryChildId
 		For Json AUTO
 	)
  select @outputData=json from x;

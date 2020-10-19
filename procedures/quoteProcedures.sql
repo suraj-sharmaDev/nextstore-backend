@@ -16,7 +16,12 @@ BEGIN
 			select * from quoteDetail
 			where quoteMasterId=@quoteMasterId
 			FOR JSON PATH			
-		)
+		),
+		providerBids = (
+			select * from quotationBiddings
+			where quoteMasterId = quoteMaster.id
+			FOR JSON PATH, INCLUDE_NULL_VALUES
+		)		
 		For JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER			
 	)
 	

@@ -4,6 +4,9 @@ CREATE Procedure dbo.spInitializeCustomer
 As
 Begin 
 	Declare @result nvarchar(max);
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;	
 	with x(json) as (
 		Select 
 			name,
@@ -51,7 +54,11 @@ Begin
 				qm.deliveryAddress,
 				quoteDetail.productId,
 				quoteDetail.productName,
-				quoteDetail.json 
+				quoteDetail.json,
+				biddingCount = (
+					SELECT count(id) from
+					quotationBiddings qb where qb.quoteMasterId = qm.id
+				)
 				from quoteMaster qm 
 				INNER JOIN quoteDetail on quoteDetail.quoteMasterId = qm.id 
 				where qm.customerId = @custId
@@ -59,23 +66,22 @@ Begin
 				For Json AUTO, INCLUDE_NULL_VALUES
 			),
 			recentOrder = (
-				select
+				SELECT 
 				TOP 3
 				orderMaster.*,
-				items.productId,
-				items.productName,
-				items.price,
-				items.qty 
-				from 
-				(
-					SELECT orderMaster.*, shop.name, shop.category from orderMaster
-					INNER JOIN shop on shop.id = orderMaster.shopId
-					where orderMaster.customerId = @custId
-					And orderMaster.status in ('completed')
+				shop.name as shopName,
+				shop.category as category,
+				CONCAT(@baseUrl ,shop.image) as shopImage,
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
 				)
-				as orderMaster				
-				INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
-				For Json AUTO, INCLUDE_NULL_VALUES				
+				from orderMaster
+				INNER JOIN shop on shop.id = orderMaster.shopId 
+				where orderMaster.customerId = @custId
+                and orderMaster.status = 'completed'
+                For Json PATH, INCLUDE_NULL_VALUES
 			)
 		from customer
 		where id = @custId

@@ -294,6 +294,7 @@ BEGIN
 				SELECT 
 				orderMaster.*,
 				shop.name as shopName,
+				shop.category as category,
 				CONCAT(@baseUrl ,shop.image) as shopImage,
 				items = (
 					select * from orderDetail

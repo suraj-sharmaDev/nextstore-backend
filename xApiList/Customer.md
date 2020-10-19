@@ -180,23 +180,37 @@ Quote
 	POST : JSON
 	```javascript
 	{
-	"master": {
-		"customerId": 1,
-		"deliveryAddress": "{\"latitude\": 9.230385, \"longitude\": 76.515898}",
-		"type": "repair",
-		"categoryId": 1
-	},
-	"detail":[
-		{
-			"productId": 119,
-			"productName" : "DV Bellow"
-		},
-		{
-			"productId": 120,
-			"productName" : "DV Assembly"
-		}    
-	]
-	}	
+			"master": {
+			"customerId": 1,
+			"deliveryAddress": {
+				"id":1,
+				"savedAs":"home",
+				"coordinate": {
+					"latitude":9.230385,
+					"longitude":76.515898
+					},
+					"houseDetail":"Anugraha",
+					"landmark":"Near Arvees"
+				},
+			"type": "breakdown",
+			"categoryId": 1
+			},
+			"detail":[
+			{
+				"productName" : "Breakdown Assistance",
+				"json":	{
+						"PackageItemName":"Breakdown Assistance",
+						"Description": "Car Model XYZ", 
+						"destination": {
+							"latitude":9.27385,
+							"longitude":76.785898, 
+							"houseDetail":"Allapuzha",
+							"landmark":"Carmel College Road"
+						}
+					}
+				}
+			]
+	}
 	```
 
 3. Accept Service Provider biddings by customer

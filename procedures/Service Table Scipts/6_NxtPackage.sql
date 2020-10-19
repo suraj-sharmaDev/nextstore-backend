@@ -1,5 +1,17 @@
 -------------------------------------------------------
 
+-- SELECT * FROM nxtServiceItem WHERE CategoryItemName = 'Two Wheeler'
+
+INSERT INTO nxtPackage ([PackageName],[CategoryItemId]) 
+VALUES
+('General check-up',1),
+('Minor electrical check-up',1),
+('Minor engine tune-up',1);
+
+-----------------------
+
+-------------------------------------------------------
+
 -- SELECT * FROM nxtServiceItem WHERE CategoryItemName = 'Pest Control'
 
 INSERT INTO nxtPackage ([PackageName],[CategoryItemId],[Description]) VALUES('Pest Control',15,'')
