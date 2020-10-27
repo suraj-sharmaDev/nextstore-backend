@@ -19,12 +19,9 @@ app.use('/service', jsonParser, service);
 app.use('/category', jsonParser, category);
 app.use('/product', jsonParser, product);
 
-app.get('/', (req, res)=>{
-	sequelize.sync()
-	.then(()=>res.json(result))
-	.catch(err=>res.json(err))
+app.get('/', (req, res) => {
+	res.send({ path: 404 })
 })
-
 //create error 404 error
 app.use((req, res, next)=>{
 	next(createError(404));
