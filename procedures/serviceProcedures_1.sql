@@ -87,7 +87,8 @@ GO;
 
 CREATE PROCEDURE dbo.spGetAllServicesNearUser
 @custLat FLOAT,
-@custLng FLOAT
+@custLng FLOAT,
+@categoryId INT = NULL
 AS
 BEGIN
 	IF OBJECT_ID('tempdb..#NearByServiceProviders') IS NOT NULL
@@ -104,11 +105,12 @@ BEGIN
 	    )
 	
 	INSERT INTO #NearByServiceProviders
-		exec spfindServiceProvidersNearby @custLat, @custLng, NULL;
+		exec spfindServiceProvidersNearby @custLat, @custLng, @categoryId;
 	
 	SELECT * from nxtServiceCategory
 	where nxtServiceCategory.CategoryId in (
 		SELECT DISTINCT categoryId from  #NearByServiceProviders
+		where Active = 1
 	);
 	
 END

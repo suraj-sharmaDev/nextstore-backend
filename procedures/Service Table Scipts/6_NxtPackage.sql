@@ -1,3 +1,43 @@
+DECLARE @STARTLIMIT INT = 14;
+DECLARE @ENDLIMIT INT = 29;
+
+WHILE @STARTLIMIT <= @ENDLIMIT
+BEGIN
+
+	INSERT INTO nxtPackage ([PackageName],[CategoryItemId]) 
+	VALUES
+	('General check-up', @STARTLIMIT),
+	('Minor electrical check-up',@STARTLIMIT),
+	('Minor tune-up',@STARTLIMIT);
+
+	-- select * from nxtPackage  where [PackageName] = 'General check-up'
+	
+	INSERT INTO nxtPackageItemRate([PackageItemName],[PackageId],[Rate],[OfferRate]) 
+	VALUES
+	('Portable', (select PackageId from nxtPackage  where [PackageName] = 'General check-up' and [CategoryItemId] = @STARTLIMIT), 950, 600),
+	('Central', (select PackageId from nxtPackage  where [PackageName] = 'General check-up' and [CategoryItemId] = @STARTLIMIT), 950, 600),
+	('Smart', (select PackageId from nxtPackage  where [PackageName] = 'General check-up' and [CategoryItemId] = @STARTLIMIT), 950, 600);
+	
+	-- select * from nxtPackage  where [PackageName] = 'Minor electrical check-up'
+	
+	INSERT INTO nxtPackageItemRate([PackageItemName],[PackageId],[Rate],[OfferRate]) 
+	VALUES
+	('Portable', (select PackageId from nxtPackage  where [PackageName] = 'Minor electrical check-up' and [CategoryItemId] = @STARTLIMIT), 950, 600),
+	('Central', (select PackageId from nxtPackage  where [PackageName] = 'Minor electrical check-up' and [CategoryItemId] = @STARTLIMIT), 950, 600),
+	('Smart', (select PackageId from nxtPackage  where [PackageName] = 'Minor electrical check-up' and [CategoryItemId] = @STARTLIMIT), 950, 600);
+	
+	-- select * from nxtPackage  where [PackageName] = 'Minor tune-up'
+	
+	INSERT INTO nxtPackageItemRate([PackageItemName],[PackageId],[Rate],[OfferRate]) 
+	VALUES
+	('Portable', (select PackageId from nxtPackage  where [PackageName] = 'Minor tune-up' and [CategoryItemId] = @STARTLIMIT), 950, 600),
+	('Central', (select PackageId from nxtPackage  where [PackageName] = 'Minor tune-up' and [CategoryItemId] = @STARTLIMIT), 950, 600),
+	('Smart', (select PackageId from nxtPackage  where [PackageName] = 'Minor tune-up' and [CategoryItemId] = @STARTLIMIT), 950, 600);
+
+    --Increment by 1
+    SET @STARTLIMIT = @STARTLIMIT + 1;
+END
+
 -------------------------------------------------------
 
 -- SELECT * FROM nxtServiceItem WHERE CategoryItemName = 'Two Wheeler'

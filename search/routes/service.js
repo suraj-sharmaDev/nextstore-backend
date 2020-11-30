@@ -1,93 +1,92 @@
 const express = require('express');
-const {sequelize} = require('../models');
+const { sequelize } = require('../models');
 
 const router = express.Router();
 
-router.get('/', async(req, res, next)=>{
+router.get('/', async (req, res, next) => {
     //get all services
-	try {
+    try {
         const services = await sequelize.query('exec spGetAllServices')
-            .spread((value, created)=>
-            {
+            .spread((value, created) => {
                 return value;
             });
-		res.send(services);
-	} catch(e) {
-		res.send({error : true});
-		console.log(e);
-	}
+        res.send(services);
+    } catch (e) {
+        res.send({ error: true });
+        console.log(e);
+    }
 });
 
-router.get('/services/:lat/:lng', async(req, res, next)=>{
-    //get all services near the user with latitude and longitude
-	try {
-        const services = await sequelize.query('exec spGetAllServicesNearUser :custLat, :custLng', {
-                replacements: {
-                    custLat: req.params.lat,
-                    custLng: req.params.lng
-                }
-            })
-            .spread((value, created)=>
-            {
+router.get('/services/:lat/:lng/:categoryId?', async (req, res, next) => {
+    // get all services near the user with latitude and longitude
+    // optional parameter is categoryId
+    const { lat, lng, categoryId } = req.params;
+    try {
+        const services = await sequelize.query('exec spGetAllServicesNearUser :custLat, :custLng, :categoryId', {
+            replacements: {
+                custLat: lat,
+                custLng: lng,
+                categoryId: categoryId
+            }
+        })
+            .spread((value, created) => {
                 return value;
             });
-		res.send(services);
-	} catch(e) {
-		res.send({error : true});
-		console.log(e);
-	}
+        res.send(services);
+    } catch (e) {
+        res.send({ error: true });
+        console.log(e);
+    }
 });
 
-router.get('/:type/:id', async(req, res, next)=>{
+router.get('/:type/:id', async (req, res, next) => {
     //get all services
-	try {
+    try {
         let error = false;
         let procedureName = null;
         let type = 0;
-        if(req.params.type == 'serviceItem'){
+        if (req.params.type == 'serviceItem') {
             //get all services for category
             procedureName = `dbo.spGetAllServicesForCategory`;
             type = 1;
-        }else if(req.params.type == 'serviceDetails'){
+        } else if (req.params.type == 'serviceDetails') {
             //get all details for services
             procedureName = `dbo.spGetAllDetailsInService`;
             type = 2;
-        }else if(req.params.type == 'packageRate'){
+        } else if (req.params.type == 'packageRate') {
             //get package item rate
             procedureName = `dbo.spGetPackageItemRate`;
             type = 3;
-        }else if(req.params.type == 'repairParts'){
+        } else if (req.params.type == 'repairParts') {
             //get repair parts service and charge
             procedureName = `dbo.spGetRepairPartsServiceCharge`;
             type = 4;
-        }else{
+        } else {
             //404 not found
             error = true;
         }
 
-        if(!error)
-        {
+        if (!error) {
             const details = await sequelize.query(`exec ${procedureName} :id`, {
                 replacements: {
                     id: req.params.id
                 }
             })
-            .spread((value, created)=>
-            {
-                if(type === 2 || type === 4){
-                    return JSON.parse(value[0].json);
-                }else{
-                    return value;
-                }
-            });
-		    res.send(details);
-        }else{
-            res.send({error : true, message: '404 Not Found'});            
+                .spread((value, created) => {
+                    if (type === 2 || type === 4) {
+                        return JSON.parse(value[0].json);
+                    } else {
+                        return value;
+                    }
+                });
+            res.send(details);
+        } else {
+            res.send({ error: true, message: '404 Not Found' });
         }
-	} catch(e) {
-		res.send({error : true});
-		console.log(e);
-	}
+    } catch (e) {
+        res.send({ error: true });
+        console.log(e);
+    }
 });
 
 module.exports = router;
