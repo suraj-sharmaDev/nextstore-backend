@@ -26,7 +26,7 @@ router.get('/services/:lat/:lng/:categoryId?', async (req, res, next) => {
             replacements: {
                 custLat: lat,
                 custLng: lng,
-                categoryId: categoryId
+                categoryId: categoryId || null
             }
         })
             .spread((value, created) => {
