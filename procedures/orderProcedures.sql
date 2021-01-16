@@ -215,6 +215,67 @@ END
 GO;
 
 -------------------------------------------------------------------
+-----------Get orders irrespective of any particular shops---------
+
+CREATE Procedure dbo.spGetAllShopOrders
+@status NVARCHAR(30),
+@page INT,
+@startDate datetimeoffset,
+@endDate datetimeoffset
+As
+BEGIN
+	-- this procedure gives 20 orders belonging to all shops
+	-- orders with status pending, accepted, rejected or all
+	DECLARE @offset INT = 20 * (@page - 1);
+	DECLARE @query NVARCHAR(MAX) = N'
+			;with x(json) as (
+				SELECT 
+				orderMaster.*,
+				shop.name as shopName,
+				customer.name as customerName,
+				customer.mobile as customerMobile,				
+				items = (
+					select * from orderDetail
+					where orderMasterId = orderMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from orderMaster
+				INNER JOIN shop on shop.id = orderMaster.shopId
+				INNER JOIN customer on customer.id = orderMaster.customerId
+				where orderMaster.shopId > 0
+	';
+	
+	IF (@startDate is not NULL and @endDate is not NULL)
+	BEGIN
+		SET @query = @query + '
+			and ( createdAt >= @startDate and createdAt <= @endDate)
+		';
+	END
+	IF (@status <> 'all')
+	BEGIN
+		SET @query = @query + '
+				and status = @status
+		';
+	END
+	-- finally query execution
+	SET @query = @query + '
+		ORDER BY orderMaster.id DESC
+		OFFSET @offset ROWS 
+		FETCH FIRST 20 ROWS ONLY
+		FOR JSON PATH, INCLUDE_NULL_VALUES
+		)
+		SELECT json as [json] from x;
+	';
+	EXEC sp_executeSql 
+		@query, 
+		N'@status NVARCHAR(30), @startDate datetimeoffset, @endDate datetimeoffset, @offset INT',
+		@status, @startDate, @endDate, @offset
+	;
+END
+
+GO;
+
+-------------------------------------------------------------------
 ------------Get Orders for shops belonging to any of 4 criteria----
 
 CREATE Procedure dbo.spGetShopOrders

@@ -317,6 +317,75 @@ END
 GO;
 
 ------------------------------------------------------------------------------
+------------Get Quotes irrespective of any particular serviceProviders -------
+
+CREATE Procedure dbo.spGetAllServiceProviderQuotes
+@status NVARCHAR(30),
+@page INT,
+@startDate datetimeoffset,
+@endDate datetimeoffset
+AS
+BEGIN
+	-- this procedure gives 15 orders belonging to shopId
+	-- orders with status pending, accepted, rejected or all
+	DECLARE @offset INT = 15 * (@page - 1);
+	DECLARE @query NVARCHAR(MAX) = N'
+			;with x(json) as (
+				SELECT 
+				quoteMaster.*,
+				qS.serviceProviderId,
+				qS.status as providerStatus,
+				customer.name as customerName,
+				customer.mobile as customerMobile,
+				items = (
+					select * from quoteDetail
+					where quoteMasterId = quoteMaster.id
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				),
+				providerBids = (
+					select * from quotationBiddings
+					where quoteMasterId = quoteMaster.id
+					and serviceProviderId = qS.serviceProviderId
+					FOR JSON PATH, INCLUDE_NULL_VALUES
+				)
+				from quoteMaster
+				INNER JOIN customer on customer.id = quoteMaster.customerId
+				INNER JOIN quotedServiceProviders qS on 
+					qS.quoteMasterId = quoteMaster.id 
+				where qS.serviceProviderId > 0
+	';
+	
+	IF (@startDate is not NULL and @endDate is not NULL)
+	BEGIN
+		SET @query = @query + '
+			and ( quoteMaster.createdAt >= @startDate and quoteMaster.createdAt <= @endDate)
+		';
+	END
+	IF (@status <> 'all')
+	BEGIN
+		SET @query = @query + '
+				and quoteMaster.status = @status
+		';
+	END
+	-- finally query execution
+	SET @query = @query + '
+		ORDER BY qS.id DESC
+		OFFSET @offset ROWS 
+		FETCH FIRST 15 ROWS ONLY	
+		FOR JSON PATH, INCLUDE_NULL_VALUES
+		)
+		SELECT json as [json] from x;
+	';
+	EXEC sp_executeSql 
+		@query, 
+		N'@status NVARCHAR(30), @startDate datetimeoffset, @endDate datetimeoffset, @offset INT',
+		@status, @startDate, @endDate, @offset
+	;
+--	SELECT @query ;
+END
+
+Go;
+------------------------------------------------------------------------------
 ------------Get Quotes for serviceProviders belonging to any of 4 criteria----
 
 CREATE Procedure dbo.spGetServiceProviderQuotes

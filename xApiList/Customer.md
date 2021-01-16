@@ -17,7 +17,9 @@ Services
 	https://nxtshops.com/searchApi/service
 
 	#Get All Services Categorically and near the user
-	https://nxtshops.com/searchApi/service/services/9.230385/76.515898
+	https://nxtshops.com/searchApi/service/services/lat/lng/categoryId?
+	where categoryId is optional parameter
+	e.g) https://nxtshops.com/searchApi/service/services/9.230385/76.515898
 
 2. Get Service Item for the service Category
 	https://nxtshops.com/searchApi/service/serviceItem/CategoryId
