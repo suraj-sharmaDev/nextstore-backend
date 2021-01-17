@@ -41,27 +41,27 @@ router.get("/services/:lat/:lng/:categoryId?", async (req, res, next) => {
   }
 });
 
-router.get("/:type/:id", async (req, res, next) => {
+router.get("/:procType/:id", async (req, res, next) => {
   //get all services
   try {
     let error = false;
     let procedureName = null;
     let type = 0;
-    const { type, id } = req.params;
+    const { procType, id } = req.params;
     const isActive = req.query.isActive ? req.query.isActive : 1;
-    if (type == "serviceItem") {
+    if (procType == "serviceItem") {
       //get all services for category
       procedureName = `dbo.spGetAllServicesForCategory`;
       type = 1;
-    } else if (type == "serviceDetails") {
+    } else if (procType == "serviceDetails") {
       //get all details for services
       procedureName = `dbo.spGetAllDetailsInService`;
       type = 2;
-    } else if (type == "packageRate") {
+    } else if (procType == "packageRate") {
       //get package item rate
       procedureName = `dbo.spGetPackageItemRate`;
       type = 3;
-    } else if (type == "repairParts") {
+    } else if (procType == "repairParts") {
       //get repair parts service and charge
       procedureName = `dbo.spGetRepairPartsServiceCharge`;
       type = 4;
