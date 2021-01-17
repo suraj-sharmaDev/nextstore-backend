@@ -5,6 +5,8 @@ const merchant = require("./merchant");
 const shop = require("./shop");
 const order = require("./order");
 const service = require("./service");
+const servicePackage = require("./servicePackage");
+const serviceRepair = require("./serviceRepair");
 module.exports = {
   admin,
   product,
@@ -13,4 +15,6 @@ module.exports = {
   shop,
   order,
   service,
+  servicePackage,
+  serviceRepair,
 };

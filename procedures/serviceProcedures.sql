@@ -330,3 +330,310 @@ BEGIN
 
 	SELECT @message as message;
 END
+
+
+--------------------------------------------------------------------------------------------
+-----------------------Add or update service Packages---------------------------------------
+CREATE PROCEDURE dbo.spAddUpdateServicePackage
+@json NVARCHAR(max),
+@packageId INT
+AS
+BEGIN
+	DECLARE @message varchar(40);
+	IF OBJECT_ID('tempdb..#ServicePackageDetailTemp') IS NOT NULL
+	DROP TABLE #ServicePackageDetailTemp;
+	-- add the json data to tempTable
+    select 
+        json.PackageName, json.CategoryItemId,
+        json.[Description], json.Active
+    INTO #ServicePackageDetailTemp FROM OPENJSON(@json)
+        with (
+            PackageName varchar(50) '$.PackageName', 
+            CategoryItemId int '$.CategoryItemId',
+            [Description] [varchar](500) '$.Description',
+            Active int '$.Active'
+        )json
+	-- if packageId is null then the procedure will add the serviceItem
+	-- else it will update the existing serviceItem
+	If @packageId IS NULL
+	BEGIN
+		INSERT INTO nxtPackage(PackageName, CategoryItemId, [Description], Active)
+		SELECT
+		PackageName, 
+		CategoryItemId, 
+		[Description], 
+		COALESCE(Active, 1) AS Active
+		FROM #ServicePackageDetailTemp;
+		SET @message = 'Package inserted';
+	END
+	ELSE
+	BEGIN
+		IF EXISTS (SELECT PackageId from nxtPackage where PackageId=@packageId)
+		BEGIN
+			UPDATE nxtPackage
+			SET 
+				nxtPackage.PackageName = CASE
+				WHEN #ServicePackageDetailTemp.PackageName IS NOT NULL THEN #ServicePackageDetailTemp.PackageName
+				ELSE nxtPackage.PackageName
+				END,
+				nxtPackage.CategoryItemId = CASE
+				WHEN #ServicePackageDetailTemp.CategoryItemId IS NOT NULL THEN #ServicePackageDetailTemp.CategoryItemId
+				ELSE nxtPackage.CategoryItemId
+				END,
+				nxtPackage.Description = CASE
+				WHEN #ServicePackageDetailTemp.Description IS NOT NULL THEN #ServicePackageDetailTemp.Description
+				ELSE nxtPackage.Description
+				END,
+				nxtPackage.Active = CASE
+				WHEN #ServicePackageDetailTemp.Active IS NOT NULL THEN #ServicePackageDetailTemp.Active
+				ELSE nxtPackage.Active
+				END
+			FROM nxtPackage, #ServicePackageDetailTemp 
+			WHERE nxtPackage.PackageId = @packageId;
+			SET @message = 'Package updated';
+		END
+		ELSE
+		BEGIN
+			SET @message = 'Given Package Id doesnt exist';
+		END	
+	END
+
+	SELECT @message as message;
+END
+
+
+--------------------------------------------------------------------------------------------
+-----------------------Add or update service PackageItems-----------------------------------
+CREATE PROCEDURE dbo.spAddUpdateServicePackageItem
+@json NVARCHAR(max),
+@packageItemId INT
+AS
+BEGIN
+	DECLARE @message varchar(40);
+	IF OBJECT_ID('tempdb..#ServicePackageItemDetailTemp') IS NOT NULL
+	DROP TABLE #ServicePackageItemDetailTemp;
+	-- add the json data to tempTable
+    select 
+        json.PackageItemName, json.PackageId,
+        json.[Description], json.Active, json.Rate, json.OfferRate
+    INTO #ServicePackageItemDetailTemp FROM OPENJSON(@json)
+        with (
+            PackageItemName varchar(50) '$.PackageItemName', 
+            PackageId int '$.PackageId',
+            [Description] [varchar](500) '$.Description',
+            Active int '$.Active',
+			Rate float '$.Rate',
+			OfferRate float '$.OfferRate'			
+        )json
+	-- if packageItemId is null then the procedure will add the serviceItem
+	-- else it will update the existing serviceItem
+	If @packageItemId IS NULL
+	BEGIN
+		INSERT INTO nxtPackageItemRate(PackageItemName, PackageId, [Description], Active, Rate, OfferRate)
+		SELECT
+		PackageItemName, 
+		PackageId, 
+		[Description], 
+		COALESCE(Active, 1) AS Active,
+		Rate, 
+		OfferRate
+		FROM #ServicePackageItemDetailTemp;
+		SET @message = 'Package Item inserted';
+	END
+	ELSE
+	BEGIN
+		IF EXISTS (SELECT PackageItemsId from nxtPackageItemRate where PackageItemsId=@packageItemId)
+		BEGIN
+			UPDATE nxtPackageItemRate
+			SET 
+				nxtPackageItemRate.PackageItemName = CASE
+				WHEN #ServicePackageItemDetailTemp.PackageItemName IS NOT NULL THEN #ServicePackageItemDetailTemp.PackageItemName
+				ELSE nxtPackageItemRate.PackageItemName
+				END,
+				nxtPackageItemRate.PackageId = CASE
+				WHEN #ServicePackageItemDetailTemp.PackageId IS NOT NULL THEN #ServicePackageItemDetailTemp.PackageId
+				ELSE nxtPackageItemRate.PackageId
+				END,
+				nxtPackageItemRate.Description = CASE
+				WHEN #ServicePackageItemDetailTemp.Description IS NOT NULL THEN #ServicePackageItemDetailTemp.Description
+				ELSE nxtPackageItemRate.Description
+				END,
+				nxtPackageItemRate.Active = CASE
+				WHEN #ServicePackageItemDetailTemp.Active IS NOT NULL THEN #ServicePackageItemDetailTemp.Active
+				ELSE nxtPackageItemRate.Active
+				END,
+				nxtPackageItemRate.Rate = CASE
+				WHEN #ServicePackageItemDetailTemp.Rate IS NOT NULL THEN #ServicePackageItemDetailTemp.Rate
+				ELSE nxtPackageItemRate.Rate
+				END,
+				nxtPackageItemRate.OfferRate = CASE
+				WHEN #ServicePackageItemDetailTemp.OfferRate IS NOT NULL THEN #ServicePackageItemDetailTemp.OfferRate
+				ELSE nxtPackageItemRate.OfferRate
+				END								
+			FROM nxtPackageItemRate, #ServicePackageItemDetailTemp 
+			WHERE nxtPackageItemRate.PackageItemsId = @packageItemId;
+			SET @message = 'Package Item updated';
+		END
+		ELSE
+		BEGIN
+			SET @message = 'Given Package Item Id doesnt exist';
+		END	
+	END
+
+	SELECT @message as message;
+END
+
+
+--------------------------------------------------------------------------------------------
+-----------------------Add or update service RepairItems-----------------------------------
+
+CREATE PROCEDURE dbo.spAddUpdateServiceRepairItem
+@json NVARCHAR(max),
+@RepairItemId INT
+AS
+BEGIN
+	DECLARE @message varchar(40);
+	IF OBJECT_ID('tempdb..#ServiceRepairItemDetailTemp') IS NOT NULL
+	DROP TABLE #ServiceRepairItemDetailTemp;
+	-- add the json data to tempTable
+    select 
+        json.RepairItems, json.CategoryItemId,
+        json.Active
+    INTO #ServiceRepairItemDetailTemp FROM OPENJSON(@json)
+        with (
+            RepairItems varchar(50) '$.RepairItems', 
+            CategoryItemId int '$.CategoryItemId',
+            Active int '$.Active'
+        )json
+	-- if RepairItemId is null then the procedure will add the serviceItem
+	-- else it will update the existing serviceItem
+	If @RepairItemId IS NULL
+	BEGIN
+		INSERT INTO nxtRepairItems(RepairItems, CategoryItemId, Active)
+		SELECT
+		RepairItems, 
+		CategoryItemId, 
+		COALESCE(Active, 1) AS Active
+		FROM #ServiceRepairItemDetailTemp;
+		SET @message = 'Package Item inserted';
+	END
+	ELSE
+	BEGIN
+		IF EXISTS (SELECT RepairItemId from nxtRepairItems where RepairItemId=@RepairItemId)
+		BEGIN
+			UPDATE nxtRepairItems
+			SET 
+				nxtRepairItems.RepairItems = CASE
+				WHEN #ServiceRepairItemDetailTemp.RepairItems IS NOT NULL THEN #ServiceRepairItemDetailTemp.RepairItems
+				ELSE nxtRepairItems.RepairItems
+				END,
+				nxtRepairItems.CategoryItemId = CASE
+				WHEN #ServiceRepairItemDetailTemp.CategoryItemId IS NOT NULL THEN #ServiceRepairItemDetailTemp.CategoryItemId
+				ELSE nxtRepairItems.CategoryItemId
+				END,
+				nxtRepairItems.Active = CASE
+				WHEN #ServiceRepairItemDetailTemp.Active IS NOT NULL THEN #ServiceRepairItemDetailTemp.Active
+				ELSE nxtRepairItems.Active
+				END
+			FROM nxtRepairItems, #ServiceRepairItemDetailTemp 
+			WHERE nxtRepairItems.RepairItemId = @RepairItemId;
+			SET @message = 'Package Item updated';
+		END
+		ELSE
+		BEGIN
+			SET @message = 'Given Package Item Id doesnt exist';
+		END	
+	END
+
+	SELECT @message as message;
+END
+
+--------------------------------------------------------------------------------------------
+-----------------------Add or update service Repair Parts-----------------------------------
+
+CREATE PROCEDURE dbo.spAddUpdateServiceRepairParts
+@json NVARCHAR(max),
+@RepairItemsAndRate_Id INT
+AS
+BEGIN
+	DECLARE @message varchar(120);
+	IF OBJECT_ID('tempdb..#ServiceRepairPartItemDetailTemp') IS NOT NULL
+	DROP TABLE #ServiceRepairPartItemDetailTemp;
+	-- add the json data to tempTable
+    select 
+        json.RepairItemsPart, json.RepairItemId,
+		json.Rate, json.OfferRate,
+        json.Active, json.Min_Rate,
+		json.Min_OfferRate
+    INTO #ServiceRepairPartItemDetailTemp FROM OPENJSON(@json)
+        with (
+            RepairItemsPart varchar(50) '$.RepairItemsPart', 
+            RepairItemId int '$.RepairItemId',
+			Rate float '$.Rate',
+			OfferRate float '$.OfferRate',			
+            Active int '$.Active',
+			Min_Rate float '$.Min_Rate',
+			Min_OfferRate float '$.Min_OfferRate'						
+        )json
+	-- if RepairItemsAndRate_Id is null then the procedure will add the serviceItem
+	-- else it will update the existing serviceItem
+	If @RepairItemsAndRate_Id IS NULL
+	BEGIN
+		INSERT INTO nxtRepairServiceCharge(RepairItemsPart, RepairItemId, Rate, OfferRate, Active, Min_Rate, Min_OfferRate)
+		SELECT
+		RepairItemsPart, 
+		RepairItemId, 
+		Rate,
+		OfferRate,
+		COALESCE(Active, 1) AS Active,
+		Min_Rate,
+		Min_OfferRate
+		FROM #ServiceRepairPartItemDetailTemp;
+		SET @message = 'Repair Item Parts and Charge inserted';
+	END
+	ELSE
+	BEGIN
+		IF EXISTS (SELECT RepairItemsAndRate_Id from nxtRepairServiceCharge where RepairItemsAndRate_Id=@RepairItemsAndRate_Id)
+		BEGIN
+			UPDATE nxtRepairServiceCharge
+			SET 
+				nxtRepairServiceCharge.RepairItemsPart = CASE
+				WHEN #ServiceRepairPartItemDetailTemp.RepairItemsPart IS NOT NULL THEN #ServiceRepairPartItemDetailTemp.RepairItemsPart
+				ELSE nxtRepairServiceCharge.RepairItemsPart
+				END,
+				nxtRepairServiceCharge.RepairItemId = CASE
+				WHEN #ServiceRepairPartItemDetailTemp.RepairItemId IS NOT NULL THEN #ServiceRepairPartItemDetailTemp.RepairItemId
+				ELSE nxtRepairServiceCharge.RepairItemId
+				END,
+				nxtRepairServiceCharge.Rate = CASE
+				WHEN #ServiceRepairPartItemDetailTemp.Rate IS NOT NULL THEN #ServiceRepairPartItemDetailTemp.Rate
+				ELSE nxtRepairServiceCharge.Rate
+				END,
+				nxtRepairServiceCharge.OfferRate = CASE
+				WHEN #ServiceRepairPartItemDetailTemp.OfferRate IS NOT NULL THEN #ServiceRepairPartItemDetailTemp.OfferRate
+				ELSE nxtRepairServiceCharge.OfferRate
+				END,								
+				nxtRepairServiceCharge.Active = CASE
+				WHEN #ServiceRepairPartItemDetailTemp.Active IS NOT NULL THEN #ServiceRepairPartItemDetailTemp.Active
+				ELSE nxtRepairServiceCharge.Active
+				END,
+				nxtRepairServiceCharge.Min_Rate = CASE
+				WHEN #ServiceRepairPartItemDetailTemp.Min_Rate IS NOT NULL THEN #ServiceRepairPartItemDetailTemp.Min_Rate
+				ELSE nxtRepairServiceCharge.Min_Rate
+				END,
+				nxtRepairServiceCharge.Min_OfferRate = CASE
+				WHEN #ServiceRepairPartItemDetailTemp.Min_OfferRate IS NOT NULL THEN #ServiceRepairPartItemDetailTemp.Min_OfferRate
+				ELSE nxtRepairServiceCharge.Min_OfferRate
+				END								
+			FROM nxtRepairServiceCharge, #ServiceRepairPartItemDetailTemp 
+			WHERE nxtRepairServiceCharge.RepairItemsAndRate_Id = @RepairItemsAndRate_Id;
+			SET @message = 'Repair Item Parts and Charge updated';
+		END
+		ELSE
+		BEGIN
+			SET @message = 'Given Repair Item Parts Id doesnt exist';
+		END	
+	END
+
+	SELECT @message as message;
+END

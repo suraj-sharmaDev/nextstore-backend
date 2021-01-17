@@ -8,6 +8,8 @@ const {
   merchant,
   shop,
   service,
+  servicePackage,
+  serviceRepair,
   order,
 } = require("./routes");
 const bodyParser = require("body-parser");
@@ -27,6 +29,8 @@ app.use("/shop", jsonParser, shop);
 app.use("/merchant", jsonParser, merchant);
 app.use("/order", jsonParser, order);
 app.use("/service", jsonParser, service);
+app.use("/servicePackage", jsonParser, servicePackage);
+app.use("/serviceRepair", jsonParser, serviceRepair);
 
 app.get("/", (req, res) => {
   res.send({ path: 404 });
