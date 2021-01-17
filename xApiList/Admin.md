@@ -351,16 +351,16 @@
     ```
 
 12. Get Service Item for the service Category
-    https://nxtshops.com/searchApi/service/serviceItem/CategoryId
+    https://nxtshops.com/searchApi/service/serviceItem/CategoryId?isActive=0
 
 13. Get available repair and packages for service Item
-    https://nxtshops.com/searchApi/service/serviceDetails/ServiceItemId
+    https://nxtshops.com/searchApi/service/serviceDetails/ServiceItemId?isActive=0
 
 14. Get package rate for packages
-    https://nxtshops.com/searchApi/service/packageRate/PackageId
+    https://nxtshops.com/searchApi/service/packageRate/PackageId?isActive=0
 
 15. Get Service charge and Repair Parts Rate for RepairItemId
-    https://nxtshops.com/searchApi/service/repairParts/RepairItemId
+    https://nxtshops.com/searchApi/service/repairParts/RepairItemId?isActive=0
 
 16. Add a serviceProvider to a merchantId
     https://nxtshops.com/merchantApi/service

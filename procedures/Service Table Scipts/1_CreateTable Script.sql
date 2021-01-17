@@ -233,5 +233,6 @@ CREATE TABLE [dbo].[nxtServiceItemSymptoms](
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	CategoryItemId int NOT NULL FOREIGN KEY REFERENCES nxtServiceItem(CategoryItemId),
 	[type] varchar(50) NULL,
-	[symptom] varchar(100) NULL	
+	[symptom] varchar(100) NULL,
+	[Active] [int] NULL
 );

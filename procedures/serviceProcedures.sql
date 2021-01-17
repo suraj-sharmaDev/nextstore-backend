@@ -119,11 +119,13 @@ GO;
 
 ----------Get all service Item for belonging to service Category
 CREATE PROCEDURE dbo.spGetAllServicesForCategory
-@categoryId INT
+@categoryId INT,
+@onlyActive INT = 1
 AS
 BEGIN
 	SELECT * FROM nxtServiceItem
-	where CategoryId = @categoryId;
+	where CategoryId = @categoryId
+	and Active >= @onlyActive;
 END
 
 GO;
@@ -131,7 +133,8 @@ GO;
 -- Get packages and repair items belonging to serviceItem
 
 CREATE PROCEDURE dbo.spGetAllDetailsInService
-@categoryItemId int
+@categoryItemId int,
+@onlyActive INT = 1
 AS
 BEGIN
 	with x(json) as
@@ -140,16 +143,19 @@ BEGIN
 			repairItems = (
 				SELECT * FROM nxtRepairItems
 				where CategoryItemId = @categoryItemId
+				and Active >= @onlyActive
 				FOR JSON PATH, INCLUDE_NULL_VALUES	
 			),
 			symptoms = (
 				SELECT * FROM nxtServiceItemSymptoms
 				where CategoryItemId = @categoryItemId
+				and Active >= @onlyActive
 				FOR JSON PATH, INCLUDE_NULL_VALUES					
 			),
 			packages = (
 				SELECT * FROM nxtPackage np 
 				where CategoryItemId = @categoryItemId
+				and Active >= @onlyActive
 				FOR JSON PATH, INCLUDE_NULL_VALUES					
 			)
 		For JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER				
@@ -161,11 +167,13 @@ GO;
 
 ---Get Package Item rate
 CREATE PROCEDURE dbo.spGetPackageItemRate
-@packageId int
+@packageId int,
+@onlyActive INT = 1
 AS
 BEGIN
 	SELECT * from nxtPackageItemRate
 	where PackageId = @packageId
+	and Active >= @onlyActive;
 END
 
 GO;
@@ -173,7 +181,8 @@ GO;
 ---Get Repair Service Charge and Parts Rate
 
 CREATE PROCEDURE dbo.spGetRepairPartsServiceCharge
-@repairItemId int
+@repairItemId int,
+@onlyActive INT = 1
 AS
 BEGIN
 	-- first we have to check if its twowheeler or other
@@ -233,6 +242,7 @@ BEGIN
 					Active 
 					FROM RepairPartsRate
 					where RepairItemID = @repairItemId
+					and Active >= @onlyActive
 					FOR JSON PATH, INCLUDE_NULL_VALUES	
 				),
 				repairServiceCharge = (
@@ -246,6 +256,7 @@ BEGIN
 					convert(numeric(38,0),cast(Min_OfferRate AS float)) as Min_OfferRate				
 					FROM nxtRepairServiceCharge
 					where RepairItemID = @repairItemId
+					and Active >= @onlyActive
 					FOR JSON PATH, INCLUDE_NULL_VALUES					
 				)
 			For JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER				
