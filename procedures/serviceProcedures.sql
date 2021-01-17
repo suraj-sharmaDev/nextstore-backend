@@ -253,3 +253,80 @@ BEGIN
 		select json from x;
 	END
 END
+
+
+--------------------------------------------------------------------------------------------
+-----------------------Add or update service Item-------------------------------------------
+CREATE PROCEDURE dbo.spAddUpdateServiceItem
+@json NVARCHAR(max),
+@serviceItemId INT
+AS
+BEGIN
+	DECLARE @message varchar(40);
+	IF OBJECT_ID('tempdb..#ServiceItemDetailTemp') IS NOT NULL
+	DROP TABLE #ServiceItemDetailTemp;
+	-- add the json data to tempTable
+    select 
+        json.CategoryItemName, json.CategoryId,
+        json.[Description], json.Active, 
+        json.[Type]
+    INTO #ServiceItemDetailTemp FROM OPENJSON(@json)
+        with (
+            CategoryItemName varchar(50) '$.CategoryItemName', 
+            CategoryId int '$.CategoryId',
+            [Description] [varchar](500) '$.Description',
+            Active int '$.Active',
+            [Type] [varchar](30) '$.Type'
+        )json
+	-- if serviceItemId is null then the procedure will add the serviceItem
+	-- else it will update the existing serviceItem
+	If @serviceItemId IS NULL
+	BEGIN
+		INSERT INTO nxtServiceItem(CategoryItemName, CategoryId, [Description], Active, [Type])
+		SELECT
+		CategoryItemName, 
+		CategoryId, 
+		[Description], 
+		COALESCE(Active, 1) AS Active, 
+		[Type]
+		FROM #ServiceItemDetailTemp;
+		SET @message = 'service item inserted';
+	END
+	ELSE
+	BEGIN
+		IF EXISTS (SELECT CategoryItemId from nxtServiceItem where CategoryItemId=@serviceItemId)
+		BEGIN
+			UPDATE nxtServiceItem
+			SET 
+				nxtServiceItem.CategoryItemName = CASE
+				WHEN #ServiceItemDetailTemp.CategoryItemName IS NOT NULL THEN #ServiceItemDetailTemp.CategoryItemName
+				ELSE nxtServiceItem.CategoryItemName
+				END,
+				nxtServiceItem.CategoryId = CASE
+				WHEN #ServiceItemDetailTemp.CategoryId IS NOT NULL THEN #ServiceItemDetailTemp.CategoryId
+				ELSE nxtServiceItem.CategoryId
+				END,
+				nxtServiceItem.Description = CASE
+				WHEN #ServiceItemDetailTemp.Description IS NOT NULL THEN #ServiceItemDetailTemp.Description
+				ELSE nxtServiceItem.Description
+				END,
+				nxtServiceItem.Active = CASE
+				WHEN #ServiceItemDetailTemp.Active IS NOT NULL THEN #ServiceItemDetailTemp.Active
+				ELSE nxtServiceItem.Active
+				END,
+				nxtServiceItem.Type = CASE
+				WHEN #ServiceItemDetailTemp.Type IS NOT NULL THEN #ServiceItemDetailTemp.Type
+				ELSE nxtServiceItem.Type
+				END						
+			FROM nxtServiceItem, #ServiceItemDetailTemp 
+			WHERE nxtServiceItem.CategoryItemId = @serviceItemId;
+			SET @message = 'service item updated';
+		END
+		ELSE
+		BEGIN
+			SET @message = 'Given serviceItem Id doesnt exist';
+		END	
+	END
+
+	SELECT @message as message;
+END

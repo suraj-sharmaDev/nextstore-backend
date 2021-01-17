@@ -212,19 +212,43 @@
    #Get All Services Categorically and near the user
    https://nxtshops.com/searchApi/service/services/9.230385/76.515898
 
-2. Get Service Item for the service Category
+2. Add service Item
+   Method : POST
+
+   ```javascript
+   {
+      "CategoryItemName": "new service",
+      "CategoryId": 1,
+      "Description": "some value",
+      "Active": 1/0
+   }
+   ```
+
+3. Update service Item
+   Method : PUT
+
+   ```javascript
+   {
+      "CategoryItemName": "new service",
+      "CategoryId": 1,
+      "Description": "some value",
+      "Active": 1/0
+   }
+   ```
+
+4. Get Service Item for the service Category
    https://nxtshops.com/searchApi/service/serviceItem/CategoryId
 
-3. Get available repair and packages for service Item
+5. Get available repair and packages for service Item
    https://nxtshops.com/searchApi/service/serviceDetails/ServiceItemId
 
-4. Get package rate for packages
+6. Get package rate for packages
    https://nxtshops.com/searchApi/service/packageRate/PackageId
 
-5. Get Service charge and Repair Parts Rate for RepairItemId
+7. Get Service charge and Repair Parts Rate for RepairItemId
    https://nxtshops.com/searchApi/service/repairParts/RepairItemId
 
-6. Add a serviceProvider to a merchantId
+8. Add a serviceProvider to a merchantId
    https://nxtshops.com/merchantApi/service
    POST : JSON
    ```javascript
@@ -242,7 +266,7 @@
    	}
    }
    ```
-7. Update a serviceProvider
+9. Update a serviceProvider
    https://nxtshops.com/merchantApi/service/serviceProviderId
    PUT : JSON
 
@@ -262,11 +286,11 @@
    }
    ```
 
-8. Get all service providers abiding to certain criteria or filtering
-   https://nxtshops.com/adminApi/service/pageNo?providerName=a&merchantId=b&onlineStatus=0/1
-   Page No is basically limit, each page will have max 15 service providers
-   #merchantId here is emailId which is string
-   e.g)https://nxtshops.com/adminApi/service/1?onlineStatus=1&providerName=Motor House
+10. Get all service providers abiding to certain criteria or filtering
+    https://nxtshops.com/adminApi/service/pageNo?providerName=a&merchantId=b&onlineStatus=0/1
+    Page No is basically limit, each page will have max 15 service providers
+    #merchantId here is emailId which is string
+    e.g)https://nxtshops.com/adminApi/service/1?onlineStatus=1&providerName=Motor House
 
 ## Product Master
 

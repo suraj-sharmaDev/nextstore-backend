@@ -65,4 +65,61 @@ router.get("/:status/:page/:startDate?/:endDate?", async (req, res, next) => {
   }
 });
 
+router.post("/", async (req, res, next) => {
+  let error = true;
+  let status = null;
+  try {
+    status = await sequelize
+      .query("exec spAddUpdateServiceItem :json, :serviceItemId", {
+        replacements: {
+          json: JSON.stringify(req.body),
+          serviceItemId: null,
+        },
+      })
+      .spread((value, message) => {
+        //since the return data will be string and not parsed
+        //lets parse it
+        return value;
+      });
+    error = false;
+  } catch (err) {
+    error = true;
+    console.log(err);
+  }
+  if (error) {
+    res.send({ error: true, message: "db_error" });
+  } else {
+    res.send(status);
+  }
+});
+
+router.put("/:serviceItemId", async (req, res, next) => {
+  let error = true;
+  let status = null;
+  try {
+    const { serviceItemId } = req.params;
+    status = await sequelize
+      .query("exec spAddUpdateServiceItem :json, :serviceItemId", {
+        replacements: {
+          json: JSON.stringify(req.body),
+          serviceItemId: serviceItemId,
+        },
+      })
+      .spread((value, message) => {
+        //since the return data will be string and not parsed
+        //lets parse it
+        return value;
+      });
+    error = false;
+  } catch (err) {
+    error = true;
+    console.log(err);
+  }
+  if (error) {
+    res.send({ error: true, message: "db_error" });
+  } else {
+    res.send(status);
+  }
+});
+
 module.exports = router;
