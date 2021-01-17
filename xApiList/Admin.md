@@ -213,6 +213,7 @@
    https://nxtshops.com/searchApi/service/services/9.230385/76.515898
 
 2. Add service Item
+   https://nxtshops.com/adminApi/service
    Method : POST
 
    ```javascript
