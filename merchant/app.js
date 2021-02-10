@@ -6,7 +6,7 @@ const createError = require('http-errors');
 const {merchant, login, shop, service, category, product} = require('./routes');
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3007;
 app.use(cors());
 //create a middleware for each route
 const jsonParser = express.json();

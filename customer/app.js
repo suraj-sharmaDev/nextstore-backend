@@ -10,7 +10,7 @@ var {
 } = require('./routes');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3006;
 app.use(cors());
 //create a middleware for each route
 const jsonParser = express.json();

@@ -15,7 +15,7 @@ const {
 const bodyParser = require("body-parser");
 const upload = require("./middleware/fileUpload");
 const app = express();
-const port = process.env.PORT || 3004;
+const port = process.env.PORT || 3010;
 app.use(cors());
 
 //create a middleware for each route

@@ -6,7 +6,7 @@ const createError = require('http-errors');
 const {order, quote, operations} = require('./routes');
 
 const app = express();
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 3008;
 app.use(cors());
 //create a middleware for each route
 const jsonParser = express.json();

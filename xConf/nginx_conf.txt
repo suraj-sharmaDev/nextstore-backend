@@ -4,23 +4,23 @@
 -----------------------------------------------------------
 
 upstream customer {
-	server 127.0.0.1:3000;
+	server 127.0.0.1:3006;
 }
 
 upstream merchant {
-	server 127.0.0.1:3001;
+	server 127.0.0.1:3007;
 }
 
 upstream order {
-	server 127.0.0.1:3002;
+	server 127.0.0.1:3008;
 }
 
 upstream search {
-	server 127.0.0.1:3003;
+	server 127.0.0.1:3009;
 }
 
 upstream admin {
-	server 127.0.0.1:3004;
+	server 127.0.0.1:3010;
 }
 
 server{
