@@ -1,27 +1,27 @@
 module.exports = {
   apps : [
     {
-      name: 'customer',
+      name: 'customer_nextstore',
       script: './customer/app.js',
       watch: '.'
     },
     {
-      name: 'merchant',
+      name: 'merchant_nextstore',
       script: './merchant/app.js',
       watch: '.'
     },
     {
-      name: 'order',
+      name: 'order_nextstore',
       script: './order/app.js',
       watch: '.'
     },
     {
-      name: 'search',
+      name: 'search_nextstore',
       script: './search/app.js',
       watch: '.'
     },
     {
-      name: 'admin',
+      name: 'admin_nextstore',
       script: './admin/app.js',
       watch: '.'
     }    
