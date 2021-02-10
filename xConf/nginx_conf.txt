@@ -3,82 +3,64 @@
     sudo systemctl restart nginx
 -----------------------------------------------------------
 
-upstream customer {
-	server 127.0.0.1:3006;
-}
+ server{
+    listen 80;
 
-upstream merchant {
-	server 127.0.0.1:3007;
-}
+    server_name nxtshops.com www.nxtshops.com;
 
-upstream order {
-	server 127.0.0.1:3008;
-}
-
-upstream search {
-	server 127.0.0.1:3009;
-}
-
-upstream admin {
-	server 127.0.0.1:3010;
-}
-
-server{
-	listen 80;
-
-	location /customerApi/{
-		proxy_pass http://customer/;
+    location /customerApi/{
+        proxy_pass http://127.0.0.1:3006/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;		
-	}
+        proxy_cache_bypass $http_upgrade; 
+    }
 
-	location /merchantApi/{
-		proxy_pass http://merchant/;
+    location /merchantApi/{
+        proxy_pass http://127.0.0.1:3007/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;		
-	}
+        proxy_cache_bypass $http_upgrade; 
+    }
 
-	location /orderApi/{
-		proxy_pass http://order/;
+    location /orderApi/{
+        proxy_pass http://127.0.0.1:3008/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;		
-	}	
+        proxy_cache_bypass $http_upgrade; 
+    } 
 
-	location /searchApi/{
-		proxy_pass http://search/;
+    location /searchApi/{
+        proxy_pass http://127.0.0.1:3009/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;		
-	}
-	
+        proxy_cache_bypass $http_upgrade; 
+    }
+    
     location /adminApi/{
-		proxy_pass http://admin/;
+        proxy_pass http://127.0.0.1:3010/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;		
-	}
+        proxy_cache_bypass $http_upgrade; 
+    }
 
-	location /assets/ {
+    location /assets/ {
         #change this to the location of images
-        #root "/home/suraj/nextstore-server/";
+        root "/root/nextstore-server/";
         #root "/home/suraj/Desktop/localhost/";
     }
 
-#	location ~ \.(jpg|jpeg|png) {
-#        root "/home/suraj/Desktop/localhost/assets";
-#   }
+    # location ~ \.(jpg|jpeg|png) {
+        # root "/home/suraj/Desktop/localhost/assets";
+    # }
 
-}
+ }
