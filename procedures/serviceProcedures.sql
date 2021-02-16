@@ -17,6 +17,9 @@ BEGIN
 	DECLARE @shopCategoryId INT;
 
 	DECLARE @distance FLOAT;
+	DECLARE @shopLat FLOAT;
+	DECLARE @shopLng FLOAT;
+
 	DECLARE @serviceProviderTable table (
 		id INT,
 		categoryId INT,
@@ -46,20 +49,27 @@ BEGIN
 		begin
 			
 			--find distance between shop and customer
-			SELECT @distance = geography::Point(@custLat, @custLng, 4326).STDistance(
-				geography::Point(latitude, longitude, 4326)
-			) from serviceProviderAddress
+			SELECT @shopLat = latitude, @shopLng = longitude 
+			from serviceProviderAddress
 			where serviceProviderAddress.serviceProviderId = @id;
-			-- convert meters to KMs
-			SET @distance = ROUND(@distance/1000, 2);
-			--check if distance is less than the coverage of shop
-			If(@distance <= @coverage)
-			begin
-				--if user is within coverage distance add shop to output table
-				INSERT INTO @serviceProviderTable(id, categoryId, onlineStatus, fcmToken, 
-					coverage, distance) 
-				values (@id, @shopCategoryId, @onlineStatus, @fcmToken, @coverage, @distance);
-			end
+			
+			-- check if shopLat and shopLng are not null
+			if(@shopLat IS NOT NULL AND @shopLng IS NOT NULL)
+			BEGIN 
+				SET @distance = geography::Point(@custLat, @custLng, 4326).STDistance(
+					geography::Point(@shopLat, @shopLng, 4326)
+				);
+				-- convert meters to KMs
+				SET @distance = ROUND(@distance/1000, 2);
+				--check if distance is less than the coverage of shop
+				If(@distance <= @coverage)
+				begin
+					--if user is within coverage distance add shop to output table
+					INSERT INTO @serviceProviderTable(id, categoryId, onlineStatus, fcmToken, 
+						coverage, distance) 
+					values (@id, @shopCategoryId, @onlineStatus, @fcmToken, @coverage, @distance);
+				end			
+			END
 			
 			Fetch next from shopCursor into @id, @shopCategoryId, @onlineStatus, @fcmToken, @coverage;
 		end
