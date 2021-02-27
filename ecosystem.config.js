@@ -24,7 +24,12 @@ module.exports = {
       name: 'admin_nextstore',
       script: './admin/app.js',
       watch: '.'
-    }    
+    },
+    {
+      name: 'payment_nextstore',
+      script: './payment/app.js',
+      watch: '.'
+    },    
   ],
 
   deploy : {
