@@ -77,7 +77,7 @@ BEGIN
 		)A
 		FOR JSON PATH
 	) as fcmToken,
-	@orderMasterId as orderMasterId, 
+	@orderMasterId as orderId, 
 	json as orderDetail from x;
 
 END

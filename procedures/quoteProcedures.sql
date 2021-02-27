@@ -47,23 +47,23 @@ BEGIN
 	DECLARE @custLat FLOAT = JSON_VALUE(@deliveryAddress, '$.coordinate.latitude');
 	DECLARE @custLng FLOAT = JSON_VALUE(@deliveryAddress, '$.coordinate.longitude');
 
-	IF OBJECT_ID('tempdb..#NearByServiceProviders') IS NOT NULL
-	    Truncate TABLE #NearByServiceProviders
-	else
-	    CREATE TABLE #NearByServiceProviders
-	    (
-			id int,
-			categoryId int,
-			onlineStatus BIT,
-			fcmToken NVARCHAR(255),
-			coverage INT,
-			distance FLOAT
-	    )
+	-- IF OBJECT_ID('tempdb..#NearByServiceProviders') IS NOT NULL
+	--     Truncate TABLE #NearByServiceProviders
+	-- else
+	--     CREATE TABLE #NearByServiceProviders
+	--     (
+	-- 		id int,
+	-- 		categoryId int,
+	-- 		onlineStatus BIT,
+	-- 		fcmToken NVARCHAR(255),
+	-- 		coverage INT,
+	-- 		distance FLOAT
+	--     )
 	    
 	-- insert into quotemaster
 	
-	insert into quotemaster (customerId, [type], deliveryAddress, createdAt)
-	VALUES (@customerId, @type, @deliveryAddress, @createdAt);
+	insert into quotemaster (customerId, [type], categoryId, deliveryAddress, createdAt)
+	VALUES (@customerId, @type, @categoryId, @deliveryAddress, @createdAt);
 	
 	--then bulk insert into quoteDetail with the quoteMasterId
 	SET @quoteMasterId = SCOPE_IDENTITY();
@@ -78,20 +78,20 @@ BEGIN
 	  )json
 
 	 -- Find all service providers nearby to send them the quotations
-	INSERT INTO #NearByServiceProviders
-		exec spfindServiceProvidersNearby @custLat, @custLng, @categoryId; 
+	-- INSERT INTO #NearByServiceProviders
+	-- 	exec spfindServiceProvidersNearby @custLat, @custLng, @categoryId; 
 
-	INSERT INTO quotedServiceProviders (serviceProviderId, quoteMasterId )
-		SELECT id as serviceProviderId, @quoteMasterId as quoteMasterId
-		FROM #NearByServiceProviders
+	-- INSERT INTO quotedServiceProviders (serviceProviderId, quoteMasterId )
+	-- 	SELECT id as serviceProviderId, @quoteMasterId as quoteMasterId
+	-- 	FROM #NearByServiceProviders
 		
-	SELECT fcmToken from #NearByServiceProviders
-	WHERE fcmToken IS NOT NULL AND fcmToken <> ''
-	UNION ALL
-	SELECT adminTable.fcmToken
-	FROM adminTable
-	where adminTable.fcmToken IS NOT NULL and adminTable.fcmToken <> ''	;
-	 
+	-- SELECT fcmToken from #NearByServiceProviders
+	-- WHERE fcmToken IS NOT NULL AND fcmToken <> ''
+	-- UNION ALL
+	-- SELECT adminTable.fcmToken
+	-- FROM adminTable
+	-- where adminTable.fcmToken IS NOT NULL and adminTable.fcmToken <> ''	;
+	 SELECT @quoteMasterId as quoteId;
 END
 
 GO;

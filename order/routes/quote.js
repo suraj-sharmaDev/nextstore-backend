@@ -68,6 +68,7 @@ router.get('/:serviceProviderId/:status/:page/:startDate?/:endDate?', async(req,
 
 router.post('/', async(req, res, next)=>{
 	//create a new quote by customer
+	let quoteId;
 	try {
 		const serviceProvider = await sequelize.query(
 			'exec spCreateNewQuote :json', 
@@ -75,26 +76,39 @@ router.post('/', async(req, res, next)=>{
 				replacements: { json: JSON.stringify(req.body) }
 			}).spread((user, created)=>{
 				return (user); 
-			})
-		const type = 'new_quote';
-		if(serviceProvider.length > 0){
-			let fcmToken = [];
-			serviceProvider.map((s)=>{
-				if(s.fcmToken != null){
-					fcmToken.push(s.fcmToken)
-				}
 			});
-			//send push notification to service providers only if valid fcmToken available
-			if(fcmToken.length > 0){
-				let data = {
-					fcmToken: fcmToken,
-					type: type
-				}
-				sendMessage(data);
-			}
-		}
+		quoteId = serviceProvider.quoteId;
+		/**
+		 * After payment gateway flow has been added we dont notify the admin and merchant
+		 * now itself.
+		 * The create order flow now is :
+		 * 1. Create a order
+		 * 2. Use the order Id to create payment
+		 * 3. Then pass order Id and payment Info to server and store
+		 * 4. Then notify required parties
+		 */
+	
+		 // const type = 'new_quote';
+		// if(serviceProvider.length > 0){
+		// 	let fcmToken = [];
+		// 	serviceProvider.map((s)=>{
+		// 		if(s.fcmToken != null){
+		// 			fcmToken.push(s.fcmToken)
+		// 		}
+		// 	});
+		// 	//send push notification to service providers only if valid fcmToken available
+		// 	if(fcmToken.length > 0){
+		// 		let data = {
+		// 			fcmToken: fcmToken,
+		// 			type: type
+		// 		}
+		// 		sendMessage(data);
+		// 	}
+		// }
+
 		//send api request back to client
-		res.send({message : 'created'});
+		res.send({message : 'created', quoteId});
+
 	} catch(e) {
 		// statements
 		res.send({error : true});

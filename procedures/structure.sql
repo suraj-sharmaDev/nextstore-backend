@@ -75,7 +75,7 @@ CREATE TABLE nextstore.dbo.orderMaster (
 	id int IDENTITY(1,1) NOT NULL,
 	customerId int NULL,
 	shopId int NULL,
-	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'unpaid',
 	createdAt datetimeoffset NULL,
 	deliveryAddress NVARCHAR(250) NULL,
 	CONSTRAINT PK__orderMas__3213E83F7DB14EFF PRIMARY KEY (id)
@@ -357,8 +357,9 @@ CREATE TABLE nextstore.dbo.notifications (
 CREATE TABLE nextstore.dbo.quoteMaster (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	customerId int NULL,
-	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'pending', --can be pending, accepted, rejected or completed
+	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'unpaid', --can be pending, accepted, rejected or completed
 	[type] NVARCHAR(30) NULL,	--can be repair or package
+	categoryId INT NULL,
 	[image] NVARCHAR(100) NULL, --if type is image then file url, used for storing bill image,	
 	deliveryAddress NVARCHAR(250) NULL,
 	createdAt datetimeoffset NULL
@@ -410,24 +411,17 @@ CREATE TABLE nextstore.dbo.quotationBiddings (
 ---------Payment Tables -------------
 
 ---------Order Payment Table---------
-CREATE TABLE nextstore.dbo.orderPayments (
+CREATE TABLE nextstore.dbo.payments (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	orderId int NOT NULL FOREIGN KEY REFERENCES orderMaster(id),
+	orderId int DEFAULT NULL,	
+	quoteId int DEFAULT NULL,
 	totalAmount int NOT NULL,
-	transactionId int NULL,
 	paymentMethod varchar(100) DEFAULT 'COD',
-	createdAt datetimeoffset NULL		
-);
-
----------Quote Payment Table---------
-CREATE TABLE nextstore.dbo.quotePayments (
-	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	quoteId int NOT NULL FOREIGN KEY REFERENCES quoteMaster(id),
-	quoteType varchar(100), ---can be package, repair or breakdown
-	totalAmount int NOT NULL,
-	transactionId int NULL,
-	paymentMethod varchar(100) DEFAULT 'COD',
-	createdAt datetimeoffset NULL		
+	razorpay_payment_id NVARCHAR(100),
+	razorpay_order_id NVARCHAR(100),
+	razorpay_signature NVARCHAR(255),
+	remarks NVARCHAR(255) DEFAULT NULL,
+	createdAt datetimeoffset NULL	
 );
 
 

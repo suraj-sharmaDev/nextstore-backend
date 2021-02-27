@@ -62,7 +62,7 @@ router.get('/:shopId/:status/:page/:startDate?/:endDate?', async(req, res, next)
 router.post('/:orderId?', async(req, res, next)=>{
 	//when orderId is not passed a new orderwill be created
 	//else orders will be added to existent order
-	let orderMasterId = null;
+	let orderId = null;
 	let orderDetail = null;
 	try {
 		if(!req.params.orderId){
@@ -76,33 +76,44 @@ router.post('/:orderId?', async(req, res, next)=>{
 							return user[0]; 
 						})
 			const type = 'new_order';
-			orderMasterId = shop.orderMasterId;
+			orderId = shop.orderId;
 			orderDetail = JSON.parse(shop.orderDetail);
-			if(shop.fcmToken!= null){
-				//fix the fcmTokens to array
-				let fcmTokens = [];
-				let parsedArray = JSON.parse(shop.fcmToken);
-				parsedArray.map((p)=>{
-					fcmTokens.push(p.fcmToken)
-				})
-				let data = {
-					fcmToken: fcmTokens,
-					orderId: orderMasterId,
-					type: type
-				}
-				sendMessage(data);
-			}
+			/**
+			 * After payment gateway flow has been added we dont notify the admin and merchant
+			 * now itself.
+			 * The create order flow now is :
+			 * 1. Create a order
+			 * 2. Use the order Id to create payment
+			 * 3. Then pass order Id and payment Info to server and store
+			 * 4. Then notify required parties
+			 */
+			
+			// if(shop.fcmToken!= null){
+			// 	//fix the fcmTokens to array
+			// 	let fcmTokens = [];
+			// 	let parsedArray = JSON.parse(shop.fcmToken);
+			// 	parsedArray.map((p)=>{
+			// 		fcmTokens.push(p.fcmToken)
+			// 	})
+			// 	let data = {
+			// 		fcmToken: fcmTokens,
+			// 		orderId: orderId,
+			// 		type: type
+			// 	}
+			// 	sendMessage(data);
+			// }
+
 		}
 		// else{
-		// 	await sequelize.query('exec spbulkCreateOrderDetail :json, :orderMasterId', { 
+		// 	await sequelize.query('exec spbulkCreateOrderDetail :json, :orderId', { 
 		// 		replacements: 
 		// 		{ 
 		// 			json: JSON.stringify(req.body), 
-		// 			orderMasterId: req.params.orderId
+		// 			orderId: req.params.orderId
 		// 		}
 		// 	});
 		// }
-		res.send({message : 'created', orderDetail: orderDetail});
+		res.send({message : 'created', orderDetail, orderId});
 	} catch(e) {
 		// statements
 		res.send({error : true});
