@@ -90,6 +90,7 @@ router.post('/:orderId?', async(req, res, next)=>{
 				res.send({
 					error: false,
 					message: 'created',
+					totalAmount: totalAmount,
 					razorPayOrderId: result.message.id
 				})
 			})
