@@ -41,10 +41,10 @@ router.post('/', async(req, res, next)=>{
 			});
 			// after getting result we have to send OTP to users mobile
 			//remaining
-			// sendMessage({
-			// 	mobile: user.mobile, 
-			// 	message: `Your nxtStores OTP is : ${user.otp}. Please DO NOT share this with anyone!.`
-			// });
+			sendMessage({
+				mobile: user.mobile, 
+				message: `Your nxtStores OTP is : ${user.otp}. Please DO NOT share this with anyone!.`
+			});
 			res.send(user);
 		}else{
 			res.json({error: true, message: 'invalid_number'});
