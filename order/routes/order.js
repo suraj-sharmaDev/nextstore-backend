@@ -91,7 +91,8 @@ router.post('/:orderId?', async(req, res, next)=>{
 					error: false,
 					message: 'created',
 					totalAmount: totalAmount,
-					razorPayOrderId: result.message.id
+					razorPayOrderId: result.message.id,
+					nxtstoresOrderId: orderId
 				})
 			})
 			.catch((err)=>res.send({error: true, message: err}))			
