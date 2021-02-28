@@ -99,24 +99,28 @@
    POST : JSON
    ```javascript
    {
-     "master": {
-   	"customerId": 1,
-   	"shopId": 1
-     },
-     "detail":[
-       {
-   		"productId": 1,
-   		"productName" : "soup",
-   		"price": 200,
-   	    "qty": 2
-       },
-       {
-   		"productId": 2,
-   		"productName" : "noodles",
-   		"price": 200,
-   	    "qty": 2
-       }
-      ]
+   "master": {
+      "customerId": 1,
+      "deliveryAddress": {
+         "id": 1,
+         "savedAs": "home",
+         "coordinate": {
+         "latitude": 9.173591,
+         "longitude": 76.555973
+         },
+         "houseDetail": "Check",
+         "landmark": "Ok"
+      },
+      "shopId": 2
+   },
+   "detail": [
+      {
+         "productId": 18423,
+         "productName": "AMBIPUR VANILA SPICE AIR SPARY 275G",
+         "price": 212,
+         "qty": 2
+      }
+   ]
    }
    ```
 3. Add orders to existent Order
