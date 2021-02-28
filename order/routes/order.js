@@ -82,7 +82,7 @@ router.post('/:orderId?', async(req, res, next)=>{
 			var options = {
 				amount: totalAmount * 100,  // amount in the smallest currency unit
 				currency: "INR",
-				receipt: orderId
+				receipt: `orderId:${orderId}`
 			};
 
 			createRazorPayOrder(options)
@@ -95,7 +95,7 @@ router.post('/:orderId?', async(req, res, next)=>{
 					nxtstoresOrderId: orderId
 				})
 			})
-			.catch((err)=>res.send({error: true, message: err}))			
+			.catch((err)=>res.send({error: true, message: err}))
 			/**
 			 * After payment gateway flow has been added we dont notify the admin and merchant
 			 * now itself.

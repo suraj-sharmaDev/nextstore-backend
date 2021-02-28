@@ -295,8 +295,9 @@ BEGIN
 	DECLARE @CGST int = JSON_VALUE(@json, '$.CGST');
 	DECLARE @GST int = JSON_VALUE(@json, '$.GST');
 	DECLARE @stdShipping int = JSON_VALUE(@json, '$.stdShipping');
-	DECLARE @minShippingDistance INT = JSON_VALUE(@json, '$.minShippingDistance');
-	DECLARE @extraShippingCharge INT = JSON_VALUE(@json, '$.extraShippingCharge');
+	DECLARE @serviceInitialPayment int = JSON_VALUE(@json, '$.serviceInitialPayment');	
+	-- DECLARE @minShippingDistance INT = JSON_VALUE(@json, '$.minShippingDistance');
+	-- DECLARE @extraShippingCharge INT = JSON_VALUE(@json, '$.extraShippingCharge');
 
 	UPDATE appConfig
 	SET 
@@ -319,7 +320,12 @@ BEGIN
 			CASE WHEN (@stdShipping IS NOT NULL)
 				THEN @stdShipping
 				ELSE appConfig.stdShipping
-			END
+			END,
+		appConfig.serviceInitialPayment = 
+			CASE WHEN (@serviceInitialPayment IS NOT NULL)
+				THEN @serviceInitialPayment
+				ELSE appConfig.serviceInitialPayment
+			END			
 		-- appConfig.minShippingDistance = 
 		-- 	CASE WHEN (@minShippingDistance IS NOT NULL)
 		-- 		THEN @minShippingDistance

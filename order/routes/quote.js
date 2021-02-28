@@ -1,6 +1,6 @@
 const express = require('express');
 const {sequelize} = require('../models');
-const sendMessage = require('../middleware/firebase');
+const {createRazorPayOrder} = require('../middleware/razorPayUtil');
 const router = express.Router();
 
 
@@ -78,6 +78,7 @@ router.post('/', async(req, res, next)=>{
 				return (user); 
 			});
 		quoteId = serviceProvider.quoteId;
+		totalAmount = serviceProvider.totalAmount;
 		/**
 		 * After payment gateway flow has been added we dont notify the admin and merchant
 		 * now itself.
@@ -87,7 +88,25 @@ router.post('/', async(req, res, next)=>{
 		 * 3. Then pass order Id and payment Info to server and store
 		 * 4. Then notify required parties
 		 */
-	
+
+		var options = {
+			amount: totalAmount * 100,  // amount in the smallest currency unit
+			currency: "INR",
+			receipt: `quoteId:${quoteId}`
+		};
+
+		createRazorPayOrder(options)
+		.then((result)=>{
+			res.send({
+				error: false,
+				message: 'created',
+				totalAmount: totalAmount,
+				razorPayOrderId: result.message.id,
+				nxtstoresQuoteId: quoteId
+			})
+		})
+		.catch((err)=>res.send({error: true, message: err}))
+
 		 // const type = 'new_quote';
 		// if(serviceProvider.length > 0){
 		// 	let fcmToken = [];
@@ -105,13 +124,9 @@ router.post('/', async(req, res, next)=>{
 		// 		sendMessage(data);
 		// 	}
 		// }
-
-		//send api request back to client
-		res.send({message : 'created', quoteId});
-
 	} catch(e) {
 		// statements
-		res.send({error : true});
+		res.send({error : true, message: e});
 		console.log(e);
 	}
 })

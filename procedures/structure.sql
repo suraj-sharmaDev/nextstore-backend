@@ -5,7 +5,8 @@ CREATE TABLE nextstore.dbo.appConfig (
 	CGST int DEFAULT 0,
 	GST int DEFAULT 0,
 	stdShipping int DEFAULT 0,
-	stateId int DEFAULT 0
+	stateId int DEFAULT 0,
+	serviceInitialPayment int DEFAULT 0
 );
 
 -- nextstore.dbo.admin definition

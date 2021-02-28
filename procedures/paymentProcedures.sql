@@ -60,6 +60,9 @@ BEGIN
         ------------ SERVICE SECTION ----------------
 	    SET @remarks += ' for service with quoteMasterId ' + CAST(@orderQuoteId as VARCHAR);
 	   	SET @quoteId = @orderQuoteId;
+        
+        -- we also neet to change the status of orderMaster to pending from unpaid
+        UPDATE quoteMaster SET [status] = N'pending' WHERE id = @quoteId;
 
         IF OBJECT_ID('tempdb..#NearByServiceProviders') IS NOT NULL
             Truncate TABLE #NearByServiceProviders

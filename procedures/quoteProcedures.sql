@@ -59,9 +59,11 @@ BEGIN
 	-- 		coverage INT,
 	-- 		distance FLOAT
 	--     )
-	    
+
+	-- variables to store charge amount and other admin set values
+	DECLARE @totalAmount INT;
+
 	-- insert into quotemaster
-	
 	insert into quotemaster (customerId, [type], categoryId, deliveryAddress, createdAt)
 	VALUES (@customerId, @type, @categoryId, @deliveryAddress, @createdAt);
 	
@@ -77,6 +79,9 @@ BEGIN
 	    [json] NVARCHAR(MAX) AS JSON
 	  )json
 
+	-- store totalAmount to variable
+	SELECT @totalAmount = serviceInitialPayment from appConfig WHERE id = 1;
+
 	 -- Find all service providers nearby to send them the quotations
 	-- INSERT INTO #NearByServiceProviders
 	-- 	exec spfindServiceProvidersNearby @custLat, @custLng, @categoryId; 
@@ -91,7 +96,7 @@ BEGIN
 	-- SELECT adminTable.fcmToken
 	-- FROM adminTable
 	-- where adminTable.fcmToken IS NOT NULL and adminTable.fcmToken <> ''	;
-	 SELECT @quoteMasterId as quoteId;
+	 SELECT @quoteMasterId as quoteId, @totalAmount as totalAmount;;
 END
 
 GO;
