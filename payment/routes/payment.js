@@ -31,6 +31,7 @@ router.post('/', async(req, res, next)=>{
 				fcmToken: fcmTokens,
 				type: type
 			}
+			console.log(data);
 			sendMessage(data);
 		}
         
