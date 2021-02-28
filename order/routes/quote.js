@@ -75,7 +75,7 @@ router.post('/', async(req, res, next)=>{
 			{ 
 				replacements: { json: JSON.stringify(req.body) }
 			}).spread((user, created)=>{
-				return (user); 
+				return user[0];
 			});
 		quoteId = serviceProvider.quoteId;
 		totalAmount = serviceProvider.totalAmount;
