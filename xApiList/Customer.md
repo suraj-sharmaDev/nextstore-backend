@@ -3,10 +3,10 @@
 ## Shop
 
 1. Get content of shop with shopId
-   http://35.230.117.116/merchantApi/shop/shopId
+   http://nxtshops.com/merchantApi/shop/shopId
 
 2. Get products of shop with shopId, for subCategoryId
-   http://35.230.117.116/merchantApi/shop/shopId/subCategoryId
+   http://nxtshops.com/merchantApi/shop/shopId/subCategoryId
 
 ## Services
 
@@ -33,29 +33,29 @@
 ## category
 
 1. Get All Category
-   http://35.230.117.116/merchantApi/category
+   http://nxtshops.com/merchantApi/category
 
 2. Get category with Id
-   http://35.230.117.116/merchantApi/category/category/categoryId
+   http://nxtshops.com/merchantApi/category/category/categoryId
 
    ```
 
    ```
 
 3. Get subCategory with Id
-   http://35.230.117.116/merchantApi/category/subCategory/subCategoryId
+   http://nxtshops.com/merchantApi/category/subCategory/subCategoryId
 
 4. Get subCategoryChild with Id
-   http://35.230.117.116/merchantApi/category/subCategory/subCategoryId
+   http://nxtshops.com/merchantApi/category/subCategory/subCategoryId
 
 ## Cart
 
 1. Get all items in cart for customerId
-   http://35.230.117.116/customerApi/cart/customerId
+   http://nxtshops.com/customerApi/cart/customerId
    GET
 
 2. Create cart for customer with customerId
-   http://35.230.117.116/customerApi/cart/customerId
+   http://nxtshops.com/customerApi/cart/customerId
    POST : JSON
    ```javascript
    [
@@ -69,7 +69,7 @@
    ];
    ```
 3. Update some of item in cart table using cartId
-   http://35.230.117.116/customerApi/cart/cartId
+   http://nxtshops.com/customerApi/cart/cartId
    PUT : JSON
 
    ```javascript
@@ -79,7 +79,7 @@
    ```
 
 4. Delete some or all items in cartTable using cartId
-   http://35.230.117.116/customerApi/cart
+   http://nxtshops.com/customerApi/cart
    DELETE : JSON
    ```javascript
    [1, 2, 3];
@@ -88,14 +88,14 @@
 ## Order
 
 1. Get Order Details
-   http://35.230.117.116/orderApi/order/orderId
+   http://nxtshops.com/orderApi/order/orderId
 
    #Get Order belonging to Customer
    https://nxtshops.com/customerApi/order/customerId/pageNo/startDate?/endDate?
    where startDate and endDate are optional parameters
 
 2. Create New Order
-   http://35.230.117.116/orderApi/order
+   http://nxtshops.com/orderApi/order
    POST : JSON
    ```javascript
    {
@@ -120,7 +120,7 @@
    }
    ```
 3. Add orders to existent Order
-   http://35.230.117.116/orderApi/order/orderId
+   http://nxtshops.com/orderApi/order/orderId
    POST : JSON
    ```javascript
    [
@@ -139,7 +139,7 @@
    ];
    ```
 4. Update some products in orders
-   http://35.230.117.116/orderApi/order
+   http://nxtshops.com/orderApi/order
    PUT : JSON
    //this will affect orderDetail Table
    ```javascript
@@ -155,14 +155,35 @@
    ];
    ```
 5. Delete full Order
-   http://35.230.117.116/orderApi/order/orderId
+   http://nxtshops.com/orderApi/order/orderId
    DELETE Method
 
 6. Delete particular products in order with known id for each added products in orderDetail
-   http://35.230.117.116/orderApi/order
+   http://nxtshops.com/orderApi/order
    DELETE : JSON
    ```javascript
    [1, 2, 3];
+   ```
+
+## Payment
+
+   <!-- After create order API and the payment has been done -->
+
+1. Finalize Payment
+   http://nxtshops.com/paymentApi/payment
+
+   METHOD : POST
+
+   ```javascript
+    {
+        "orderType" : 'order' / 'service',
+        "orderQuoteId": Id of order or quote
+        "totalAmount" : ??,
+        "paymentMethod" : ??
+        "razorpay_payment_id" : ??
+        "razorpay_order_id" : ??
+        "razorpay_signature" : ??
+    }
    ```
 
 ## Quote

@@ -1,6 +1,6 @@
 const express = require('express');
 const {orderMaster, orderDetail, sequelize} = require('../models');
-const sendMessage = require('../middleware/firebase');
+const {createRazorPayOrder} = require('../middleware/razorPayUtil');
 const router = express.Router();
 
 router.get('/:orderId?/:status?', async(req, res, next)=>{
@@ -75,9 +75,25 @@ router.post('/:orderId?', async(req, res, next)=>{
 						}).spread((user, created)=>{ 
 							return user[0]; 
 						})
-			const type = 'new_order';
+
 			orderId = shop.orderId;
-			orderDetail = JSON.parse(shop.orderDetail);
+			const totalAmount = shop.totalAmount;
+
+			var options = {
+				amount: totalAmount * 100,  // amount in the smallest currency unit
+				currency: "INR",
+				receipt: orderId
+			};
+
+			createRazorPayOrder(options)
+			.then((result)=>{
+				res.send({
+					error: false,
+					message: 'created',
+					razorPayOrderId: result.message.id
+				})
+			})
+			.catch((err)=>res.send({error: true, message: err}))			
 			/**
 			 * After payment gateway flow has been added we dont notify the admin and merchant
 			 * now itself.
@@ -104,16 +120,6 @@ router.post('/:orderId?', async(req, res, next)=>{
 			// }
 
 		}
-		// else{
-		// 	await sequelize.query('exec spbulkCreateOrderDetail :json, :orderId', { 
-		// 		replacements: 
-		// 		{ 
-		// 			json: JSON.stringify(req.body), 
-		// 			orderId: req.params.orderId
-		// 		}
-		// 	});
-		// }
-		res.send({message : 'created', orderDetail, orderId});
 	} catch(e) {
 		// statements
 		res.send({error : true});

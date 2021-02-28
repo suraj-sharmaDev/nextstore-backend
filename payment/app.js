@@ -3,7 +3,8 @@ const cors = require("cors");
 const createError = require("http-errors");
 
 const {
-  acceptPayment
+  payment,
+  order
 } = require("./routes");
 
 const bodyParser = require("body-parser");
@@ -15,7 +16,8 @@ app.use(cors());
 const jsonParser = express.json();
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/acceptPayment', jsonParser, acceptPayment);
+app.use('/payment', jsonParser, payment);
+app.use('/order', jsonParser, order);
 
 app.get("/", (req, res) => {
   res.send({ path: 404 });

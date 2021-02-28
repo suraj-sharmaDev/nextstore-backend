@@ -11,6 +11,15 @@ BEGIN
 	DECLARE @customerId INT = JSON_VALUE(@json, '$.master.customerId');
 	DECLARE @shopId INT = JSON_VALUE(@json, '$.master.shopId');
 	DECLARE @deliveryAddress NVARCHAR(500) = JSON_QUERY(@json, '$.master.deliveryAddress');
+	
+	-- variables to store charge amount and other admin set values
+	DECLARE @totalAmount INT;
+	DECLARE @deliveryCharge INT;
+
+	-- store values from table to corresponding variables
+	SELECT 
+	@deliveryCharge = stdShipping
+	from appConfig;
 
 	-- update cartMaster table to identify fulfilled carts
 
@@ -36,6 +45,12 @@ BEGIN
 		qty INT '$.qty'
 	)json
 
+	-- store totalAmount to variable
+	SELECT @totalAmount = sum(price) from orderDetail where orderMasterId = @orderMasterId;
+
+	-- Add delivery charge to total Amount
+	SET @totalAmount = @totalAmount + @deliveryCharge;
+
 	---all the products ordered will be sent for recommendation---
 	EXEC spInsertRecommendedProduct @shopId, @json;  
 	--------------------------------------------------------------
@@ -44,24 +59,24 @@ BEGIN
 	-- 	select shopId from openjson(@json, '$.master') with ( shopId int '$.shopId')
 	-- );
 
-	;with x(json) as (
-		select
-		orderMaster.*,
-		items.productId,
-		items.productName,
-		items.price,
-		items.qty 
-		from 
-		(
-			SELECT orderMaster.*, shop.name from orderMaster
-			INNER JOIN shop on shop.id = orderMaster.shopId
-			WHERE [orderMaster].[id] = @orderMasterId
-		)
-		as orderMaster				
-		INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
-		And orderMaster.status in ('pending', 'accepted')
-		For Json AUTO, INCLUDE_NULL_VALUES	
-	)
+	-- ;with x(json) as (
+	-- 	select
+	-- 	orderMaster.*,
+	-- 	items.productId,
+	-- 	items.productName,
+	-- 	items.price,
+	-- 	items.qty 
+	-- 	from 
+	-- 	(
+	-- 		SELECT orderMaster.*, shop.name from orderMaster
+	-- 		INNER JOIN shop on shop.id = orderMaster.shopId
+	-- 		WHERE [orderMaster].[id] = @orderMasterId
+	-- 	)
+	-- 	as orderMaster				
+	-- 	INNER JOIN orderDetail as items on items.orderMasterId = orderMaster.id
+	-- 	And orderMaster.status in ('pending', 'accepted')
+	-- 	For Json AUTO, INCLUDE_NULL_VALUES	
+	-- )
 
 	select 
 	(
@@ -77,8 +92,8 @@ BEGIN
 		)A
 		FOR JSON PATH
 	) as fcmToken,
-	@orderMasterId as orderId, 
-	json as orderDetail from x;
+	@orderMasterId as orderId,
+	@totalAmount as totalAmount;
 
 END
 
