@@ -27,7 +27,7 @@ router.post('/', async(req, res, next)=>{
 			parsedArray.map((p)=>{
 				fcmTokens.push(p.fcmToken)
 			});
-			sendMessage(fcmToken, type);
+			sendMessage(fcmTokens, type);
 		}
         
 		res.send({message: 'created', error: false});
