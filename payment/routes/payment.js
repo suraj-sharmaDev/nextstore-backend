@@ -23,7 +23,7 @@ router.post('/', async(req, res, next)=>{
             const type = 'new_order';
 			//fix the fcmTokens to array
 			let fcmTokens = [];
-			let parsedArray = JSON.parse(shop.fcmToken);
+			let parsedArray = JSON.parse(payment.fcmToken);
 			parsedArray.map((p)=>{
 				fcmTokens.push(p.fcmToken)
 			})
