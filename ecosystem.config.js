@@ -3,32 +3,38 @@ module.exports = {
     {
       name: 'customer_nextstore',
       script: './customer/app.js',
-      watch: '.'
+      watch: true,
+      ignore_watch: ["node_modules"]
     },
     {
       name: 'merchant_nextstore',
       script: './merchant/app.js',
-      watch: '.'
+      watch: true,
+      ignore_watch: ["node_modules"]
     },
     {
       name: 'order_nextstore',
       script: './order/app.js',
-      watch: '.'
+      watch: true,
+      ignore_watch: ["node_modules"]
     },
     {
       name: 'search_nextstore',
       script: './search/app.js',
-      watch: '.'
+      watch: true,
+      ignore_watch: ["node_modules"]
     },
     {
       name: 'admin_nextstore',
       script: './admin/app.js',
-      watch: '.'
+      watch: true,
+      ignore_watch: ["node_modules"]
     },
     {
       name: 'payment_nextstore',
       script: './payment/app.js',
-      watch: '.'
+      watch: true,
+      ignore_watch: ["node_modules"]
     },    
   ],
 
