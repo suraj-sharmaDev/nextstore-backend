@@ -3,6 +3,7 @@ const cors = require("cors");
 const createError = require("http-errors");
 const {
   admin,
+  appConfig,
   product,
   shopOffer,
   merchant,
@@ -23,6 +24,7 @@ const jsonParser = express.json();
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use("/admin", jsonParser, admin);
+app.use("/appConfig", jsonParser, appConfig);
 app.use("/product", upload, product);
 app.use("/shopOffer", upload, shopOffer);
 app.use("/shop", jsonParser, shop);

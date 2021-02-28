@@ -552,4 +552,21 @@
 5. Services available within x km radius of coordinates
    https://nxtshops.com/searchApi/service/services/9.230385/76.515898
 
+## AppConfig Operations
+
+1. Get all configurations
+   https://adastratech.in/adminApi/appConfig
+
+2. Update Configurations
+   https://adastratech.in/adminApi/appConfig
+
+   PUT : JSON
+
+   ```javascript
+   {
+   	"baseUrl" : "https:www.domain.com",
+   	"stdShipping": 40
+   }
+   ```
+
 ## Author : Suraj Sharma

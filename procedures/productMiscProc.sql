@@ -275,3 +275,62 @@ BEGIN
 	
 	SELECT @prevImage as previousImage;
 END
+
+-------------Get app Config------------
+CREATE PROCEDURE dbo.spGetAppConfig
+AS
+BEGIN
+	SELECT
+	*
+	FROM appConfig
+	WHERE id = 1;
+END
+
+-----------Update app config--------------
+CREATE PROCEDURE dbo.spUpdateAppConfig
+@json NVARCHAR(MAX)
+AS
+BEGIN
+	DECLARE @baseUrl varchar(150) = JSON_VALUE(@json, '$.baseUrl');
+	DECLARE @CGST int = JSON_VALUE(@json, '$.CGST');
+	DECLARE @GST int = JSON_VALUE(@json, '$.GST');
+	DECLARE @stdShipping int = JSON_VALUE(@json, '$.stdShipping');
+	DECLARE @minShippingDistance INT = JSON_VALUE(@json, '$.minShippingDistance');
+	DECLARE @extraShippingCharge INT = JSON_VALUE(@json, '$.extraShippingCharge');
+
+	UPDATE appConfig
+	SET 
+		appConfig.baseUrl = 
+			CASE WHEN (@baseUrl IS NOT NULL)
+				THEN @baseUrl
+				ELSE appConfig.baseUrl
+			END,
+		appConfig.CGST = 
+			CASE WHEN (@CGST IS NOT NULL)
+				THEN @CGST
+				ELSE appConfig.CGST
+			END,
+		appConfig.GST = 
+			CASE WHEN (@GST IS NOT NULL)
+				THEN @GST
+				ELSE appConfig.GST
+			END,
+		appConfig.stdShipping = 
+			CASE WHEN (@stdShipping IS NOT NULL)
+				THEN @stdShipping
+				ELSE appConfig.stdShipping
+			END
+		-- appConfig.minShippingDistance = 
+		-- 	CASE WHEN (@minShippingDistance IS NOT NULL)
+		-- 		THEN @minShippingDistance
+		-- 		ELSE appConfig.minShippingDistance
+		-- 	END,
+		-- appConfig.extraShippingCharge = 
+		-- 	CASE WHEN (@extraShippingCharge IS NOT NULL)
+		-- 		THEN @extraShippingCharge
+		-- 		ELSE appConfig.extraShippingCharge
+		-- 	END			
+		WHERE appConfig.id = 1;
+
+	SELECT 'updated' as [message];	
+END

@@ -408,4 +408,9 @@
 5. Services available within x km radius of coordinates
    https://nxtshops.com/searchApi/service/services/9.230385/76.515898
 
+## AppConfig Operations
+
+1. Get all configurations
+   https://nxtshops.com/adminApi/appConfig
+
 ## Author : Suraj Sharma
