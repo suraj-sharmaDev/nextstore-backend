@@ -46,7 +46,7 @@ BEGIN
 	)json
 
 	-- store totalAmount to variable
-	SELECT @totalAmount = sum(price) from orderDetail where orderMasterId = @orderMasterId;
+	SELECT @totalAmount = sum(price * qty) from orderDetail where orderMasterId = @orderMasterId;
 
 	-- Add delivery charge to total Amount
 	SET @totalAmount = @totalAmount + @deliveryCharge;
