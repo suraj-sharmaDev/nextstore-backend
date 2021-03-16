@@ -34,7 +34,7 @@ router.put('/:adminId', async(req, res, next)=>{
             }});
 		res.json({error: false, message: "updated_token"});
 	} catch(e) {
-		res.send({error : true});
+		res.send({error : true, message : e});
 		console.log(e);
 	}
 })

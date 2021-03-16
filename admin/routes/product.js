@@ -1,6 +1,7 @@
 const express = require('express');
 const {sequelize} = require('../models');
 const router = express.Router();
+const path = require('path');
 
 router.get('/', (req, res, next)=>{
     res.send(__dirname+'../../assets');
@@ -32,7 +33,8 @@ router.post('/', async(req, res, next)=>{
     for (let index = 0; index < files.length; index++) {
         const file = files[index];
         const fileName = file.fieldname;
-        insertData[fileName] = file.path.split('assets/images/').slice(1).join('.');;
+        const normalizedPath = path.normalize(file.path).replace(/\\/g, "/");
+        insertData[fileName] = normalizedPath.split('assets/images/').slice(1).join('.');;
     }
     //insert product data in database
     try {
@@ -75,7 +77,8 @@ router.put('/:productMasterId', async(req, res, next)=>{
     for (let index = 0; index < files.length; index++) {
         const file = files[index];
         const fileName = file.fieldname;
-        updateData[fileName] = file.path.split('assets/images/').slice(1).join('.');;
+        const normalizedPath = path.normalize(file.path).replace(/\\/g, "/");
+        updateData[fileName] = normalizedPath.split('assets/images/').slice(1).join('.');;
     }
     //update product data in database
     try {

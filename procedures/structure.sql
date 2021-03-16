@@ -1,35 +1,34 @@
--- nextstore.dbo.appConfig definition
-CREATE TABLE nextstore.dbo.appConfig (
+-- [dbo].appConfig definition
+CREATE TABLE [dbo].appConfig (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	baseUrl nvarchar(150) NOT NULL,
 	CGST int DEFAULT 0,
 	GST int DEFAULT 0,
 	stdShipping int DEFAULT 0,
 	stateId int DEFAULT 0,
-	serviceInitialPayment int DEFAULT 0
 );
 
--- nextstore.dbo.admin definition
+-- [dbo].admin definition
 
-CREATE TABLE nextstore.dbo.adminTable (
+CREATE TABLE [dbo].adminTable (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[username] nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[password] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	fcmToken nvarchar(255) NULL
 );
 
--- nextstore.dbo.category definition
+-- [dbo].category definition
 
-CREATE TABLE nextstore.dbo.category (
+CREATE TABLE [dbo].category (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	CONSTRAINT PK__category__3213E83F1A37568D PRIMARY KEY (id)
 );
 
 
--- nextstore.dbo.customer definition
+-- [dbo].customer definition
 
-CREATE TABLE nextstore.dbo.customer (
+CREATE TABLE [dbo].customer (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	mobile nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -37,9 +36,9 @@ CREATE TABLE nextstore.dbo.customer (
 	CONSTRAINT PK__customer__3213E83FA6F76262 PRIMARY KEY (id)
 );
 
--- nextstore.dbo.verification definition
+-- [dbo].verification definition
 
-CREATE TABLE nextstore.dbo.verification (
+CREATE TABLE [dbo].verification (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	customerId int NOT NULL FOREIGN KEY REFERENCES customer(id),
 	otpCode NVARCHAR(10) NOT NULL,
@@ -47,13 +46,13 @@ CREATE TABLE nextstore.dbo.verification (
 	[timestamp] DATETIME2 default CURRENT_TIMESTAMP
 );
 
--- nextstore.dbo.merchant definition
+-- [dbo].merchant definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.merchant GO
+-- DROP TABLE [dbo].merchant GO
 
-CREATE TABLE nextstore.dbo.merchant (
+CREATE TABLE [dbo].merchant (
 	id int IDENTITY(1,1) NOT NULL,
 	firstName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	lastName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -66,13 +65,13 @@ CREATE TABLE nextstore.dbo.merchant (
 );
 
 
--- nextstore.dbo.orderMaster definition
+-- [dbo].orderMaster definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.orderMaster GO
+-- DROP TABLE [dbo].orderMaster GO
 
-CREATE TABLE nextstore.dbo.orderMaster (
+CREATE TABLE [dbo].orderMaster (
 	id int IDENTITY(1,1) NOT NULL,
 	customerId int NULL,
 	shopId int NULL,
@@ -83,13 +82,13 @@ CREATE TABLE nextstore.dbo.orderMaster (
 );
 
 
--- nextstore.dbo.orderDetail definition
+-- [dbo].orderDetail definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.orderDetail GO
+-- DROP TABLE [dbo].orderDetail GO
 
-CREATE TABLE nextstore.dbo.orderDetail (
+CREATE TABLE [dbo].orderDetail (
 	id int IDENTITY(1,1) NOT NULL,
 	productId int NULL,
 	productName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -97,16 +96,16 @@ CREATE TABLE nextstore.dbo.orderDetail (
 	price int NULL,
 	orderMasterId int NULL,
 	CONSTRAINT PK__orderDet__3213E83F4619239D PRIMARY KEY (id),
-	CONSTRAINT FK__orderDeta__order__15DA3E5D FOREIGN KEY (orderMasterId) REFERENCES nextstore.dbo.orderMaster(id)
+	CONSTRAINT FK__orderDeta__order__15DA3E5D FOREIGN KEY (orderMasterId) REFERENCES [dbo].orderMaster(id)
 );
 
--- nextstore.dbo.cartMaster definition
+-- [dbo].cartMaster definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.cartMaster GO
+-- DROP TABLE [dbo].cartMaster GO
 
-CREATE TABLE nextstore.dbo.cartMaster (
+CREATE TABLE [dbo].cartMaster (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	customerId int NULL FOREIGN KEY REFERENCES customer(id) ON DELETE SET NULL,
 	shopId int NULL FOREIGN KEY REFERENCES shop(id) ON DELETE SET NULL,
@@ -114,13 +113,13 @@ CREATE TABLE nextstore.dbo.cartMaster (
 	createdAt datetimeoffset DEFAULT CURRENT_TIMESTAMP
 );
 
--- nextstore.dbo.cart definition
+-- [dbo].cart definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.cart GO
+-- DROP TABLE [dbo].cart GO
 
-CREATE TABLE nextstore.dbo.cartDetail (
+CREATE TABLE [dbo].cartDetail (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	productId int NULL,
 	name nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -131,13 +130,13 @@ CREATE TABLE nextstore.dbo.cartDetail (
 );
 
 
--- nextstore.dbo.customerAddress definition
+-- [dbo].customerAddress definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.customerAddress GO
+-- DROP TABLE [dbo].customerAddress GO
 
-CREATE TABLE nextstore.dbo.customerAddress (
+CREATE TABLE [dbo].customerAddress (
 	id int IDENTITY(1,1) NOT NULL,
 	label nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	addressName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -147,16 +146,16 @@ CREATE TABLE nextstore.dbo.customerAddress (
 	reverseAddress nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	customerId int NULL,
 	CONSTRAINT PK__customer__3213E83FFEE64773 PRIMARY KEY (id),
-	CONSTRAINT FK__customerA__custo__0A9D95DB FOREIGN KEY (customerId) REFERENCES nextstore.dbo.customer(id) ON DELETE SET NULL
+	CONSTRAINT FK__customerA__custo__0A9D95DB FOREIGN KEY (customerId) REFERENCES [dbo].customer(id) ON DELETE SET NULL
 );
 
--- nextstore.dbo.shop definition
+-- [dbo].shop definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.shop GO
+-- DROP TABLE [dbo].shop GO
 
-CREATE TABLE nextstore.dbo.shop (
+CREATE TABLE [dbo].shop (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	category nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -167,16 +166,16 @@ CREATE TABLE nextstore.dbo.shop (
 	[image] nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	rating int DEFAULT 0,
 	CONSTRAINT PK__shop__3213E83FAF52DF09 PRIMARY KEY (id),
-	CONSTRAINT FK__shop__merchantId__0B5CAFEA FOREIGN KEY (merchantId) REFERENCES nextstore.dbo.merchant(id) ON DELETE SET NULL
+	CONSTRAINT FK__shop__merchantId__0B5CAFEA FOREIGN KEY (merchantId) REFERENCES [dbo].merchant(id) ON DELETE SET NULL
 );
 
--- nextstore.dbo.serviceProvider definition
+-- [dbo].serviceProvider definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.serviceProvider GO
+-- DROP TABLE [dbo].serviceProvider GO
 
-CREATE TABLE nextstore.dbo.serviceProvider (
+CREATE TABLE [dbo].serviceProvider (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	name nvarchar(255) NULL,
 	categoryId int NULL FOREIGN KEY REFERENCES nxtServiceCategory(CategoryId) ON DELETE SET NULL,
@@ -188,82 +187,82 @@ CREATE TABLE nextstore.dbo.serviceProvider (
 	rating int DEFAULT 0
 );
 
--- nextstore.dbo.favourite definition
+-- [dbo].favourite definition
 
-CREATE TABLE nextstore.dbo.favourite (
+CREATE TABLE [dbo].favourite (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	customerId int NULL FOREIGN KEY REFERENCES customer(id),
 	shopId int NULL FOREIGN KEY REFERENCES shop(id),
 	[timestamp] DATETIME default CURRENT_TIMESTAMP
 );
 
--- nextstore.dbo.shopAddress definition
+-- [dbo].shopAddress definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.shopAddress GO
+-- DROP TABLE [dbo].shopAddress GO
 
-CREATE TABLE nextstore.dbo.shopAddress (
+CREATE TABLE [dbo].shopAddress (
 	id int IDENTITY(1,1) NOT NULL,
 	pickupAddress nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	latitude float NULL,
 	longitude float NULL,
 	shopId int NULL,
 	CONSTRAINT PK__shopAddr__3213E83F70869032 PRIMARY KEY (id),
-	CONSTRAINT FK__shopAddre__shopI__0E391C95 FOREIGN KEY (shopId) REFERENCES nextstore.dbo.shop(id)
+	CONSTRAINT FK__shopAddre__shopI__0E391C95 FOREIGN KEY (shopId) REFERENCES [dbo].shop(id)
 );
 
--- nextstore.dbo.serviceProviderAddress definition
+-- [dbo].serviceProviderAddress definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.serviceProviderAddress GO
+-- DROP TABLE [dbo].serviceProviderAddress GO
 
-CREATE TABLE nextstore.dbo.serviceProviderAddress (
+CREATE TABLE [dbo].serviceProviderAddress (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	pickupAddress nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	latitude float NULL,
 	longitude float NULL,
-	serviceProviderId int NULL FOREIGN KEY REFERENCES nextstore.dbo.serviceProvider(id)
+	serviceProviderId int NULL FOREIGN KEY REFERENCES [dbo].serviceProvider(id)
 );
 
--- nextstore.dbo.subCategory definition
+-- [dbo].subCategory definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.subCategory GO
+-- DROP TABLE [dbo].subCategory GO
 
-CREATE TABLE nextstore.dbo.subCategory (
+CREATE TABLE [dbo].subCategory (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	categoryId int NULL,
 	CONSTRAINT PK__subCateg__3213E83F7CAB3994 PRIMARY KEY (id),
-	CONSTRAINT FK__subCatego__categ__18B6AB08 FOREIGN KEY (categoryId) REFERENCES nextstore.dbo.category(id)
+	CONSTRAINT FK__subCatego__categ__18B6AB08 FOREIGN KEY (categoryId) REFERENCES [dbo].category(id)
 );
 
 
--- nextstore.dbo.subCategoryChild definition
+-- [dbo].subCategoryChild definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.subCategoryChild GO
+-- DROP TABLE [dbo].subCategoryChild GO
 
-CREATE TABLE nextstore.dbo.subCategoryChild (
+CREATE TABLE [dbo].subCategoryChild (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	subCategoryId int NULL,
 	CONSTRAINT PK__subCateg__3213E83F94F8A0C7 PRIMARY KEY (id),
-	CONSTRAINT FK__subCatego__subCa__1B9317B3 FOREIGN KEY (subCategoryId) REFERENCES nextstore.dbo.subCategory(id)
+	CONSTRAINT FK__subCatego__subCa__1B9317B3 FOREIGN KEY (subCategoryId) REFERENCES [dbo].subCategory(id)
 );
 
 
--- nextstore.dbo.productMaster definition
+-- [dbo].productMaster definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.productMaster GO
+-- DROP TABLE [dbo].productMaster GO
 
-CREATE TABLE nextstore.dbo.productMaster (
+CREATE TABLE [dbo].productMaster (
 	id int IDENTITY(1,1) NOT NULL,
 	name nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[image] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -275,17 +274,17 @@ CREATE TABLE nextstore.dbo.productMaster (
 	[bigImage6] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,	
 	subCategoryChildId int NULL,
 	CONSTRAINT PK__productM__3213E83FBAAA4E7D PRIMARY KEY (id),
-	CONSTRAINT FK__productMa__subCa__1E6F845E FOREIGN KEY (subCategoryChildId) REFERENCES nextstore.dbo.subCategoryChild(id)
+	CONSTRAINT FK__productMa__subCa__1E6F845E FOREIGN KEY (subCategoryChildId) REFERENCES [dbo].subCategoryChild(id)
 );
 
 
--- nextstore.dbo.product1 definition
+-- [dbo].product1 definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.product1 GO
+-- DROP TABLE [dbo].product1 GO
 
-CREATE TABLE nextstore.dbo.product1 (
+CREATE TABLE [dbo].product1 (
 	id int IDENTITY(1,1) NOT NULL,
 	mrp float NULL,
 	price float NULL,
@@ -293,21 +292,21 @@ CREATE TABLE nextstore.dbo.product1 (
 	productMasterId int NULL,
 	stock int DEFAULT 1,
 	CONSTRAINT PK__product__3213E83F16B61479 PRIMARY KEY (id),
-	CONSTRAINT FK__product__product__22401542 FOREIGN KEY (productMasterId) REFERENCES nextstore.dbo.productMaster(id),
-	CONSTRAINT FK__product__shopId__214BF109 FOREIGN KEY (shopId) REFERENCES nextstore.dbo.shop(id)
+	CONSTRAINT FK__product__product__22401542 FOREIGN KEY (productMasterId) REFERENCES [dbo].productMaster(id),
+	CONSTRAINT FK__product__shopId__214BF109 FOREIGN KEY (shopId) REFERENCES [dbo].shop(id)
 );
 
--- nextstore.dbo.recommendedProducts definition
-CREATE TABLE nextstore.dbo.recommendedProducts (
+-- [dbo].recommendedProducts definition
+CREATE TABLE [dbo].recommendedProducts (
 	id int IDENTITY(1,1) NOT NULL,
 	shopId int NOT NULL FOREIGN KEY REFERENCES shop(id),
 	productId int NOT NULL,
 	[count] int DEFAULT 1
 );
 
--- nextstore.dbo.offers definition
+-- [dbo].offers definition
 
-CREATE TABLE nextstore.dbo.offers (
+CREATE TABLE [dbo].offers (
 	id int IDENTITY(1,1) NOT NULL,
 	offer_name varchar(15) NOT NULL,
 	offer_image varchar(40) NOT NULL,
@@ -315,18 +314,18 @@ CREATE TABLE nextstore.dbo.offers (
 	createdAt datetime default CURRENT_TIMESTAMP
 );
 
--- nextstore.dbo.shopOffers definition
+-- [dbo].shopOffers definition
 
-CREATE TABLE nextstore.dbo.shopOffers (
+CREATE TABLE [dbo].shopOffers (
 	id int IDENTITY(1,1) NOT NULL,
 	shopId int NOT NULL FOREIGN KEY REFERENCES shop(id),
 	offer_image varchar(100) NOT NULL,
 	createdAt datetime default CURRENT_TIMESTAMP
 );
 
--- nextstore.dbo.coupons definition
+-- [dbo].coupons definition
 
-CREATE TABLE nextstore.dbo.coupons (
+CREATE TABLE [dbo].coupons (
   id int IDENTITY(1,1) PRIMARY KEY,
   coupon_code varchar(12) NULL,
   max_use_count int NOT NULL,
@@ -335,9 +334,9 @@ CREATE TABLE nextstore.dbo.coupons (
   max_discount_amount int
 );
 
--- nextstore.dbo.notifications definition
+-- [dbo].notifications definition
 
-CREATE TABLE nextstore.dbo.notifications (
+CREATE TABLE [dbo].notifications (
   id int IDENTITY(1,1) PRIMARY KEY,
   sender_category varchar(15) NOT NULL,
   receiver_category varchar(15) NOT NULL,
@@ -349,13 +348,13 @@ CREATE TABLE nextstore.dbo.notifications (
   createdAt datetimeoffset NULL
 );
 
--- nextstore.dbo.quoteMaster definition
+-- [dbo].quoteMaster definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.quoteMaster GO
+-- DROP TABLE [dbo].quoteMaster GO
 
-CREATE TABLE nextstore.dbo.quoteMaster (
+CREATE TABLE [dbo].quoteMaster (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	customerId int NULL,
 	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'unpaid', --can be pending, accepted, rejected or completed
@@ -367,52 +366,63 @@ CREATE TABLE nextstore.dbo.quoteMaster (
 );
 
 
--- nextstore.dbo.quoteDetail definition
+-- [dbo].quoteDetail definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.quoteDetail GO
+-- DROP TABLE [dbo].quoteDetail GO
 
 -- This table is filled by user
-CREATE TABLE nextstore.dbo.quoteDetail (
+CREATE TABLE [dbo].quoteDetail (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	productId int NULL,
 	productName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[json] NVARCHAR(1000) NULL, --this can be json data or text
 	remark NVARCHAR(500) NULL, -- this is user given comments
 	[image] NVARCHAR(100) NULL, --if type is image then file url, used for storing user request	
-	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id)
+	quoteMasterId int NULL FOREIGN KEY REFERENCES [dbo].quoteMaster(id)
 );
 
--- nextstore.dbo.quotedServiceProviders definition
+-- [dbo].quotedServiceProviders definition
 
 -- Drop table
 
--- DROP TABLE nextstore.dbo.quotedServiceProviders GO
+-- DROP TABLE [dbo].quotedServiceProviders GO
 
-CREATE TABLE nextstore.dbo.quotedServiceProviders (
+CREATE TABLE [dbo].quotedServiceProviders (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	serviceProviderId int NULL FOREIGN KEY REFERENCES serviceProvider(id),
-	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id),
+	quoteMasterId int NULL FOREIGN KEY REFERENCES [dbo].quoteMaster(id),
 	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'pending', --can be pending, rejected or accepted
 	createdAt datetimeoffset NULL
 );
 
 --- when merchant accpets above then he call bid
 -- customer can accept the bids
-CREATE TABLE nextstore.dbo.quotationBiddings (
+CREATE TABLE [dbo].quotationBiddings (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	serviceProviderId int NULL FOREIGN KEY REFERENCES serviceProvider(id),
-	quoteMasterId int NULL FOREIGN KEY REFERENCES nextstore.dbo.quoteMaster(id),
+	quoteMasterId int NULL FOREIGN KEY REFERENCES [dbo].quoteMaster(id),
 	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'pending',  -- can be pending, rejected or accepted
 	[json] NVARCHAR(1000) NULL,
+	createdAt datetimeoffset NULL
+);
+
+---Merchant can store their bill image in the server
+-- this is just optional table in case
+CREATE TABLE [dbo].nxtBillDetails (
+	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	merchantId int DEFAULT NULL,	
+	orderId int DEFAULT NULL,	
+	quoteId int DEFAULT NULL,
+	[image] nvarchar(180) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
 	createdAt datetimeoffset NULL
 );
 
 ---------Payment Tables -------------
 
 ---------Order Payment Table---------
-CREATE TABLE nextstore.dbo.payments (
+CREATE TABLE [dbo].payments (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	orderId int DEFAULT NULL,	
 	quoteId int DEFAULT NULL,
@@ -427,7 +437,7 @@ CREATE TABLE nextstore.dbo.payments (
 
 
 ----------Wallets--------------
-CREATE TABLE nextstore.dbo.wallet (
+CREATE TABLE [dbo].wallet (
 	id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	customerId int FOREIGN KEY REFERENCES customer(id),
 	walletAmount int NOT NULL,

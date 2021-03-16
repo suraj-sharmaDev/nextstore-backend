@@ -2,6 +2,7 @@ const express = require('express');
 const {sequelize} = require('../models');
 const router = express.Router();
 const deleteFile = require('../middleware/fileDelete');
+const path = require('path');
 
 router.get('/:page?/:shopId?', async(req, res, next)=>{
     //list out all offers belonging to shops
@@ -49,7 +50,8 @@ router.post('/:shopId', async(req, res, next)=>{
     //since file has been uploaded lets insert into our database
     for (let index = 0; index < files.length; index++) {
         const file = files[index];
-        insertData.offer_image = file.path.split('assets/images/').slice(1).join('.');
+        const normalizedPath = path.normalize(file.path).replace(/\\/g, "/");
+        insertData.offer_image = normalizedPath.split('assets/images/').slice(1).join('.');
     }
     if(files.length > 0){
         //insert offer data in database
@@ -92,7 +94,8 @@ router.put('/:offerId/:shopId', async(req, res, next)=>{
     //since file has been uploaded lets insert into our database
     for (let index = 0; index < files.length; index++) {
         const file = files[index];
-        updateData.offer_image = file.path.split('assets/images/').slice(1).join('.');;
+        const normalizedPath = path.normalize(file.path).replace(/\\/g, "/");
+        updateData.offer_image = normalizedPath.split('assets/images/').slice(1).join('.');;
     }
     //update product data in database
     try {

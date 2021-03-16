@@ -9,6 +9,8 @@ CREATE TABLE [dbo].[nxtServiceCategory](
 	[CategoryId] [int] IDENTITY(1,1) NOT NULL,
 	[CategoryName] [varchar](50) NULL,
 	[Active] [int] NULL,
+	[InitialPaymentAmount] int DEFAULT 0,
+	[MinBookDay] int DEFAULT 1
  CONSTRAINT [PK_nxtServiceCategory] PRIMARY KEY CLUSTERED 
 (
 	[CategoryId] ASC
