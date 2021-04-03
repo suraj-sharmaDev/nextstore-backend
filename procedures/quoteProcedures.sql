@@ -401,6 +401,10 @@ CREATE Procedure dbo.spGetServiceProviderQuotes
 @endDate datetimeoffset
 AS
 BEGIN
+
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;	
 	-- this procedure gives 15 orders belonging to shopId
 	-- orders with status pending, accepted, rejected or all
 	DECLARE @offset INT = 15 * (@page - 1);
@@ -412,6 +416,10 @@ BEGIN
 				qS.status as providerStatus,
 				customer.name as customerName,
 				customer.mobile as customerMobile,
+				billImage = (
+					SELECT CONCAT(@baseUrl ,nbd.image) as [Image] from nxtBillDetails nbd
+					where nbd.quoteId = quoteMaster.id
+				),
 				items = (
 					select * from quoteDetail
 					where quoteMasterId = quoteMaster.id
@@ -453,8 +461,13 @@ BEGIN
 	';
 	EXEC sp_executeSql 
 		@query, 
-		N'@serviceProviderId INT, @status NVARCHAR(30), @startDate datetimeoffset, @endDate datetimeoffset, @offset INT',
-		@serviceProviderId, @status, @startDate, @endDate, @offset
+		N'@serviceProviderId INT, 
+		@status NVARCHAR(30), 
+		@startDate datetimeoffset, 
+		@endDate datetimeoffset, 
+		@offset INT, 
+		@baseUrl NVARCHAR(200)',
+		@serviceProviderId, @status, @startDate, @endDate, @offset, @baseUrl
 	;
 --	SELECT @query ;
 END
@@ -469,6 +482,10 @@ CREATE Procedure dbo.spGetCustomerQuotes
 @endDate datetimeoffset
 AS
 BEGIN
+
+	Declare @baseUrl varchar(200);
+	--get baseUrl as local variable
+	Select @baseUrl=baseUrl from appConfig;	
 	-- this procedure gives 15 quotes belonging to customerId
 	DECLARE @offset INT = 15 * (@page - 1);
 	DECLARE @status NVARCHAR(30) = N'completed';
@@ -477,6 +494,10 @@ BEGIN
 				SELECT 
 				quoteMaster.*,
 				sP.name as serviceProviderName,
+				billImage = (
+					SELECT CONCAT(@baseUrl ,nbd.image) as [Image] from nxtBillDetails nbd
+					where nbd.quoteId = quoteMaster.id
+				),				
 				items = (
 					select * from quoteDetail
 					where quoteMasterId = quoteMaster.id
@@ -511,8 +532,9 @@ BEGIN
 		@query, 
 		N'@customerId INT, @status NVARCHAR(30), 
 		  @startDate datetimeoffset, @endDate datetimeoffset, 
-		  @offset INT
+		  @offset INT,
+		  @baseUrl NVARCHAR(200)
 		',
-		@customerId, @status, @startDate, @endDate, @offset
+		@customerId, @status, @startDate, @endDate, @offset, @baseUrl
 	;
 END

@@ -6,6 +6,7 @@ const merchant = require("./merchant");
 const shop = require("./shop");
 const order = require("./order");
 const service = require("./service");
+const serviceCategory = require("./serviceCategory");
 const servicePackage = require("./servicePackage");
 const serviceRepair = require("./serviceRepair");
 
@@ -18,6 +19,7 @@ module.exports = {
   shop,
   order,
   service,
+  serviceCategory,
   servicePackage,
   serviceRepair,
 };

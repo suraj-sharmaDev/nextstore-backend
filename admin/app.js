@@ -9,6 +9,7 @@ const {
   merchant,
   shop,
   service,
+  serviceCategory,
   servicePackage,
   serviceRepair,
   order,
@@ -31,6 +32,7 @@ app.use("/shop", jsonParser, shop);
 app.use("/merchant", jsonParser, merchant);
 app.use("/order", jsonParser, order);
 app.use("/service", jsonParser, service);
+app.use("/serviceCategory", jsonParser, serviceCategory);
 app.use("/servicePackage", jsonParser, servicePackage);
 app.use("/serviceRepair", jsonParser, serviceRepair);
 

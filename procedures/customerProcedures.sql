@@ -58,6 +58,10 @@ Begin
 				biddingCount = (
 					SELECT count(id) from
 					quotationBiddings qb where qb.quoteMasterId = qm.id
+				),
+				billImage = (
+					SELECT CONCAT(@baseUrl ,nbd.image) as [Image] from nxtBillDetails nbd
+					where nbd.quoteId = qm.id
 				)
 				from quoteMaster qm 
 				INNER JOIN quoteDetail on quoteDetail.quoteMasterId = qm.id 

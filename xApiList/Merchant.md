@@ -14,15 +14,16 @@
    #merchId is id of merchant which is integer
 
 3. Upload a bill
-   https://nxtshops.com/orderApi/bills
+   https://nxtshops.com/orderApi/bill
    POST: FORMDATA
 
    image: FILE ----> mandatory
+   merchantId: INTEGER
    orderId: INTEGER
    quoteId: INTEGER
 
 4. Retrieve Bills
-   https://nxtshops.com/orderApi/bills/@merchantId/@type/@orderQuoteId
+   https://nxtshops.com/orderApi/bill/@merchantId/@type/@orderQuoteId
    METHOD : GET
 
    @merchantId : id of merchant

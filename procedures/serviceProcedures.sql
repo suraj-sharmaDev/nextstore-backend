@@ -276,6 +276,78 @@ BEGIN
 END
 
 
+
+--------------------------------------------------------------------------------------------
+-----------------------Add or update service Category---------------------------------------
+CREATE PROCEDURE dbo.spAddUpdateServiceCategory
+@json NVARCHAR(max),
+@serviceCategoryId INT
+AS
+BEGIN
+	DECLARE @message varchar(40);
+	IF OBJECT_ID('tempdb..#ServiceCategoryDetailTemp') IS NOT NULL
+	DROP TABLE #ServiceCategoryDetailTemp;
+	-- add the json data to tempTable
+    select 
+        json.CategoryName,
+		json.Active, 
+        json.[InitialPaymentAmount],
+        json.[MinBookDay]
+    INTO #ServiceCategoryDetailTemp FROM OPENJSON(@json)
+        with (
+            CategoryName varchar(50) '$.CategoryName', 
+            Active int '$.Active',
+            [InitialPaymentAmount] int '$.InitialPaymentAmount',
+            [MinBookDay] int '$.MinBookDay'
+        )json
+	-- if serviceCategoryId is null then the procedure will add the serviceCategory
+	-- else it will update the existing serviceCategory
+	If @serviceCategoryId IS NULL
+	BEGIN
+		INSERT INTO nxtServiceCategory(CategoryName, Active, [InitialPaymentAmount], MinBookDay)
+		SELECT
+		CategoryName, 
+		COALESCE(Active, 1) AS Active, 
+		[InitialPaymentAmount],
+		MinBookDay
+		FROM #ServiceCategoryDetailTemp;
+		SET @message = 'service category inserted';
+	END
+	ELSE
+	BEGIN
+		IF EXISTS (SELECT CategoryId from nxtServiceCategory where CategoryId=@serviceCategoryId)
+		BEGIN
+			UPDATE nxtServiceCategory
+			SET 
+				nxtServiceCategory.CategoryName = CASE
+				WHEN #ServiceCategoryDetailTemp.CategoryName IS NOT NULL THEN #ServiceCategoryDetailTemp.CategoryName
+				ELSE nxtServiceCategory.CategoryName
+				END,
+				nxtServiceCategory.Active = CASE
+				WHEN #ServiceCategoryDetailTemp.Active IS NOT NULL THEN #ServiceCategoryDetailTemp.Active
+				ELSE nxtServiceCategory.Active
+				END,
+				nxtServiceCategory.InitialPaymentAmount = CASE
+				WHEN #ServiceCategoryDetailTemp.InitialPaymentAmount IS NOT NULL THEN #ServiceCategoryDetailTemp.InitialPaymentAmount
+				ELSE nxtServiceCategory.InitialPaymentAmount
+				END,
+				nxtServiceCategory.MinBookDay = CASE
+				WHEN #ServiceCategoryDetailTemp.MinBookDay IS NOT NULL THEN #ServiceCategoryDetailTemp.MinBookDay
+				ELSE nxtServiceCategory.MinBookDay
+				END								
+			FROM nxtServiceCategory, #ServiceCategoryDetailTemp 
+			WHERE nxtServiceCategory.CategoryId = @serviceCategoryId;
+			SET @message = 'service category updated';
+		END
+		ELSE
+		BEGIN
+			SET @message = 'Given serviceCategory Id doesnt exist';
+		END	
+	END
+
+	SELECT @message as message;
+END
+
 --------------------------------------------------------------------------------------------
 -----------------------Add or update service Item-------------------------------------------
 CREATE PROCEDURE dbo.spAddUpdateServiceItem
