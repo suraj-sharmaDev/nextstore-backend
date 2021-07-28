@@ -297,6 +297,7 @@ BEGIN
 		For Json AUTO
 	)
  select @outputData=json from x;
+ SET @outputData = REPLACE(@outputData, '"data":null', '"data":[]');
  select @outputData;
  RETURN
 

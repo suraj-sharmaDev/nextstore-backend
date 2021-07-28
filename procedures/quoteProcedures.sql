@@ -80,7 +80,7 @@ BEGIN
 	  )json
 
 	-- store totalAmount to variable
-	SELECT @totalAmount = serviceInitialPayment from appConfig WHERE id = 1;
+	SELECT @totalAmount = InitialPaymentAmount from nxtServiceCategory WHERE CategoryId = @categoryId;
 
 	 -- Find all service providers nearby to send them the quotations
 	-- INSERT INTO #NearByServiceProviders

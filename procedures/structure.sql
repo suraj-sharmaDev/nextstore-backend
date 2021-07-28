@@ -77,7 +77,7 @@ CREATE TABLE [dbo].orderMaster (
 	shopId int NULL,
 	[status] nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS DEFAULT 'unpaid',
 	createdAt datetimeoffset NULL,
-	deliveryAddress NVARCHAR(250) NULL,
+	deliveryAddress NVARCHAR(3000) NULL,
 	CONSTRAINT PK__orderMas__3213E83F7DB14EFF PRIMARY KEY (id)
 );
 
@@ -91,7 +91,7 @@ CREATE TABLE [dbo].orderMaster (
 CREATE TABLE [dbo].orderDetail (
 	id int IDENTITY(1,1) NOT NULL,
 	productId int NULL,
-	productName nvarchar(100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	productName nvarchar(300) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	qty int NULL,
 	price int NULL,
 	orderMasterId int NULL,
