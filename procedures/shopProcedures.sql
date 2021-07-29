@@ -224,7 +224,8 @@ BEGIN
 			subCategoryChildId int,
 			stock int,
 			mrp int,
-			price int
+			price int,
+			extras nvarchar(1000)
 		);
 	
 	declare @query nvarchar(max) = N'
@@ -242,7 +243,8 @@ BEGIN
 		productMaster.subCategoryChildId,
 		product.stock,
 		product.mrp,
-		product.price
+		product.price,
+		product.extras
 		from productMaster
 		Inner join ' + @tableName +' as product on product.productMasterId = productMaster.id
 		where product.shopId = '+ cast(@shopId as varchar);
@@ -277,7 +279,8 @@ BEGIN
 				[bigImage6],
 				[stock],
 				mrp,
-				price
+				price,
+				extras
 				FROM #DistTemp where subCategoryChildId = scc.subCategoryChildId
 				FOR JSON AUTO, INCLUDE_NULL_VALUES
 		)
@@ -294,7 +297,7 @@ BEGIN
 			inner join category on category.id = subCategory.categoryId
 			where subCategoryChild.subCategoryId = @subCategoryId
 		) as scc
-		For Json AUTO
+		For Json PATH, INCLUDE_NULL_VALUES
 	)
  select @outputData=json from x;
  SET @outputData = REPLACE(@outputData, '"data":null', '"data":[]');
