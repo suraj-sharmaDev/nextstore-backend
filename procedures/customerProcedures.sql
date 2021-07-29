@@ -103,37 +103,85 @@ GO;
 --procedure to find or create a customer along with otp--
 
 CREATE PROCEDURE dbo.spLoginOrSignupCustomer
-@mobile nvarchar(20)
+@mobile nvarchar(20),
+@password nvarchar(30) = ''
 AS
 BEGIN
 	DECLARE @otp nvarchar(10);
 	DECLARE @customerId int;
+	DECLARE @storedPassword nvarchar(100);
+	DECLARE @password_hash NVARCHAR(500);
+
 	-- create and store otp in @otp
 	exec spGenerateOtp 4, @output = @otp out;
-	SELECT @customerId = id FROM customer WHERE mobile = @mobile;
+
+	SELECT @customerId = id, @storedPassword = password FROM customer WHERE mobile = @mobile;
+
 	IF (@customerId > 0)
-		BEGIN 
-			-- create a row for verifying the customer
-			INSERT INTO verification (customerId, otpCode ) values (@customerId, @otp);
-			-- Return customer Information
-			SELECT 
-			c.id, c.name, c.mobile, @otp as otp
-			from customer as c
-			where c.id = @customerId
+		BEGIN
+			IF (LEN(@password) > 0)
+			BEGIN
+				-- this login is for users who provide password
+				SET @password_hash = HASHBYTES('MD5', @password);
+
+				IF @storedPassword = @password_hash
+				BEGIN
+					-- passwords match
+					SELECT 
+					c.id, c.name, c.mobile, @otp as otp
+					from customer as c
+					where c.id = @customerId
+				END
+				ELSE 
+				BEGIN 
+					-- passwords dont match
+					select 'dont  match' as error;
+				END
+			END
+			ELSE
+			BEGIN
+				-- this is for otp based login
+				
+				-- create a row for verifying the customer
+				INSERT INTO verification (customerId, otpCode ) values (@customerId, @otp);
+				-- Return customer Information
+				SELECT 
+				c.id, c.name, c.mobile, @otp as otp
+				from customer as c
+				where c.id = @customerId
+			END
 		END
 	ELSE 
 		BEGIN 
-			-- create a new user with @mobile
-			INSERT INTO customer (mobile) values (@mobile);
-			-- Get the customerId of the inserted customer
-			SELECT @customerId = id FROM customer WHERE mobile = @mobile;
-			-- create a row for verifying the customer
-			INSERT INTO verification (customerId, otpCode ) values (@customerId, @otp);
-			-- Return customer Information
-			SELECT 
-			c.id, c.name, c.mobile, @otp as otp
-			from customer as c
-			where c.id = @customerId
+			-- password based sign up
+			IF (LEN(@password) > 0)
+			BEGIN
+				SET @password_hash = HASHBYTES('MD5', @password);
+				-- create a new user with @mobile
+				INSERT INTO customer (mobile, password) values (@mobile, @password_hash);
+				-- Get the customerId of the inserted customer
+				SELECT @customerId = id FROM customer WHERE mobile = @mobile and password = @password_hash;
+				-- Return customer Information
+				SELECT 
+				c.id, c.name, c.mobile, @otp as otp
+				from customer as c
+				where c.id = @customerId			
+			END
+			-- otp based sign up
+			ELSE 
+			BEGIN 
+				-- create a new user with @mobile
+				INSERT INTO customer (mobile) values (@mobile);
+				-- Get the customerId of the inserted customer
+				SELECT @customerId = id FROM customer WHERE mobile = @mobile;
+				-- create a row for verifying the customer
+				INSERT INTO verification (customerId, otpCode ) values (@customerId, @otp);
+				-- Return customer Information
+				SELECT 
+				c.id, c.name, c.mobile, @otp as otp
+				from customer as c
+				where c.id = @customerId
+			END
 		END
 END
 

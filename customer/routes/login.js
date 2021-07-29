@@ -31,20 +31,32 @@ router.post('/', async(req, res, next)=>{
 	try {
 		//check if mobile number is valid or not
 		let mobile = req.body.mobile;
+		let password = req.body.password || '';
 		if(mobile.length >= 10){
-			user = await sequelize.query('EXEC spLoginOrSignupCustomer :mobile',{
-				replacements: {
-					mobile: mobile
-				}
-			}).spread((value, created)=> {
-				return value[0];
-			});
-			// after getting result we have to send OTP to users mobile
-			//remaining
-			sendMessage({
-				mobile: user.mobile, 
-				message: `Your nxtStores OTP is : ${user.otp}. Please DO NOT share this with anyone!.`
-			});
+			if (password.length === 0) {
+				user = await sequelize.query('EXEC spLoginOrSignupCustomer :mobile',{
+					replacements: {
+						mobile: mobile
+					}
+				}).spread((value, created)=> {
+					return value[0];
+				});
+				// after getting result we have to send OTP to users mobile
+				//remaining
+				sendMessage({
+					mobile: user.mobile, 
+					message: `Your nxtStores OTP is : ${user.otp}. Please DO NOT share this with anyone!.`
+				});
+			} else {
+				user = await sequelize.query('EXEC spLoginOrSignupCustomer :mobile, :password',{
+					replacements: {
+						mobile: mobile,
+						password: password
+					}
+				}).spread((value, created)=> {
+					return value[0];
+				});				
+			}
 			res.send(user);
 		}else{
 			res.json({error: true, message: 'invalid_number'});
