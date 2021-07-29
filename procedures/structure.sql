@@ -95,6 +95,7 @@ CREATE TABLE [dbo].orderDetail (
 	qty int NULL,
 	price int NULL,
 	orderMasterId int NULL,
+	extraData nvarchar(3000),	
 	CONSTRAINT PK__orderDet__3213E83F4619239D PRIMARY KEY (id),
 	CONSTRAINT FK__orderDeta__order__15DA3E5D FOREIGN KEY (orderMasterId) REFERENCES [dbo].orderMaster(id)
 );

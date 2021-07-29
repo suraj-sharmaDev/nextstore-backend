@@ -42,7 +42,8 @@ BEGIN
 		productId INT '$.productId',
 		productName nvarchar(100) '$.productName',
 		price INT '$.price',
-		qty INT '$.qty'
+		qty INT '$.qty',
+		extraData nvarchar(3000) '$.extraData'
 	)json
 
 	-- store totalAmount to variable
