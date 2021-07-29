@@ -292,6 +292,7 @@ CREATE TABLE [dbo].product1 (
 	shopId int NULL,
 	productMasterId int NULL,
 	stock int DEFAULT 1,
+	extras nvarchar(1000) NULL,
 	CONSTRAINT PK__product__3213E83F16B61479 PRIMARY KEY (id),
 	CONSTRAINT FK__product__product__22401542 FOREIGN KEY (productMasterId) REFERENCES [dbo].productMaster(id),
 	CONSTRAINT FK__product__shopId__214BF109 FOREIGN KEY (shopId) REFERENCES [dbo].shop(id)

@@ -388,6 +388,7 @@ BEGIN
 	DECLARE @price INT = JSON_VALUE(@json, '$.price');
 	DECLARE @productMasterId INT = JSON_VALUE(@json, '$.productMasterId');
 	DECLARE @shopId INT = JSON_VALUE(@json, '$.shopId');
+	DECLARE @extras NVARCHAR(1000) = JSON_VALUE(@json, '$.extras');
 	DECLARE @query NVARCHAR(MAX);
 	DECLARE @paramDef nvarchar (500);
 	-- insert into productX table
@@ -414,11 +415,11 @@ BEGIN
 				and shopId = @shopId
 			)
 			BEGIN
-				INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
-				(@mrp, @price, @shopId, @productMasterId)
+				INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId, extras) values
+				(@mrp, @price, @shopId, @productMasterId, @extras)
 			END';
-		SET @paramDef = N'@mrp int, @price int, @shopId int, @productMasterId int';
-		EXEC sp_executeSql @query, @paramDef, @mrp, @price, @shopId, @productMasterId;
+		SET @paramDef = N'@mrp int, @price int, @shopId int, @productMasterId int, @extras NVARCHAR(1000)';
+		EXEC sp_executeSql @query, @paramDef, @mrp, @price, @shopId, @productMasterId, @extras;
 	END
 	ELSE
 	BEGIN
@@ -430,14 +431,15 @@ BEGIN
 				price int NULL,
 				shopId int NULL FOREIGN KEY REFERENCES shop(id),
 				productMasterId int NULL FOREIGN KEY REFERENCES productMaster(id),
-				stock int DEFAULT 1
+				stock int DEFAULT 1,
+				extras nvarchar(1000) NULL,
 			);
 			
-			INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId) values
-			(@mrp, @price, @shopId, @productMasterId);
+			INSERT INTO '+ @tableName +' (mrp, price, shopId, productMasterId, extras) values
+			(@mrp, @price, @shopId, @productMasterId, @extras);
 		';
-		SET @paramDef = N'@mrp int, @price int, @shopId int, @productMasterId int';
-		EXEC sp_executesql @query, @paramDef, @mrp, @price, @shopId, @productMasterId;
+		SET @paramDef = N'@mrp int, @price int, @shopId int, @productMasterId int, @extras NVARCHAR(1000)';
+		EXEC sp_executesql @query, @paramDef, @mrp, @price, @shopId, @productMasterId, @extras;
 	END
 END 
 
@@ -475,7 +477,8 @@ BEGIN
 			mrp int,
 			price int,
 			productMasterId int,
-			stock int
+			stock int,
+			extras nvarchar(1000)
 		);
 	
 	SET @query = N'
@@ -492,7 +495,10 @@ BEGIN
 			ELSE '+@tableName+'.productMasterId END,
 		'+@tableName+'.stock =
 			CASE WHEN (#Product.stock IS NOT NULL) THEN #Product.stock
-			ELSE '+@tableName+'.stock END
+			ELSE '+@tableName+'.stock END,
+		'+@tableName+'.extras = 
+			CASE WHEN (#Product.extras IS NOT NULL) THEN #Product.extras
+			ELSE '+@tableName+'.extras END		
 		FROM '+@tableName+', #Product 
 		WHERE #Product.id = '+@tableName+'.id';
 	
