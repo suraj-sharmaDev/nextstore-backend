@@ -406,6 +406,28 @@
     #merchantId here is emailId which is string
     e.g)https://nxtshops.com/adminApi/service/1?onlineStatus=1&providerName=Motor House
 
+19. Add symptoms to repair item
+   https://nxtshops.com/merchantApi/service/symptom/${CategoryItemId}
+
+   where CategoryItemId is the id of service item
+
+   POST : JSON
+    ```javascript
+    ["symptom 1", "symptom 2", "symptom 3"]
+    ```
+
+20. Update symtoms
+   https://nxtshops.com/merchantApi/service/symptom/${symptomId}
+
+   where symptomId is the id of symptom item
+
+   PUT : JSON
+    ```javascript
+    {
+       "symptomData": "new data"
+    }
+    ```
+
 ## Product Master
 
 1. Create product in productMaster

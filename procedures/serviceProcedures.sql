@@ -735,10 +735,11 @@ END
 -----------------Add service symptoms------------------------------------------
 CREATE PROCEDURE dbo.spAddSymtomsToServiceRepairs
 @json NVARCHAR(MAX),
-@CategoryItemId int = NULL
+@CategoryItemId int
 AS
 BEGIN
-	IF @CategoryItemId IS NULL
+	DECLARE @arrayCheck NVARCHAR(100) = JSON_VALUE(@json, '$[0]');
+	IF @CategoryItemId IS NULL OR @arrayCheck is NULL
 	BEGIN
 		select 'pass valid data' as message;			
 	END
@@ -754,5 +755,24 @@ BEGIN
 		)json
 		
 		select 'added symptoms' as message;	
+	END
+END
+
+--------------------------------------------------------------------------------
+----------------------Update service symptom------------------------------------
+CREATE PROCEDURE dbo.spUpdateSymptomsTable
+@symptomData NVARCHAR(300),
+@symptomId int
+AS
+BEGIN
+	IF @symptomId IS NULL OR LEN(@symptomData) = 0
+	BEGIN
+		select 'pass valid data' as message;			
+	END
+	ELSE
+	BEGIN
+		UPDATE nxtServiceItemSymptoms set symptom = @symptomData
+		where id = @symptomId;
+		select 'updated symptom' as message;	
 	END
 END

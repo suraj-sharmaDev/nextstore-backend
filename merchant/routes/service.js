@@ -48,6 +48,27 @@ router.post('/symptom/:CategoryItemId', async(req, res, next)=>{
 	}
 });
 
+router.put('/symptom/:symptomId', async(req, res, next)=>{
+    //add new serviceProvider for a merchant
+	try {
+		const serviceProviderId = await sequelize.query(
+			'exec spUpdateSymptomsTable :symptomData, :symptomId', 
+			{ 
+				replacements: { 
+					symptomData: JSON.stringify(req.body?.symptomData),
+					symptomId: req.params.symptomId
+				}
+		    }).spread((value, created)=>{
+                return value[0];
+            });
+            // res.send(serviceProviderId);
+		res.send({error: false, ...serviceProviderId});
+	} catch(e) {
+		res.send({error : true});
+		console.log(e);
+	}
+});
+
 router.put('/:serviceProviderId', async(req, res, next)=>{
 	//update service Provider details
 	try {
