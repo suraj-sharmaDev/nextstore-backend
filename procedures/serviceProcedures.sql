@@ -730,3 +730,29 @@ BEGIN
 
 	SELECT @message as message;
 END
+
+-------------------------------------------------------------------------------
+-----------------Add service symptoms------------------------------------------
+CREATE PROCEDURE dbo.spAddSymtomsToServiceRepairs
+@json NVARCHAR(MAX),
+@CategoryItemId int = NULL
+AS
+BEGIN
+	IF @CategoryItemId IS NULL
+	BEGIN
+		select 'pass valid data' as message;			
+	END
+	ELSE
+	BEGIN
+		INSERT into nxtServiceItemSymptoms (CategoryItemId, symptom)
+		select
+		@CategoryItemId as CategoryItemId,
+		json.symptom as symptom
+		from openjson(@json, '$')
+		with(
+			symptom nvarchar(100) '$'
+		)json
+		
+		select 'added symptoms' as message;	
+	END
+END

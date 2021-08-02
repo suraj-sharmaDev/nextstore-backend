@@ -34,8 +34,8 @@ BEGIN
 	--then bulk insert into orderDetail with the orderMasterId
 	SET @orderMasterId = SCOPE_IDENTITY();
 
-	INSERT into orderDetail (productId, productName, price, qty, orderMasterId)
-	select json.productId, json.productName, json.price, json.qty, 
+	INSERT into orderDetail (productId, productName, price, qty, extraData, orderMasterId)
+	select json.productId, json.productName, json.price, json.qty, json.extraData,
 	@orderMasterId as orderMasterId
 	from openjson(@json, '$.detail')
 	with(
@@ -43,7 +43,7 @@ BEGIN
 		productName nvarchar(100) '$.productName',
 		price INT '$.price',
 		qty INT '$.qty',
-		extraData nvarchar(3000) '$.extraData'
+		extraData nvarchar(MAX) '$.extraData' AS JSON
 	)json
 
 	-- store totalAmount to variable
@@ -97,7 +97,6 @@ BEGIN
 	@totalAmount as totalAmount;
 
 END
-
 
 
 GO;
