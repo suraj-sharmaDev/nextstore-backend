@@ -55,7 +55,7 @@ router.put('/symptom/:symptomId', async(req, res, next)=>{
 			'exec spUpdateSymptomsTable :symptomData, :symptomId', 
 			{ 
 				replacements: { 
-					symptomData: JSON.stringify(req.body.symptomData),
+					symptomData: req.body.symptomData,
 					symptomId: req.params.symptomId
 				}
 		    }).spread((value, created)=>{
