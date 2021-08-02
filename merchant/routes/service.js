@@ -51,18 +51,21 @@ router.post('/symptom/:CategoryItemId', async(req, res, next)=>{
 router.put('/symptom/:symptomId', async(req, res, next)=>{
     //add new serviceProvider for a merchant
 	try {
-		const serviceProviderId = await sequelize.query(
-			'exec spUpdateSymptomsTable :symptomData, :symptomId', 
-			{ 
-				replacements: { 
-					symptomData: req.body.symptomData,
-					symptomId: req.params.symptomId
-				}
-		    }).spread((value, created)=>{
-                return value[0];
-            });
-            // res.send(serviceProviderId);
-		res.send({error: false, ...serviceProviderId});
+		if (req.body.symptomData) {
+			const serviceProviderId = await sequelize.query(
+				'exec spUpdateSymptomsTable :symptomData, :symptomId', 
+				{ 
+					replacements: { 
+						symptomData: req.body.symptomData,
+						symptomId: req.params.symptomId
+					}
+				}).spread((value, created)=>{
+					return value[0];
+				});
+			res.send({error: false, ...serviceProviderId});
+		} else {
+			res.send({error: true, message: 'please pass symptom data'});
+		}
 	} catch(e) {
 		res.send({error : true});
 		console.log(e);
